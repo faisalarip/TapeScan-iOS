@@ -347,6 +347,87 @@ public enum ExportError: Error, Equatable { case notPro(quotaExhausted: Bool), g
 - Brand-name field, HUD style picker: wrapped in `#if DEBUG`.
 - All existing `-ui*` launch args stay DEBUG-only; M9's UITests use them.
 
+## Competitive additions (v1 scope amendments, 2026-06-10)
+
+Adopted from `2026-06-10-competitive-benchmark.md`. These amend the contracts
+above; milestone plans are patched accordingly.
+
+**Fractional imperial (M2):** `UnitFormat` gains
+`static func lengthFractional(_ meters: Double, unit: MeasureUnit) -> String`
+returning ft′ in″ to nearest 1/16″ when `unit == .imperial` (e.g. `12′ 3 5/8″`);
+existing decimal formatting remains for areas/volumes with sane auto-scaling
+(never mm² for room areas). All measure readouts use the fractional form for
+imperial lengths.
+
+**Undo/redo (M2 protocol, M4 impl):** `ARMeasureService` gains
+`func redo()`, `var canUndo: Bool { get }`, `var canRedo: Bool { get }`.
+Undo/redo operate on the placed-point stack.
+
+**Session autosave (M2):**
+
+```swift
+// Sources/Persistence/SessionDraftStore.swift
+public struct MeasureSessionDraft: Codable, Equatable {
+    public var mode: MeasureMode
+    public var points: [WorldPoint]
+    public var savedAt: Date
+}
+public enum SessionDraftStore {           // JSON file in Application Support
+    public static func save(_ draft: MeasureSessionDraft)
+    public static func load() -> MeasureSessionDraft?
+    public static func clear()
+}
+```
+
+Measure flow saves the draft after every point change (cheap, synchronous);
+`finish()`/explicit discard clears it; on next Measure-tab open with a draft
+< 24 h old, offer "Resume previous session". Room scans persist their
+`RoomRecord` immediately on RoomPlan completion (no user save step between
+processing and persistence).
+
+**Quantities (M2 types, M5/M6 consumers):** `FloorPlanModel` gains
+`public var wallHeightMeters: Double` (from RoomPlan walls; default 2.4) and
+a computed `quantities: Quantities`:
+
+```swift
+public struct Quantities: Codable, Equatable {
+    public var perimeterMeters: Double
+    public var floorAreaSquareMeters: Double
+    public var wallAreaSquareMeters: Double   // walls × height − opening areas
+    public var volumeCubicMeters: Double      // floor area × wall height
+}
+```
+
+Shown on the floor-plan screen and printed on PDF/CSV exports. Window opening
+area uses width × 1.2 m standard height; doors width × 2.0 m.
+
+**New export formats (M6):** `ExportFormat` gains `.dxf` and `.csv`.
+`DXFExporter.dxf(for: FloorPlanModel) -> String` emits DXF R12 ASCII:
+`LWPOLYLINE`-equivalent `POLYLINE`/`VERTEX` entities on layers `WALLS`,
+`OPENINGS`, `ROOMS`, plus `TEXT` dimension labels (mm units).
+`CSVExporter.csv(for: FloorPlanModel) -> String` lists rooms with quantities
+plus a measurements section. Unit tests against `FloorPlanModel.sample`.
+
+**Confidence & accuracy honesty (M4):** Measure HUD shows a tri-state
+confidence badge derived from `tracking` + `lidarAvailable`; pre-capture
+warning chip when `tracking != .normal`. Published spec copy (used in
+onboarding calibrate screen + App Store description): "±1–2 cm typical at
+room scale on LiDAR · ±2–5 cm in visual mode · accuracy degrades in low
+light." `placePoint()` rejects raycasts beyond 15 m or with degenerate
+results (never emit nonsense numbers).
+
+**Plan editor (new M10, plan written after M5):** 2D parametric editing of
+`FloorPlanModel` only — drag wall endpoints/corners (with shared-corner
+welding), type exact wall lengths, add/remove/move openings, rename rooms.
+Editing view model keeps an undo stack of model snapshots; saving bumps
+`RoomRecord.updatedAt` (sync picks it up). No freeform drawing.
+
+**Monetization guardrails (M3/M5/M6 copy + logic):** export-quota state shown
+on the scan start screen ("3 free exports left"); no paywall presentation
+before a first successful measurement; saved content always re-openable
+regardless of entitlement; trial screen shows exact post-trial price; rating
+prompt (`SKStoreReviewController`) only after 2nd successful export.
+
 ## Commit conventions
 
 Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `docs:`), one commit
