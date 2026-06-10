@@ -1,0 +1,332 @@
+// PaywallView.swift — RevenueCat-style PRO paywall.
+// Ported 1:1 from onboarding.jsx `Paywall` + the verified HTML reference.
+//
+// Structure:
+//   • hero band (accent gradient) with close, PRO badge, headline, "used all 3 free exports"
+//   • perks list (check rows)
+//   • selectable plans (Monthly / Annual SAVE 58% / Lifetime) — radio group
+//   • CTA bound to the selected plan ("Start Free 7-day Trial" / "Unlock Lifetime · $59.99")
+//   • per-plan billing disclosure (Guideline 3.1.2) + Restore / Terms / Privacy links
+//
+// Purchasing goes through ``PurchaseService`` (a RevenueCat-style stub) — no SDK,
+// no keys. The UI never names a concrete vendor.
+
+import SwiftUI
+
+/// Why the paywall was presented. Drives the (truthful) hero sub-headline so the
+/// store copy never claims "you've used all your exports" when the user still has
+/// quota — a proactive upsell shows an honest "go unlimited" line instead.
+public enum PaywallContext: Sendable {
+    /// Opened because the free export quota was exhausted (Export flow at 0 left).
+    /// Renders the canonical 1:1 source string verbatim.
+    case quotaExhausted
+    /// Opened proactively (Settings upsell / mid-quota) with `freeExportsLeft` left.
+    case proactive(freeExportsLeft: Int)
+}
+
+public struct PaywallView: View {
+    @Environment(\.theme) private var theme
+    @Environment(AppState.self) private var appState
+    @Environment(\.openURL) private var openURL
+
+    /// Injected purchasing seam. Defaults to the in-memory stub.
+    private let service: PurchaseService
+    /// Why the sheet was opened — selects a non-false hero sub-headline.
+    private let context: PaywallContext
+    /// Dismiss handler (close button + successful purchase).
+    private let onClose: () -> Void
+
+    @State private var selectionID: String
+    @State private var isWorking = false
+
+    /// - Parameters:
+    ///   - service: purchasing seam. Defaults to ``StubPurchaseService``.
+    ///   - context: presentation reason. Defaults to ``PaywallContext/quotaExhausted``
+    ///     so the canonical hero copy is preserved unless a caller opts into a
+    ///     proactive (mid-quota) presentation.
+    ///   - onClose: called on close tap or completed purchase/restore.
+    public init(service: PurchaseService = StubPurchaseService(),
+                context: PaywallContext = .quotaExhausted,
+                onClose: @escaping () -> Void = {}) {
+        self.service = service
+        self.context = context
+        self.onClose = onClose
+        _selectionID = State(initialValue: service.defaultSelectionID)
+    }
+
+    /// Hero sub-headline. Quota-exhausted keeps the source string 1:1; a proactive
+    /// open shows an honest, non-false alternative.
+    private var subheadline: String {
+        switch context {
+        case .quotaExhausted:
+            return "You've used all 3 free exports."
+        case .proactive(let left) where left <= 0:
+            // Defensive: a "proactive" open with no quota is really exhausted.
+            return "You've used all 3 free exports."
+        case .proactive(let left):
+            let noun = left == 1 ? "export" : "exports"
+            return "Go unlimited with Pro — \(left) of 3 free \(noun) left."
+        }
+    }
+
+    // MARK: - Derived
+
+    private var selectedPlan: SubscriptionPlan {
+        service.plans.first { $0.id == selectionID } ?? service.plans[0]
+    }
+
+    private static let perks: [(icon: String, label: String)] = [
+        ("cube3d", "glTF 3D model export"),
+        ("download", "Unlimited exports — no quota"),
+        ("room", "Unlimited saved rooms & history"),
+        ("ruler2", "High-precision LiDAR mode"),
+        ("layers", "Watermark-free floor plans"),
+    ]
+
+    public var body: some View {
+        ZStack {
+            Theme.screenBG.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                hero
+                perksList
+                    .padding(.horizontal, 22)
+                    .padding(.top, 6)
+                plansList
+                    .padding(.horizontal, 22)
+                    .padding(.top, 18)
+                Spacer(minLength: 14)
+                footer
+            }
+        }
+    }
+
+    // MARK: - Hero band
+
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Spacer()
+                Button(action: onClose) {
+                    Icon("close", size: 16, weight: 2.2, color: Theme.ink2)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(Color.white.opacity(0.1)))
+                }
+                .buttonStyle(.plain)
+                .frame(width: 44, height: 44, alignment: .trailing)
+                .accessibilityLabel("Close")
+            }
+
+            // PRO badge
+            HStack(spacing: 7) {
+                Icon("cube3d", size: 14, weight: 2, color: .white)
+                Text("PRO")
+            }
+            .font(Theme.mono(11, weight: .bold))
+            .tracking(1)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .background(Capsule().fill(theme.accent.withA(0.92)))
+            .padding(.top, 6)
+
+            Text("Unlock the full toolkit")
+                .font(Theme.sans(28, weight: .bold))
+                .tracking(-0.6)
+                .lineSpacing(2)
+                .foregroundStyle(Theme.ink)
+                .padding(.top, 14)
+            Text(subheadline)
+                .font(Theme.sans(14.5))
+                .foregroundStyle(Theme.ink2)
+                .padding(.top, 6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 22)
+        .padding(.top, 54)
+        .padding(.bottom, 18)
+        .background(
+            LinearGradient(
+                colors: [theme.accent.withA(0.4), .clear],
+                startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
+    }
+
+    // MARK: - Perks
+
+    private var perksList: some View {
+        VStack(alignment: .leading, spacing: 11) {
+            ForEach(Self.perks, id: \.label) { perk in
+                HStack(spacing: 12) {
+                    Icon("check", size: 15, weight: 2.6, color: theme.accent)
+                        .frame(width: 26, height: 26)
+                        .background(
+                            RoundedRectangle(cornerRadius: theme.r(8), style: .continuous)
+                                .fill(theme.accent.withA(0.18)))
+                    Text(perk.label)
+                        .font(Theme.sans(14.5))
+                        .foregroundStyle(Theme.ink)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Plans (radio group)
+
+    private var plansList: some View {
+        VStack(spacing: 9) {
+            ForEach(service.plans) { plan in
+                planRow(plan)
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Choose a plan")
+    }
+
+    private func planRow(_ plan: SubscriptionPlan) -> some View {
+        let on = plan.id == selectionID
+        return Button {
+            selectionID = plan.id
+        } label: {
+            HStack(spacing: 13) {
+                // radio dot
+                ZStack {
+                    Circle()
+                        .strokeBorder(on ? theme.accent : Color.white.opacity(0.3), lineWidth: 2)
+                        .frame(width: 20, height: 20)
+                    if on {
+                        Circle().fill(theme.accent).frame(width: 10, height: 10)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 8) {
+                        Text(plan.id)
+                            .font(Theme.sans(15.5, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                        if let tag = plan.tag {
+                            Text(tag)
+                                .font(Theme.mono(9.5, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .fill(Theme.iosGreen))
+                        }
+                    }
+                    Text(plan.subtitle)
+                        .font(Theme.sans(12))
+                        .foregroundStyle(Theme.ink3)
+                }
+
+                Spacer(minLength: 8)
+
+                // Price column: optional struck-through anchor above the price so
+                // the savings tag ("SAVE 58%") is substantiated (e.g. ~~$59.88~~).
+                VStack(alignment: .trailing, spacing: 1) {
+                    if let was = plan.compareAt {
+                        Text(was)
+                            .font(Theme.sans(11.5, weight: .medium))
+                            .foregroundStyle(Theme.ink3)
+                            .strikethrough(true, color: Theme.ink3)
+                            .accessibilityHidden(true)
+                    }
+                    Text(plan.price)
+                        .font(Theme.sans(16, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
+            }
+            .padding(.horizontal, 15)
+            .padding(.vertical, 13)
+            .frame(minHeight: 44)
+            .background(
+                RoundedRectangle(cornerRadius: theme.r(15), style: .continuous)
+                    .fill(on ? theme.accent.withA(0.14) : Color.white.opacity(0.04)))
+            .overlay(
+                RoundedRectangle(cornerRadius: theme.r(15), style: .continuous)
+                    .strokeBorder(on ? theme.accent : Color.white.opacity(0.1),
+                                  lineWidth: on ? 1.5 : 1))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(on ? [.isSelected, .isButton] : .isButton)
+        .accessibilityLabel("\(plan.id), \(plan.price)"
+            + (plan.compareAt.map { ", was \($0)" } ?? "")
+            + (plan.tag.map { ", \($0)" } ?? ""))
+    }
+
+    // MARK: - Footer (CTA + disclosure + legal links)
+
+    private var footer: some View {
+        VStack(spacing: 10) {
+            PrimaryButton(title: selectedPlan.ctaLabel) {
+                Task { await commitPurchase() }
+            }
+            .accessibilityLabel(selectedPlan.ctaLabel)
+            .disabled(isWorking)
+            .opacity(isWorking ? 0.6 : 1)
+
+            // Required App Store billing disclosure (Guideline 3.1.2).
+            Text(selectedPlan.disclosure)
+                .font(Theme.sans(10.5))
+                .lineSpacing(1.5)
+                .foregroundStyle(Theme.ink3)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 6)
+
+            HStack(spacing: 14) {
+                legalLink("Restore") { Task { await commitRestore() } }
+                // Functional links to the EULA / privacy policy (Guideline 3.1.2).
+                // URLs are configurable in one place (``LegalLinks``) for reskins.
+                legalLink("Terms") { openURL(LegalLinks.terms) }
+                legalLink("Privacy") { openURL(LegalLinks.privacy) }
+            }
+        }
+        .padding(.horizontal, 22)
+        .padding(.top, 14)
+        .padding(.bottom, 34)
+    }
+
+    private func legalLink(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(Theme.sans(12.5, weight: .medium))
+                .foregroundStyle(Theme.ink3)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 12)
+                .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+    }
+
+    // MARK: - Actions
+
+    private func commitPurchase() async {
+        guard !isWorking else { return }
+        isWorking = true
+        let result = await service.purchase(selectedPlan)
+        isWorking = false
+        if case .success = result {
+            appState.grantPro()   // unlock the Pro entitlement so export is no longer gated
+            onClose()
+        }
+    }
+
+    private func commitRestore() async {
+        guard !isWorking else { return }
+        isWorking = true
+        let result = await service.restore()
+        isWorking = false
+        if case .success = result {
+            appState.grantPro()   // restored purchase re-grants the Pro entitlement
+            onClose()
+        }
+    }
+}
+
+#Preview {
+    PaywallView()
+        .environment(AppState())
+        .environment(\.theme, Theme(accent: AccentOption.blue.color))
+}

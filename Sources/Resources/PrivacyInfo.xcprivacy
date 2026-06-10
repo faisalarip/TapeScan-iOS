@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The app does not track users (no cross-app/-site tracking, no IDFA). -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<!-- No data is collected by the app itself. Update this array if a real
+	     account/sync backend ships (e.g. email under "Contact Info"). -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<!-- Required-reason API declarations. Currently empty: the app uses no
+	     required-reason APIs. If you persist settings via UserDefaults, add the
+	     NSPrivacyAccessedAPICategoryUserDefaults entry with reason "CA92.1". -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.build/
+
+# Secrets — never commit real keys
+*.secrets.xcconfig
+Secrets.swift

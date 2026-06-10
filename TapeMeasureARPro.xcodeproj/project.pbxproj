@@ -1,0 +1,569 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		039F714E23A8E645B4D3DB78 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */; };
+		03A8FAF40E4847D39AB5F11D /* IOSControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67FB94D7256A0FDE78036E47 /* IOSControls.swift */; };
+		0BC91503E47934CD89004D9F /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E5D402CBACEDB5272CF415 /* ExportView.swift */; };
+		0CE60BBD46E1426E312CB009 /* OnbCalibrateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6040C95B6A2583E5DBB4206B /* OnbCalibrateView.swift */; };
+		0E105A761FC811363AACADAA /* OnbPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */; };
+		14B736D8B3A8A16A2815299E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9383F93E0991D93B5872C43B /* SettingsView.swift */; };
+		1E5A7961B1A8012398880235 /* MeasureAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */; };
+		24EC81A8D7E8B3769ACDBB98 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8A69608238A83D96D8E9B5 /* CreateAccountView.swift */; };
+		3B8E2F40ED209B657CE5F1E2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2522359FDE1BAD3E5D96DF4 /* RootView.swift */; };
+		3DA1401F282592F5866BBB51 /* MeasureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F0F62E8A1598538A27FA0D /* MeasureView.swift */; };
+		41C5790E5E5ACBC9E6AE8BAB /* MeasureBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */; };
+		43E7763DA81370934DE8102C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3968C15BB6FAA92E39C59E51 /* Assets.xcassets */; };
+		468A4843B130D5D0180B58CB /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FAF7B6E03F5CD60157E24D /* OnboardingFlowView.swift */; };
+		46B4EC518CE7A8052CB81F62 /* RoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B369180E9061586B748293 /* RoomsView.swift */; };
+		49DFC3FF7FA9EE9513CD5438 /* Shutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77950248AF8E8925748BFEAC /* Shutter.swift */; };
+		4CD991A4F64BE185795AF5C2 /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */; };
+		51F2A77388CD8D92904FDA3E /* OnbWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */; };
+		570231FBD9E2160C6139D87A /* AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4445267E139B05347C7E4A6A /* AuthFlowView.swift */; };
+		5B240D26BFC38F8752E76E5C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C7A01A4C164B6B13709437 /* Theme.swift */; };
+		5D12A436BF00EB782A8D1373 /* FloorPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2E9DB5F611E5C25596519F /* FloorPlan.swift */; };
+		626D170F0B75CAB30B998C2D /* MeasureScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622523F0B707C36A93521FA0 /* MeasureScene.swift */; };
+		68FAD6DAE5162A6660F642CB /* UnitFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */; };
+		796BBED324A12ABC8C39C82D /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63E32F053E2D0D2929E8319F /* HistoryView.swift */; };
+		92E4A5EEE68A57BA667A3890 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1D8EAB15807296E75631F /* AppState.swift */; };
+		A58B07EA3C6B258ECAC8309A /* MeasureControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */; };
+		B508102055E47686CE038B03 /* MeasureCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A506848E51054BBE6D3F89 /* MeasureCView.swift */; };
+		B5097B55C99F592EFAEBA51B /* Reticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02308EBCC17F244732D61EC5 /* Reticle.swift */; };
+		B5C53244B58478DF5C62E716 /* ARMeasureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8119FF31F81C5BACBD109115 /* ARMeasureService.swift */; };
+		BAB46E267314114FFCAE8A80 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850CB15986A4D93B73F780D /* Icon.swift */; };
+		BADF52D2C560731A68CCC5C6 /* CameraBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = C354D269884E484AB77F6F78 /* CameraBackdrop.swift */; };
+		BC584BF9E2A4EF33B3A2EAE1 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */; };
+		C245A0A21F78DD4B9C50720D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */; };
+		C480737E56FFB0567E7602F5 /* GroupedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A44956BDB1D755CA082147 /* GroupedList.swift */; };
+		C5F6F71B30A99D70254D1450 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */; };
+		D27928111747D07684CFD624 /* ValuePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */; };
+		D9B2DAFA0C1C961DE14C12B1 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F1882FED0A1E47F2DE1891 /* SignInView.swift */; };
+		DDC3DCF13EAD3D7FAB7586B4 /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */; };
+		DE28B27C2A709B8DBC589520 /* TapeMeasureARProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */; };
+		E0E5FD265385153A545A5933 /* RoomScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7952A6746C94C008AE553685 /* RoomScanView.swift */; };
+		EA4253D64818E89518F181E4 /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F78D476098320E1D9357A55 /* PurchaseService.swift */; };
+		EC134627BED506B0606ACDBA /* FeaturePoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */; };
+		FC37BE5D72BE8B1539A63A84 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02308EBCC17F244732D61EC5 /* Reticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reticle.swift; sourceTree = "<group>"; };
+		0B2E9DB5F611E5C25596519F /* FloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlan.swift; sourceTree = "<group>"; };
+		13A1D8EAB15807296E75631F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
+		3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
+		37B369180E9061586B748293 /* RoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsView.swift; sourceTree = "<group>"; };
+		3968C15BB6FAA92E39C59E51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitFormatters.swift; sourceTree = "<group>"; };
+		4280D7ABC74C9C8768A1A4AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4445267E139B05347C7E4A6A /* AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowView.swift; sourceTree = "<group>"; };
+		4F78D476098320E1D9357A55 /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
+		50F0F62E8A1598538A27FA0D /* MeasureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureView.swift; sourceTree = "<group>"; };
+		54C7A01A4C164B6B13709437 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		6040C95B6A2583E5DBB4206B /* OnbCalibrateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbCalibrateView.swift; sourceTree = "<group>"; };
+		622523F0B707C36A93521FA0 /* MeasureScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureScene.swift; sourceTree = "<group>"; };
+		63E32F053E2D0D2929E8319F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		63FAF7B6E03F5CD60157E24D /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
+		67FB94D7256A0FDE78036E47 /* IOSControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSControls.swift; sourceTree = "<group>"; };
+		6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureControls.swift; sourceTree = "<group>"; };
+		77950248AF8E8925748BFEAC /* Shutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shutter.swift; sourceTree = "<group>"; };
+		7952A6746C94C008AE553685 /* RoomScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanView.swift; sourceTree = "<group>"; };
+		8119FF31F81C5BACBD109115 /* ARMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMeasureService.swift; sourceTree = "<group>"; };
+		81B48D6221A64A1D0E72D9A0 /* TapeMeasureARPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TapeMeasureARPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapeMeasureARProApp.swift; sourceTree = "<group>"; };
+		8850CB15986A4D93B73F780D /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
+		8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureBView.swift; sourceTree = "<group>"; };
+		A3F1882FED0A1E47F2DE1891 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		A9A506848E51054BBE6D3F89 /* MeasureCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureCView.swift; sourceTree = "<group>"; };
+		AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbPermissionView.swift; sourceTree = "<group>"; };
+		B2522359FDE1BAD3E5D96DF4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
+		C354D269884E484AB77F6F78 /* CameraBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBackdrop.swift; sourceTree = "<group>"; };
+		C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbWelcomeView.swift; sourceTree = "<group>"; };
+		D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePill.swift; sourceTree = "<group>"; };
+		DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		E2E5D402CBACEDB5272CF415 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturePoints.swift; sourceTree = "<group>"; };
+		F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		F8A44956BDB1D755CA082147 /* GroupedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedList.swift; sourceTree = "<group>"; };
+		FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		FF8A69608238A83D96D8E9B5 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1D0647487A4092898F5B6959 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */,
+				54C7A01A4C164B6B13709437 /* Theme.swift */,
+				3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		4B4ACD89149DC5A7649E25C3 /* Rooms */ = {
+			isa = PBXGroup;
+			children = (
+				E2E5D402CBACEDB5272CF415 /* ExportView.swift */,
+				FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */,
+				4F78D476098320E1D9357A55 /* PurchaseService.swift */,
+				7952A6746C94C008AE553685 /* RoomScanView.swift */,
+			);
+			path = Rooms;
+			sourceTree = "<group>";
+		};
+		55FF0D88EC78956CC7301A38 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3968C15BB6FAA92E39C59E51 /* Assets.xcassets */,
+				4280D7ABC74C9C8768A1A4AD /* Info.plist */,
+				8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7E327E836B205C873BF82DAC /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B8FED12127CAEFB04DD62C86 /* App */,
+				DDF5B33CB4746EEB52A74F82 /* Components */,
+				55FF0D88EC78956CC7301A38 /* Resources */,
+				D80ECC71E4C3E3E7540B5300 /* Screens */,
+				F055BEB6C9D618D7595C7400 /* Services */,
+				1D0647487A4092898F5B6959 /* Theme */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		88AC7ED62144FF19D97C72B3 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				6040C95B6A2583E5DBB4206B /* OnbCalibrateView.swift */,
+				63FAF7B6E03F5CD60157E24D /* OnboardingFlowView.swift */,
+				AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */,
+				C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		8A9EAD693376B621BF2D22AE /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				FF8A69608238A83D96D8E9B5 /* CreateAccountView.swift */,
+				A3F1882FED0A1E47F2DE1891 /* SignInView.swift */,
+				3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		9FA20C8FF9B34EF506163EF1 /* Measure */ = {
+			isa = PBXGroup;
+			children = (
+				17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */,
+				A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */,
+				6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */,
+				A9A506848E51054BBE6D3F89 /* MeasureCView.swift */,
+				622523F0B707C36A93521FA0 /* MeasureScene.swift */,
+				50F0F62E8A1598538A27FA0D /* MeasureView.swift */,
+			);
+			path = Measure;
+			sourceTree = "<group>";
+		};
+		B8FED12127CAEFB04DD62C86 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				13A1D8EAB15807296E75631F /* AppState.swift */,
+				4445267E139B05347C7E4A6A /* AuthFlowView.swift */,
+				F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */,
+				37B369180E9061586B748293 /* RoomsView.swift */,
+				B2522359FDE1BAD3E5D96DF4 /* RootView.swift */,
+				83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C5DC905A50168D5F2DA27108 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				81B48D6221A64A1D0E72D9A0 /* TapeMeasureARPro.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D80ECC71E4C3E3E7540B5300 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				8A9EAD693376B621BF2D22AE /* Auth */,
+				FFD80B74849A3C2DCD2553E8 /* Library */,
+				9FA20C8FF9B34EF506163EF1 /* Measure */,
+				88AC7ED62144FF19D97C72B3 /* Onboarding */,
+				4B4ACD89149DC5A7649E25C3 /* Rooms */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		DDF5B33CB4746EEB52A74F82 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				C354D269884E484AB77F6F78 /* CameraBackdrop.swift */,
+				BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */,
+				E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */,
+				0B2E9DB5F611E5C25596519F /* FloorPlan.swift */,
+				FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */,
+				8850CB15986A4D93B73F780D /* Icon.swift */,
+				67FB94D7256A0FDE78036E47 /* IOSControls.swift */,
+				02308EBCC17F244732D61EC5 /* Reticle.swift */,
+				77950248AF8E8925748BFEAC /* Shutter.swift */,
+				D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		F055BEB6C9D618D7595C7400 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8119FF31F81C5BACBD109115 /* ARMeasureService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		FF220E14C4D2EA0634A15469 = {
+			isa = PBXGroup;
+			children = (
+				7E327E836B205C873BF82DAC /* Sources */,
+				C5DC905A50168D5F2DA27108 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FFD80B74849A3C2DCD2553E8 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				F8A44956BDB1D755CA082147 /* GroupedList.swift */,
+				63E32F053E2D0D2929E8319F /* HistoryView.swift */,
+				9383F93E0991D93B5872C43B /* SettingsView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C86FE48FF1D98A9231D18196 /* TapeMeasureARPro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9CBA616F66FAB79C346D5D1 /* Build configuration list for PBXNativeTarget "TapeMeasureARPro" */;
+			buildPhases = (
+				8AED0670577356BAADD34F46 /* Sources */,
+				5FB814917418E4FEEFD41D86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TapeMeasureARPro;
+			packageProductDependencies = (
+			);
+			productName = TapeMeasureARPro;
+			productReference = 81B48D6221A64A1D0E72D9A0 /* TapeMeasureARPro.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3F122ADEC9B9E63256D6D0B3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 4B613ACA4F555E47FBD6E486 /* Build configuration list for PBXProject "TapeMeasureARPro" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FF220E14C4D2EA0634A15469;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C5DC905A50168D5F2DA27108 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C86FE48FF1D98A9231D18196 /* TapeMeasureARPro */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5FB814917418E4FEEFD41D86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43E7763DA81370934DE8102C /* Assets.xcassets in Resources */,
+				C245A0A21F78DD4B9C50720D /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8AED0670577356BAADD34F46 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5C53244B58478DF5C62E716 /* ARMeasureService.swift in Sources */,
+				92E4A5EEE68A57BA667A3890 /* AppState.swift in Sources */,
+				570231FBD9E2160C6139D87A /* AuthFlowView.swift in Sources */,
+				BADF52D2C560731A68CCC5C6 /* CameraBackdrop.swift in Sources */,
+				DDC3DCF13EAD3D7FAB7586B4 /* Chip.swift in Sources */,
+				039F714E23A8E645B4D3DB78 /* Color+Hex.swift in Sources */,
+				24EC81A8D7E8B3769ACDBB98 /* CreateAccountView.swift in Sources */,
+				0BC91503E47934CD89004D9F /* ExportView.swift in Sources */,
+				EC134627BED506B0606ACDBA /* FeaturePoints.swift in Sources */,
+				5D12A436BF00EB782A8D1373 /* FloorPlan.swift in Sources */,
+				FC37BE5D72BE8B1539A63A84 /* GlassCard.swift in Sources */,
+				C480737E56FFB0567E7602F5 /* GroupedList.swift in Sources */,
+				796BBED324A12ABC8C39C82D /* HistoryView.swift in Sources */,
+				03A8FAF40E4847D39AB5F11D /* IOSControls.swift in Sources */,
+				BAB46E267314114FFCAE8A80 /* Icon.swift in Sources */,
+				BC584BF9E2A4EF33B3A2EAE1 /* MainTabView.swift in Sources */,
+				1E5A7961B1A8012398880235 /* MeasureAView.swift in Sources */,
+				41C5790E5E5ACBC9E6AE8BAB /* MeasureBView.swift in Sources */,
+				B508102055E47686CE038B03 /* MeasureCView.swift in Sources */,
+				A58B07EA3C6B258ECAC8309A /* MeasureControls.swift in Sources */,
+				626D170F0B75CAB30B998C2D /* MeasureScene.swift in Sources */,
+				3DA1401F282592F5866BBB51 /* MeasureView.swift in Sources */,
+				0CE60BBD46E1426E312CB009 /* OnbCalibrateView.swift in Sources */,
+				0E105A761FC811363AACADAA /* OnbPermissionView.swift in Sources */,
+				51F2A77388CD8D92904FDA3E /* OnbWelcomeView.swift in Sources */,
+				468A4843B130D5D0180B58CB /* OnboardingFlowView.swift in Sources */,
+				C5F6F71B30A99D70254D1450 /* PaywallView.swift in Sources */,
+				EA4253D64818E89518F181E4 /* PurchaseService.swift in Sources */,
+				B5097B55C99F592EFAEBA51B /* Reticle.swift in Sources */,
+				E0E5FD265385153A545A5933 /* RoomScanView.swift in Sources */,
+				46B4EC518CE7A8052CB81F62 /* RoomsView.swift in Sources */,
+				3B8E2F40ED209B657CE5F1E2 /* RootView.swift in Sources */,
+				14B736D8B3A8A16A2815299E /* SettingsView.swift in Sources */,
+				49DFC3FF7FA9EE9513CD5438 /* Shutter.swift in Sources */,
+				D9B2DAFA0C1C961DE14C12B1 /* SignInView.swift in Sources */,
+				DE28B27C2A709B8DBC589520 /* TapeMeasureARProApp.swift in Sources */,
+				5B240D26BFC38F8752E76E5C /* Theme.swift in Sources */,
+				68FAD6DAE5162A6660F642CB /* UnitFormatters.swift in Sources */,
+				D27928111747D07684CFD624 /* ValuePill.swift in Sources */,
+				4CD991A4F64BE185795AF5C2 /* VerifyCodeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		471D5F3FC59E14BFABB39C36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VHRN5SF2P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapemeasure.ARPro;
+				PRODUCT_NAME = TapeMeasureARPro;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		6C5B7BEA063FE452547F0BE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_LANGUAGE = en;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AD0765D104288F68D4A49F69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VHRN5SF2P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapemeasure.ARPro;
+				PRODUCT_NAME = TapeMeasureARPro;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		F80A7D15C185E06E9FAF94AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_LANGUAGE = en;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4B613ACA4F555E47FBD6E486 /* Build configuration list for PBXProject "TapeMeasureARPro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C5B7BEA063FE452547F0BE9 /* Debug */,
+				F80A7D15C185E06E9FAF94AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B9CBA616F66FAB79C346D5D1 /* Build configuration list for PBXNativeTarget "TapeMeasureARPro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD0765D104288F68D4A49F69 /* Debug */,
+				471D5F3FC59E14BFABB39C36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3F122ADEC9B9E63256D6D0B3 /* Project object */;
+}
