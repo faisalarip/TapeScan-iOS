@@ -16,6 +16,15 @@ struct TapeMeasureARProApp: App {
                 .environment(appState)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(.dark)
+                .task {
+                    // isPro is DERIVED state: checked from StoreKit entitlements
+                    // at launch, then kept current by the transaction listener
+                    // (renewals, Ask-to-Buy approvals, refunds). Never stored.
+                    appState.isPro = await StoreKitPurchaseService.currentEntitlementIsPro()
+                    await StoreKitPurchaseService.listenForTransactionUpdates { isPro in
+                        appState.isPro = isPro
+                    }
+                }
         }
     }
 }

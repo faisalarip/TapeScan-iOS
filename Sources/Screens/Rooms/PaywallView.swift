@@ -29,8 +29,8 @@ public struct PaywallView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.openURL) private var openURL
 
-    /// Injected purchasing seam. Defaults to the in-memory stub.
-    private let service: PurchaseService
+    /// Injected purchasing seam (StoreKit 2 in production).
+    private let service: any PurchaseService
     /// Why the sheet was opened — selects a non-false hero sub-headline.
     private let context: PaywallContext
     /// Dismiss handler (close button + successful purchase).
@@ -39,19 +39,22 @@ public struct PaywallView: View {
     @State private var selectionID: String
     @State private var isWorking = false
 
-    /// - Parameters:
-    ///   - service: purchasing seam. Defaults to ``StubPurchaseService``.
-    ///   - context: presentation reason. Defaults to ``PaywallContext/quotaExhausted``
-    ///     so the canonical hero copy is preserved unless a caller opts into a
-    ///     proactive (mid-quota) presentation.
-    ///   - onClose: called on close tap or completed purchase/restore.
-    public init(service: PurchaseService = StubPurchaseService(),
+    public init(service: any PurchaseService,
                 context: PaywallContext = .quotaExhausted,
                 onClose: @escaping () -> Void = {}) {
         self.service = service
         self.context = context
         self.onClose = onClose
         _selectionID = State(initialValue: service.defaultSelectionID)
+    }
+
+    /// Production entry point: real StoreKit 2 purchasing.
+    @MainActor
+    public init(context: PaywallContext = .quotaExhausted,
+                onClose: @escaping () -> Void = {}) {
+        self.init(service: StoreKitPurchaseService(),
+                  context: context,
+                  onClose: onClose)
     }
 
     /// Hero sub-headline. Quota-exhausted keeps the source string 1:1; a proactive
@@ -71,12 +74,14 @@ public struct PaywallView: View {
 
     // MARK: - Derived
 
-    private var selectedPlan: SubscriptionPlan {
-        service.plans.first { $0.id == selectionID } ?? service.plans[0]
+    /// Nil while products are loading / failed — the footer CTA hides with it,
+    /// which also removes the historical `plans[0]` crash on empty fetches.
+    private var selectedPlan: SubscriptionPlan? {
+        service.plans.first { $0.id == selectionID } ?? service.plans.first
     }
 
     private static let perks: [(icon: String, label: String)] = [
-        ("cube3d", "glTF 3D model export"),
+        ("cube3d", "USDZ + glTF 3D model export"),
         ("download", "Unlimited exports — no quota"),
         ("room", "Unlimited saved rooms & history"),
         ("ruler2", "High-precision LiDAR mode"),
@@ -92,12 +97,16 @@ public struct PaywallView: View {
                 perksList
                     .padding(.horizontal, 22)
                     .padding(.top, 6)
-                plansList
+                plansArea
                     .padding(.horizontal, 22)
                     .padding(.top, 18)
                 Spacer(minLength: 14)
                 footer
             }
+        }
+        .task {
+            if service.plans.isEmpty { await service.loadProducts() }
+            if selectionID.isEmpty { selectionID = service.defaultSelectionID }
         }
     }
 
@@ -172,16 +181,49 @@ public struct PaywallView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    // MARK: - Plans (radio group)
+    // MARK: - Plans (radio group + load states)
 
-    private var plansList: some View {
-        VStack(spacing: 9) {
-            ForEach(service.plans) { plan in
-                planRow(plan)
+    @ViewBuilder
+    private var plansArea: some View {
+        switch service.loadState {
+        case .loading:
+            VStack(spacing: 10) {
+                ProgressView()
+                    .tint(theme.accent)
+                Text("Loading plans…")
+                    .font(Theme.sans(13))
+                    .foregroundStyle(Theme.ink3)
             }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 36)
+        case .failed(let message):
+            VStack(spacing: 12) {
+                Text(message)
+                    .font(Theme.sans(13.5))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Theme.ink2)
+                Button {
+                    Task { await service.loadProducts() }
+                } label: {
+                    Text("Try Again")
+                        .font(Theme.sans(14, weight: .semibold))
+                        .foregroundStyle(theme.accent)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Try loading plans again")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+        case .loaded:
+            VStack(spacing: 9) {
+                ForEach(service.plans) { plan in
+                    planRow(plan)
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Choose a plan")
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Choose a plan")
     }
 
     private func planRow(_ plan: SubscriptionPlan) -> some View {
@@ -202,7 +244,7 @@ public struct PaywallView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 8) {
-                        Text(plan.id)
+                        Text(plan.displayName)
                             .font(Theme.sans(15.5, weight: .semibold))
                             .foregroundStyle(Theme.ink)
                         if let tag = plan.tag {
@@ -250,7 +292,7 @@ public struct PaywallView: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(on ? [.isSelected, .isButton] : .isButton)
-        .accessibilityLabel("\(plan.id), \(plan.price)"
+        .accessibilityLabel("\(plan.displayName), \(plan.price)"
             + (plan.compareAt.map { ", was \($0)" } ?? "")
             + (plan.tag.map { ", \($0)" } ?? ""))
     }
@@ -259,25 +301,27 @@ public struct PaywallView: View {
 
     private var footer: some View {
         VStack(spacing: 10) {
-            PrimaryButton(title: selectedPlan.ctaLabel) {
-                Task { await commitPurchase() }
-            }
-            .accessibilityLabel(selectedPlan.ctaLabel)
-            .disabled(isWorking)
-            .opacity(isWorking ? 0.6 : 1)
+            if let plan = selectedPlan {
+                PrimaryButton(title: plan.ctaLabel) {
+                    Task { await commitPurchase(plan) }
+                }
+                .accessibilityLabel(plan.ctaLabel)
+                .disabled(isWorking)
+                .opacity(isWorking ? 0.6 : 1)
 
-            // Required App Store billing disclosure (Guideline 3.1.2).
-            Text(selectedPlan.disclosure)
-                .font(Theme.sans(10.5))
-                .lineSpacing(1.5)
-                .foregroundStyle(Theme.ink3)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 6)
+                // Required App Store billing disclosure (Guideline 3.1.2) —
+                // always names the exact post-trial price.
+                Text(plan.disclosure)
+                    .font(Theme.sans(10.5))
+                    .lineSpacing(1.5)
+                    .foregroundStyle(Theme.ink3)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 6)
+            }
 
             HStack(spacing: 14) {
                 legalLink("Restore") { Task { await commitRestore() } }
                 // Functional links to the EULA / privacy policy (Guideline 3.1.2).
-                // URLs are configurable in one place (``LegalLinks``) for reskins.
                 legalLink("Terms") { openURL(LegalLinks.terms) }
                 legalLink("Privacy") { openURL(LegalLinks.privacy) }
             }
@@ -302,14 +346,21 @@ public struct PaywallView: View {
 
     // MARK: - Actions
 
-    private func commitPurchase() async {
+    private func commitPurchase(_ plan: SubscriptionPlan) async {
         guard !isWorking else { return }
         isWorking = true
-        let result = await service.purchase(selectedPlan)
+        let result = await service.purchase(plan)
         isWorking = false
-        if case .success = result {
-            appState.isPro = true   // M3 replaces this with a StoreKit entitlement check
+        switch result {
+        case .success:
+            // The service returns .success only for a verified, finished
+            // transaction; the Transaction.updates listener keeps this in sync.
+            appState.isPro = true
             onClose()
+        case .cancelled:
+            break
+        case .failed(let message):
+            appState.presentAlert(title: "Purchase didn't complete", message: message)
         }
     }
 
@@ -318,15 +369,20 @@ public struct PaywallView: View {
         isWorking = true
         let result = await service.restore()
         isWorking = false
-        if case .success = result {
-            appState.isPro = true   // M3 replaces this with a StoreKit entitlement check
+        switch result {
+        case .success:
+            appState.isPro = true
             onClose()
+        case .cancelled:
+            break
+        case .failed(let message):
+            appState.presentAlert(title: "Restore didn't complete", message: message)
         }
     }
 }
 
 #Preview {
-    PaywallView()
+    PaywallView(service: SimulatedPurchaseService())
         .environment(AppState())
         .environment(\.theme, Theme(accent: AccentOption.blue.color))
 }
