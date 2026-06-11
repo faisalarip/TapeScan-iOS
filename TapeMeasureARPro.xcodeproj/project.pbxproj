@@ -27,6 +27,7 @@
 		650EB1DECF310366FF7974CB /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */; };
 		68783F56FDF5A4E09D1E63BC /* RoomScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7952A6746C94C008AE553685 /* RoomScanView.swift */; };
 		69D6689E4E6C89C9823ED6CA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */; };
+		7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */; };
 		94E8435400B188DDE786D3F6 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850CB15986A4D93B73F780D /* Icon.swift */; };
 		95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1D8EAB15807296E75631F /* AppState.swift */; };
 		9BFE95BAB6EDBCE4D0E5CB9B /* MeasureScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622523F0B707C36A93521FA0 /* MeasureScene.swift */; };
@@ -102,6 +103,7 @@
 		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureBView.swift; sourceTree = "<group>"; };
 		A3F1882FED0A1E47F2DE1891 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateBrandTests.swift; sourceTree = "<group>"; };
 		A9A506848E51054BBE6D3F89 /* MeasureCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureCView.swift; sourceTree = "<group>"; };
 		A9FB5B4D1601D87E6C8D53BB /* TapeScan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TapeScan.entitlements; sourceTree = "<group>"; };
 		AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbPermissionView.swift; sourceTree = "<group>"; };
@@ -274,6 +276,7 @@
 		E2B954474B3FFE87D77C3A36 /* TapeScanTests */ = {
 			isa = PBXGroup;
 			children = (
+				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
 				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
 			);
 			path = TapeScanTests;
@@ -462,6 +465,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
 				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

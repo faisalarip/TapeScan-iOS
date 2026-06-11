@@ -15,6 +15,7 @@ import SwiftUI
 /// Onboarding permission primer. `onContinue` advances the flow to the calibrate step.
 struct OnbPermissionView: View {
     @Environment(\.theme) private var theme
+    @Environment(AppState.self) private var appState
 
     var onContinue: () -> Void = {}
 
@@ -44,7 +45,7 @@ struct OnbPermissionView: View {
                 .foregroundStyle(Theme.ink)
                 .multilineTextAlignment(.center)
 
-            Text("TapeMeasure uses your camera to detect surfaces and place measurement points. LiDAR is used automatically when your device supports it.")
+            Text("\(appState.brand) uses your camera to detect surfaces and place measurement points. LiDAR is used automatically when your device supports it.")
                 .font(Theme.sans(15))
                 .lineSpacing(15 * 0.5)
                 .foregroundStyle(Theme.ink2)

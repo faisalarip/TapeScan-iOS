@@ -1,4 +1,4 @@
-// AppState.swift — TapeMeasure AR Pro
+// AppState.swift — TapeScan
 // Single source of truth for theme, feature flags and navigation.
 // Ported 1:1 from the design's live "tweaks" model (accent / density / unit / lidar).
 
@@ -109,8 +109,12 @@ public enum AppPhase: Sendable {
 public final class AppState {
 
     // MARK: - Branding
-    /// Product brand string. Constant for now, but kept on state so it is reskin-ready.
-    public var brand: String = "TapeMeasure"
+    /// Canonical product brand — the single source for every brand literal in
+    /// the app (wordmark, Pro card, onboarding eyebrow, BrandField fallback).
+    public static let defaultBrand = "TapeScan"
+    /// Product brand string. Defaults to ``defaultBrand``; mutable so the
+    /// DEBUG-only brand field in Settings can live-preview a reskin.
+    public var brand: String = AppState.defaultBrand
 
     // MARK: - Theme tweaks
     /// Selected accent option (drives `accent`, `accentSoft`, etc. in ``Theme``).

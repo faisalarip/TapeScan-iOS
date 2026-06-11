@@ -236,7 +236,7 @@ private struct BrandField: View {
     var body: some View {
         TextField("",
                   text: $brand,
-                  prompt: Text("TapeMeasure").foregroundColor(Theme.ink3))
+                  prompt: Text(AppState.defaultBrand).foregroundColor(Theme.ink3))
             .font(Theme.sans(14.5, weight: .medium))
             .foregroundStyle(Theme.ink)
             .tint(theme.accent)
@@ -262,7 +262,7 @@ private struct BrandField: View {
 
     /// Collapse all-whitespace input back to the default brand.
     private func normalize() {
-        if brand.trimmingCharacters(in: .whitespaces).isEmpty { brand = "TapeMeasure" }
+        if brand.trimmingCharacters(in: .whitespaces).isEmpty { brand = AppState.defaultBrand }
     }
 }
 
