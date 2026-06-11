@@ -1,46 +1,75 @@
-// RoomScanView.swift — guided room capture.
-// Ported 1:1 from support.jsx `RoomScan` + the verified HTML reference (LiDAR fallback).
+// RoomScanView.swift — guided room capture (RoomPlan on device, scripted in-sim).
 //
-// Layout (over the camera backdrop):
+// Layout (over the capture feed):
 //   • top status: "ROOM SCAN" chip + a "CAPTURING" chip (amber "· VISUAL" in fallback)
-//     and, in fallback, the visual-inertial FallbackBanner
-//   • center guidance copy (fallback swaps the sub-line to side-to-side guidance)
-//   • mini live floor-plan card building up in the top-right
-//   • bottom progress deck: 68% coverage ring + "Scanning coverage" + Finish CTA
+//   • center guidance copy
+//   • mini live floor-plan card building up in the top-right (real partial plan)
+//   • bottom progress deck: live coverage ring + wall/area readout + Finish CTA,
+//     plus the free-export quota disclosure BEFORE any work is captured
+//     (competitive guardrail: never capture first and ransom later).
 //
-// All AR theming reads `theme.lidar`; the backdrop uses the LiDAR recon-mesh +
-// brighter grid (0.22) vs the dimmer fallback grid (0.12), matching the HTML.
+// Device renders RoomPlan's coached RoomCaptureView; the Simulator runs the
+// deterministic scripted scan that ends in FloorPlanModel.sample.
 
 import SwiftUI
 
 public struct RoomScanView: View {
     @Environment(\.theme) private var theme
+    @Environment(AppState.self) private var appState
 
-    /// Coverage percentage shown on the ring + deck. Matches the source (68%).
-    private let coverage: Int
-    /// Tapping Finish. The flow routes to Export in the real app.
-    private let onFinish: () -> Void
+    @State private var service = RoomScanService()
 
-    public init(coverage: Int = 68, onFinish: @escaping () -> Void = {}) {
-        self.coverage = coverage
-        self.onFinish = onFinish
+    /// Delivered when processing completes: the parametric plan plus the USDZ
+    /// filename (nil when 3D export was unavailable).
+    private let onComplete: (FloorPlanModel, String?) -> Void
+    /// User dismissed without finishing.
+    private let onCancel: () -> Void
+
+    public init(onComplete: @escaping (FloorPlanModel, String?) -> Void = { _, _ in },
+                onCancel: @escaping () -> Void = {}) {
+        self.onComplete = onComplete
+        self.onCancel = onCancel
     }
 
     public var body: some View {
         ZStack {
-            // Camera backdrop — LiDAR mesh + bright grid vs dim fallback grid.
-            CameraBackdrop(accent: theme.accent,
-                           scan: true,
-                           mesh: theme.lidar,
-                           gridAlpha: theme.lidar ? 0.22 : 0.12)
-            FeaturePoints(accent: theme.accent)
-
-            // captured-wall ribbons (solid = locked, dashed = in-progress)
-            CapturedWalls(accent: theme.accent)
-                .ignoresSafeArea()
-
+            backdrop
             content
         }
+        .onAppear { service.start() }
+        .onDisappear { if service.phase == .scanning { service.cancel() } }
+        .onChange(of: service.phase) { _, phase in
+            switch phase {
+            case .done:
+                if let plan = service.finishedPlan {
+                    onComplete(plan, service.usdzFilename)
+                }
+            case .failed(let message):
+                appState.presentAlert(title: "Scan failed", message: message)
+                onCancel()
+            default:
+                break
+            }
+        }
+    }
+
+    // MARK: - Capture feed
+
+    @ViewBuilder
+    private var backdrop: some View {
+        #if targetEnvironment(simulator)
+        // Stylized stand-in + the design's captured-wall ribbons.
+        CameraBackdrop(accent: theme.accent,
+                       scan: true,
+                       mesh: theme.lidar,
+                       gridAlpha: theme.lidar ? 0.22 : 0.12)
+        FeaturePoints(accent: theme.accent)
+        CapturedWalls(accent: theme.accent)
+            .ignoresSafeArea()
+        #else
+        RoomCaptureViewContainer(service: service)
+            .ignoresSafeArea()
+        #endif
     }
 
     @ViewBuilder
@@ -73,17 +102,16 @@ public struct RoomScanView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 8) {
-                if theme.lidar {
+                if service.phase == .processing {
+                    Chip(accent: theme.accent, mono: true) {
+                        StatusDot(color: Theme.successGreen, blink: true)
+                        Text("PROCESSING")
+                    }
+                } else {
                     Chip(accent: theme.accent, mono: true) {
                         StatusDot(color: Theme.successGreen, blink: true)
                         Text("CAPTURING")
                     }
-                } else {
-                    Chip(accent: Theme.amber, active: true, mono: true) {
-                        StatusDot(color: .white, blink: true)
-                        Text("CAPTURING · VISUAL")
-                    }
-                    FallbackBanner()
                 }
             }
         }
@@ -99,9 +127,7 @@ public struct RoomScanView: View {
                 .font(Theme.sans(17, weight: .semibold))
                 .foregroundStyle(Theme.ink)
                 .shadow(color: .black.opacity(0.7), radius: 8, y: 2)
-            Text(theme.lidar
-                 ? "Keep the floor edge in view"
-                 : "Move side-to-side · visual-inertial tracking")
+            Text("Keep the floor edge in view")
                 .font(Theme.sans(13))
                 .foregroundStyle(Theme.ink2)
         }
@@ -117,7 +143,12 @@ public struct RoomScanView: View {
                 .font(Theme.mono(8.5))
                 .tracking(1)
                 .foregroundStyle(Theme.ink3)
-            FloorPlan(accent: theme.accent, unit: theme.unit, showDims: false, small: true)
+            FloorPlan(model: service.livePlan
+                        ?? FloorPlanModel(walls: [], openings: [], rooms: [],
+                                          widthMeters: 0, heightMeters: 0,
+                                          capturedAt: Date(timeIntervalSince1970: 0)),
+                      accent: theme.accent, unit: theme.unit,
+                      showDims: false, small: true)
         }
         .padding(8)
         .frame(width: 104, height: 96)
@@ -132,22 +163,65 @@ public struct RoomScanView: View {
     // MARK: - Bottom progress deck
 
     private var progressDeck: some View {
-        HStack(spacing: 16) {
-            CoverageRing(percent: coverage, accent: theme.accent)
-                .frame(width: 62, height: 62)
+        VStack(spacing: 10) {
+            HStack(spacing: 16) {
+                CoverageRing(percent: service.coveragePercent, accent: theme.accent)
+                    .frame(width: 62, height: 62)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Scanning coverage")
-                    .font(Theme.sans(14, weight: .semibold))
-                    .foregroundStyle(Theme.ink)
-                Text("3 walls · floor · \(UnitFormat.area(18.6, theme.unit))\(theme.lidar ? "" : " · VISUAL")")
-                    .font(Theme.mono(11.5))
-                    .foregroundStyle(Theme.ink2)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Scanning coverage")
+                        .font(Theme.sans(14, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                    Text(statusLine)
+                        .font(Theme.mono(11.5))
+                        .foregroundStyle(Theme.ink2)
+                }
+
+                Spacer(minLength: 8)
+
+                finishButton
             }
 
-            Spacer(minLength: 8)
+            // Quota disclosure BEFORE capture (never ransom captured work).
+            if !appState.isPro {
+                Text("\(max(0, appState.freeExportsLeft)) of 3 free exports left · scans are always saved and viewable")
+                    .font(Theme.sans(11))
+                    .foregroundStyle(Theme.ink3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
+                        .fill(Color(.sRGB, red: 13/255, green: 14/255, blue: 17/255, opacity: 0.82))))
+        .overlay(
+            RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
+    }
 
-            Button(action: onFinish) {
+    private var statusLine: String {
+        let walls = service.wallCount
+        let area = service.estimatedAreaSqM
+        guard walls > 0 || area > 0 else { return "Looking for walls…" }
+        var parts: [String] = []
+        if walls > 0 { parts.append("\(walls) wall\(walls == 1 ? "" : "s")") }
+        if area > 0 { parts.append("floor"); parts.append(UnitFormat.area(area, theme.unit)) }
+        return parts.joined(separator: " · ")
+    }
+
+    @ViewBuilder
+    private var finishButton: some View {
+        if service.phase == .processing {
+            ProgressView()
+                .tint(theme.accent)
+                .frame(width: 90, height: 44)
+        } else {
+            Button {
+                service.finishScan()
+            } label: {
                 HStack(spacing: 6) {
                     Icon("check", size: 16, weight: 2.4, color: .white)
                     Text("Finish")
@@ -162,22 +236,26 @@ public struct RoomScanView: View {
                         .fill(theme.accent.withA(0.95)))
             }
             .buttonStyle(.plain)
+            .disabled(service.wallCount == 0 && service.coveragePercent == 0)
             .accessibilityLabel("Finish scan")
         }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
-                        .fill(Color(.sRGB, red: 13/255, green: 14/255, blue: 17/255, opacity: 0.82))))
-        .overlay(
-            RoundedRectangle(cornerRadius: theme.r(24), style: .continuous)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
     }
 }
 
-// MARK: - Captured-wall ribbons
+#if !targetEnvironment(simulator)
+import RoomPlan
+
+/// Embeds RoomPlan's coached capture view (owned by the service).
+private struct RoomCaptureViewContainer: UIViewRepresentable {
+    let service: RoomScanService
+
+    func makeUIView(context: Context) -> RoomCaptureView { service.captureView }
+    func updateUIView(_ uiView: RoomCaptureView, context: Context) {}
+}
+#endif
+
+#if targetEnvironment(simulator)
+// MARK: - Captured-wall ribbons (simulator decoration only)
 
 /// The two perspective wall ribbons from the source 402×874 viewBox:
 ///   solid  : 40,560 250,520 250,640 40,690   (locked, accent @ 0.2 fill)
@@ -231,6 +309,7 @@ private struct WallPoly: Shape {
         return p
     }
 }
+#endif
 
 // MARK: - Coverage ring
 

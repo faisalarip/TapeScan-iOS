@@ -70,6 +70,7 @@
 		E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */; };
 		E86696095F32FB38EF7C89A8 /* MeasureBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */; };
 		EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4445267E139B05347C7E4A6A /* AuthFlowView.swift */; };
+		EDFB1A23396613EC4111509E /* RoomScanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */; };
 		EE8D34F74F597B4E1D028B28 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2522359FDE1BAD3E5D96DF4 /* RootView.swift */; };
 		F0DFFCC86BF09B288593038E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3968C15BB6FAA92E39C59E51 /* Assets.xcassets */; };
 		F173DD288879A312B9A574EB /* CapturedRoomConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */; };
@@ -103,6 +104,7 @@
 		160A7169F98D50FB48079639 /* ARPlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlacementTests.swift; sourceTree = "<group>"; };
 		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
 		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanService.swift; sourceTree = "<group>"; };
 		3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		36981A12FDDE1D097D9538C7 /* ARKitMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARKitMeasureService.swift; sourceTree = "<group>"; };
 		37B369180E9061586B748293 /* RoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsView.swift; sourceTree = "<group>"; };
@@ -373,6 +375,7 @@
 				4F8CB3AE74B68317B955F85A /* ARPlacement.swift */,
 				58509F8544E0CDE7D691B8F9 /* ARTrackingMapping.swift */,
 				C62B9BD32537555D9C604FCD /* PurchaseService.swift */,
+				249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */,
 				E6F2C3067D2B3F40E8C93F72 /* StoreKitPurchaseService.swift */,
 			);
 			path = Services;
@@ -547,6 +550,7 @@
 				F1A21734443D6CDFA477F774 /* PurchaseService.swift in Sources */,
 				24572D0C07F85AABC4A98BF5 /* Reticle.swift in Sources */,
 				8FED561765B5178BAF2F44B5 /* RoomRecord.swift in Sources */,
+				EDFB1A23396613EC4111509E /* RoomScanService.swift in Sources */,
 				68783F56FDF5A4E09D1E63BC /* RoomScanView.swift in Sources */,
 				0A9B108D47176B9D158D529F /* RoomsView.swift in Sources */,
 				EE8D34F74F597B4E1D028B28 /* RootView.swift in Sources */,
