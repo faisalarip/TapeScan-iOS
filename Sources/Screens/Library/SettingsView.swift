@@ -15,6 +15,7 @@
 // `@Observable` AppState; `Theme(appState)` is rebuilt by the root on change.
 
 import SwiftUI
+import StoreKit
 
 public struct SettingsView: View {
     @Environment(\.theme) private var theme
@@ -24,6 +25,9 @@ public struct SettingsView: View {
     @State private var pointSnapping = true
     @State private var planeDetection: PlaneMode = .all
     @State private var showPaywall = false
+    @State private var showManageSubscriptions = false
+    @State private var isRestoring = false
+    @Environment(\.openURL) private var openURL
 
     public init() {}
 
@@ -42,12 +46,14 @@ public struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 18) {
-                        proUpsell
+                        if !appState.isPro { proUpsell }
                         measurementGroup(unit: $appState.unit)
                         arEngineGroup(lidar: $appState.lidar)
                         themeGroup(accent: appState.accent,
                                    setAccent: { appState.accent = $0 },
                                    brand: $appState.brand)
+                        purchasesGroup
+                        aboutGroup
                     }
                     .padding(.horizontal, 18)
                     .padding(.bottom, 24)
@@ -55,6 +61,7 @@ public struct SettingsView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
         }
+        .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
         .fullScreenCover(isPresented: $showPaywall) {
             // The Settings card is always a proactive upsell, so the headline must
             // not falsely claim the free quota is spent.
@@ -201,6 +208,74 @@ public struct SettingsView: View {
             })
             #endif
         }
+    }
+
+    // MARK: - Purchases
+
+    private var purchasesGroup: some View {
+        DListSection(header: "Purchases") {
+            DRow(icon: "download",
+                 title: "Restore Purchases",
+                 detail: isRestoring ? "…" : nil,
+                 action: { Task { await restorePurchases() } }, accessory: {
+                Chevron()
+            })
+            .accessibilityLabel("Restore Purchases")
+            DRow(icon: "gear",
+                 title: "Manage Subscription",
+                 last: true,
+                 action: { showManageSubscriptions = true }, accessory: {
+                Chevron()
+            })
+            .accessibilityLabel("Manage Subscription")
+        }
+    }
+
+    private func restorePurchases() async {
+        guard !isRestoring else { return }
+        isRestoring = true
+        let result = await StoreKitPurchaseService().restore()
+        isRestoring = false
+        switch result {
+        case .success:
+            appState.isPro = true
+            appState.presentAlert(title: "Purchases restored",
+                                  message: "TapeScan Pro is active on this device.")
+        case .cancelled:
+            break
+        case .failed(let message):
+            appState.presentAlert(title: "Restore didn't complete", message: message)
+        }
+    }
+
+    // MARK: - About
+
+    private var aboutGroup: some View {
+        DListSection(header: "About") {
+            DRow(icon: "layers", title: "Terms of Use",
+                 action: { openURL(LegalLinks.terms) }, accessory: {
+                Chevron()
+            })
+            .accessibilityLabel("Terms of Use")
+            DRow(icon: "pin", title: "Privacy Policy",
+                 action: { openURL(LegalLinks.privacy) }, accessory: {
+                Chevron()
+            })
+            .accessibilityLabel("Privacy Policy")
+            DRow(icon: "gear", title: "Version",
+                 detail: Self.versionString,
+                 last: true, accessory: {
+                EmptyView()
+            })
+            .accessibilityLabel("Version \(Self.versionString)")
+        }
+    }
+
+    /// "1.0 (1)" from the bundle — single source for support conversations.
+    private static var versionString: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+        return "\(version) (\(build))"
     }
 }
 

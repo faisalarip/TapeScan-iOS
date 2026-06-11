@@ -72,6 +72,7 @@ schemes:
         TapeScan: all
     run:
       config: Debug
+      storeKitConfiguration: TapeScan.storekit
     test:
       config: Debug
       targets:
