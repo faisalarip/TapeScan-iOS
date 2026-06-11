@@ -21,7 +21,9 @@ public struct ExportView: View {
     @Environment(\.theme) private var theme
     @Environment(AppState.self) private var appState
 
-    /// Close handler (the X). Routes back to History in the real flow.
+    /// The room being exported; nil only in previews (falls back to .sample).
+    private let room: RoomRecord?
+    /// Close handler (the X). Routes back to the Rooms list.
     private let onClose: () -> Void
 
     private static let freeTotal = 3
@@ -47,11 +49,24 @@ public struct ExportView: View {
 
     @State private var showPaywall = false
 
-    public init(onClose: @escaping () -> Void = {}) {
+    public init(room: RoomRecord? = nil, onClose: @escaping () -> Void = {}) {
+        self.room = room
         self.onClose = onClose
     }
 
     // MARK: - Derived
+
+    /// The plan rendered + exported. Previews (room == nil) use the fixture.
+    private var plan: FloorPlanModel {
+        if let room, let decoded = try? room.decodedPlan() { return decoded }
+        #if DEBUG
+        return .sample
+        #else
+        return FloorPlanModel(walls: [], openings: [], rooms: [],
+                              widthMeters: 0, heightMeters: 0,
+                              capturedAt: Date(timeIntervalSince1970: 0))
+        #endif
+    }
 
     private var left: Int { max(0, min(Self.freeTotal, appState.freeExportsLeft)) }
     /// Locked only when the user is not Pro AND has no free exports remaining.
@@ -100,7 +115,7 @@ public struct ExportView: View {
                     .font(Theme.sans(26, weight: .bold))
                     .tracking(-0.4)
                     .foregroundStyle(Theme.ink)
-                Text("Apartment · 4 rooms")
+                Text(headerSubtitle)
                     .font(Theme.sans(13))
                     .foregroundStyle(Theme.ink3)
             }
@@ -158,13 +173,21 @@ public struct ExportView: View {
         .accessibilityLabel("\(left) of \(Self.freeTotal) free exports left. Go Pro.")
     }
 
+    /// "Room 2 · Scanned Jun 12" — real record metadata, no fictional apartment.
+    private var headerSubtitle: String {
+        guard let room else { return "Floor plan preview" }
+        return "\(room.name) · Scanned \(room.createdAt.formatted(date: .abbreviated, time: .omitted))"
+    }
+
     // MARK: - Floor-plan preview
 
     private var preview: some View {
-        ZStack(alignment: .top) {
-            FloorPlan(accent: theme.accent, unit: theme.unit)
-                .padding(.top, 18)
-                .padding(16)
+        let quantities = plan.quantities
+        return ZStack(alignment: .top) {
+            FloorPlan(model: plan, accent: theme.accent, unit: theme.unit)
+                .padding(.top, 38)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 30)
 
             HStack(alignment: .top) {
                 Text("FLOOR PLAN · \(theme.unit == .imperial ? "IMPERIAL" : "METRIC")")
@@ -173,11 +196,23 @@ public struct ExportView: View {
                     .foregroundStyle(Theme.ink3)
                 Spacer()
                 Chip(accent: theme.accent, mono: true, height: 24, fontSize: 10) {
-                    Text(UnitFormat.area(29.6, theme.unit))
+                    Text(UnitFormat.area(quantities.floorAreaSquareMeters, theme.unit))
                 }
             }
             .padding(.horizontal, 14)
             .padding(.top, 12)
+
+            // Auto-quantities strip (perimeter / wall area / volume) — the
+            // renovation math competitors charge for (benchmark parity item).
+            HStack(spacing: 12) {
+                quantityChip("PERIM", UnitFormat.lengthFractional(quantities.perimeterMeters, unit: theme.unit))
+                quantityChip("WALLS", UnitFormat.area(quantities.wallAreaSquareMeters, theme.unit))
+                quantityChip("VOL", UnitFormat.volume(quantities.volumeCubicMeters, theme.unit))
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 10)
         }
         .frame(height: 212)
         .background(
@@ -188,6 +223,22 @@ public struct ExportView: View {
         .overlay(
             RoundedRectangle(cornerRadius: theme.r(18), style: .continuous)
                 .strokeBorder(Color.white.opacity(0.1), lineWidth: 1))
+    }
+
+    private func quantityChip(_ label: String, _ value: String) -> some View {
+        HStack(spacing: 5) {
+            Text(label)
+                .font(Theme.mono(8.5))
+                .tracking(0.8)
+                .foregroundStyle(Theme.ink3)
+            Text(value)
+                .font(Theme.mono(10.5, weight: .bold))
+                .foregroundStyle(Theme.ink2)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Capsule().fill(Color.white.opacity(0.07)))
+        .accessibilityLabel("\(label) \(value)")
     }
 
     // MARK: - Format grid
