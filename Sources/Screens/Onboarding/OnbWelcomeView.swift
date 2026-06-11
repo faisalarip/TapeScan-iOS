@@ -4,7 +4,7 @@
 //   • 392-pt AR hero: CameraBackdrop + FeaturePoints + pulsing Reticle, a
 //     measure polyline with two endpoint nodes, a `2.34 m` measure pill, and a
 //     bottom fade into the screen background.
-//   • Copy block: mono kicker "TAPEMEASURE AR PRO", 30-pt headline, three
+//   • Copy block: mono kicker "TAPESCAN AR PRO", 30-pt headline, three
 //     feature rows (accent-soft 38×38 icon tiles).
 //   • Footer: paging dots (active 0) + "Get Started" primary CTA.
 
@@ -17,10 +17,10 @@ struct OnbWelcomeView: View {
 
     var onContinue: () -> Void = {}
 
-    /// Uppercased brand for the eyebrow; blank brand falls back to "TAPEMEASURE".
+    /// Uppercased brand for the eyebrow; blank brand falls back to the default.
     private var brandName: String {
         let trimmed = appState.brand.trimmingCharacters(in: .whitespaces)
-        return (trimmed.isEmpty ? "TapeMeasure" : trimmed).uppercased()
+        return (trimmed.isEmpty ? AppState.defaultBrand : trimmed).uppercased()
     }
 
     /// (icon, label) for the three feature rows — source order preserved.

@@ -126,16 +126,16 @@ public struct SettingsView: View {
 
     private func measurementGroup(unit: Binding<MeasureUnit>) -> some View {
         DListSection(header: "Measurement") {
-            DRow(icon: "ruler2", title: "Units") {
+            DRow(icon: "ruler2", title: "Units", accessory: {
                 IOSSegmented(options: MeasureUnit.allCases,
                              selection: unit) { $0.title }
                     .accessibilityLabel("Units")
-            }
-            DRow(icon: "pin", title: "Point snapping") {
+            })
+            DRow(icon: "pin", title: "Point snapping", accessory: {
                 IOSToggle(isOn: $pointSnapping)
                     .accessibilityLabel("Point snapping")
                     .accessibilityValue(pointSnapping ? "On" : "Off")
-            }
+            })
             // Precision is derived from the LiDAR flag: ±4 mm vs ±2 cm.
             DRow(icon: "distance",
                  title: "Precision",
@@ -156,16 +156,16 @@ public struct SettingsView: View {
                  title: "LiDAR depth",
                  subtitle: lidar.wrappedValue
                     ? "Auto · device supported"
-                    : "Off · visual-inertial fallback") {
+                    : "Off · visual-inertial fallback", accessory: {
                 IOSToggle(isOn: lidar)
                     .accessibilityLabel("LiDAR depth")
                     .accessibilityValue(lidar.wrappedValue ? "On" : "Off")
-            }
-            DRow(icon: "grid", title: "Plane detection", last: true) {
+            })
+            DRow(icon: "grid", title: "Plane detection", last: true, accessory: {
                 IOSSegmented(options: PlaneMode.allCases,
                              selection: $planeDetection) { $0.rawValue }
                     .accessibilityLabel("Plane detection")
-            }
+            })
         }
     }
 
@@ -174,9 +174,17 @@ public struct SettingsView: View {
     private func themeGroup(accent: AccentOption,
                             setAccent: @escaping (AccentOption) -> Void,
                             brand: Binding<String>) -> some View {
-        DListSection(header: "Theme") {
+        // The brand-name field is a white-label/dev surface, not a user feature:
+        // it ships DEBUG-only. In Release the accent row is the section's last
+        // row, so it must suppress its bottom hairline.
+        #if DEBUG
+        let accentIsLast = false
+        #else
+        let accentIsLast = true
+        #endif
+        return DListSection(header: "Theme") {
             // Accent swatch picker — 5 options in design order.
-            DRow(icon: "grid", title: "Accent color") {
+            DRow(icon: "grid", title: "Accent color", last: accentIsLast, accessory: {
                 HStack(spacing: 10) {
                     ForEach(AccentOption.allCases) { option in
                         AccentSwatch(option: option,
@@ -185,11 +193,13 @@ public struct SettingsView: View {
                         }
                     }
                 }
-            }
+            })
+            #if DEBUG
             // Brand-name field — drives the wordmark / Pro card / auth lockup.
-            DRow(icon: "ruler2", title: "Brand name", last: true) {
+            DRow(icon: "ruler2", title: "Brand name", last: true, accessory: {
                 BrandField(brand: brand)
-            }
+            })
+            #endif
         }
     }
 }
@@ -236,7 +246,7 @@ private struct BrandField: View {
     var body: some View {
         TextField("",
                   text: $brand,
-                  prompt: Text("TapeMeasure").foregroundColor(Theme.ink3))
+                  prompt: Text(AppState.defaultBrand).foregroundColor(Theme.ink3))
             .font(Theme.sans(14.5, weight: .medium))
             .foregroundStyle(Theme.ink)
             .tint(theme.accent)
@@ -262,7 +272,7 @@ private struct BrandField: View {
 
     /// Collapse all-whitespace input back to the default brand.
     private func normalize() {
-        if brand.trimmingCharacters(in: .whitespaces).isEmpty { brand = "TapeMeasure" }
+        if brand.trimmingCharacters(in: .whitespaces).isEmpty { brand = AppState.defaultBrand }
     }
 }
 

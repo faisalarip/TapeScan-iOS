@@ -1,6 +1,6 @@
 name: TapeMeasureARPro
 options:
-  bundleIdPrefix: com.tapemeasure
+  bundleIdPrefix: co.tuntun
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -12,9 +12,14 @@ settings:
     DEVELOPMENT_LANGUAGE: en
     CODE_SIGNING_ALLOWED: NO
     CODE_SIGNING_REQUIRED: NO
+    # Owner input: Apple Developer Team ID (Apple Developer portal → Membership).
+    # Uncomment and flip CODE_SIGNING_ALLOWED / CODE_SIGNING_REQUIRED to YES for
+    # device builds and archiving. Simulator builds stay unsigned on purpose so
+    # CI and local Simulator verification need no certificates.
+    # DEVELOPMENT_TEAM: REPLACE_WITH_TEAM_ID
 
 targets:
-  TapeMeasureARPro:
+  TapeScan:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
@@ -22,13 +27,59 @@ targets:
       - Sources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.tapemeasure.ARPro
-        PRODUCT_NAME: TapeMeasureARPro
+        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan
+        PRODUCT_NAME: TapeScan
         INFOPLIST_FILE: Sources/Resources/Info.plist
         GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: Sources/Resources/TapeScan.entitlements
         TARGETED_DEVICE_FAMILY: "1"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_PREVIEWS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_STRICT_CONCURRENCY: minimal
+
+  TapeScanTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - Tests/TapeScanTests
+    dependencies:
+      - target: TapeScan
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+  TapeScanUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - Tests/TapeScanUITests
+    dependencies:
+      - target: TapeScan
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.uitests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  TapeScan:
+    build:
+      targets:
+        TapeScan: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - TapeScanTests
+        - TapeScanUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
