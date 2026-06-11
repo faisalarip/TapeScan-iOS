@@ -18,6 +18,7 @@
 		24572D0C07F85AABC4A98BF5 /* Reticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02308EBCC17F244732D61EC5 /* Reticle.swift */; };
 		36F52922C6F0F66DF86CA2AF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */; };
 		37B5F3ECAECA81D3902B6210 /* FeaturePoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */; };
+		3EEC02BAB323AC03DADF8CF9 /* UnitFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77AD7324051F8A6A75173DEF /* UnitFormatTests.swift */; };
 		4456D7997157B38BC63AD2ED /* MeasureControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */; };
 		48CB6E4559E01BEB76D739B7 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FAF7B6E03F5CD60157E24D /* OnboardingFlowView.swift */; };
 		52FA790DB8A96E72BA089E0F /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8A69608238A83D96D8E9B5 /* CreateAccountView.swift */; };
@@ -102,6 +103,7 @@
 		6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureControls.swift; sourceTree = "<group>"; };
 		6EFD9F8D9FF0E08636D87786 /* TapeScanUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TapeScanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77950248AF8E8925748BFEAC /* Shutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shutter.swift; sourceTree = "<group>"; };
+		77AD7324051F8A6A75173DEF /* UnitFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitFormatTests.swift; sourceTree = "<group>"; };
 		7952A6746C94C008AE553685 /* RoomScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanView.swift; sourceTree = "<group>"; };
 		8119FF31F81C5BACBD109115 /* ARMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMeasureService.swift; sourceTree = "<group>"; };
 		83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapeMeasureARProApp.swift; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 				B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */,
 				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
+				77AD7324051F8A6A75173DEF /* UnitFormatTests.swift */,
 			);
 			path = TapeScanTests;
 			sourceTree = "<group>";
@@ -495,6 +498,7 @@
 				96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */,
 				617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */,
 				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
+				3EEC02BAB323AC03DADF8CF9 /* UnitFormatTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
