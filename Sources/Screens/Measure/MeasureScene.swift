@@ -178,12 +178,13 @@ struct MeasureScene: View {
     }
 }
 
-// MARK: - Mode model (ported from MEASURE_MODES + MODE_* maps)
+// MARK: - Mode display helpers (ported from MEASURE_MODES + MODE_* maps)
 
-/// The four measurement modes shown in the bottom mode switch / text tabs.
-enum MeasureMode: String, CaseIterable, Identifiable, Hashable {
-    case distance, area, volume, angle
-    var id: String { rawValue }
+/// UI affordances for the domain ``MeasureMode`` (declared in
+/// Sources/Domain/MeasureTypes.swift) — icon names and display labels for the
+/// bottom mode switch / text tabs.
+extension MeasureMode: Identifiable {
+    public var id: String { rawValue }
 
     /// `Icon` name in the shared icon set.
     var icon: String { rawValue }

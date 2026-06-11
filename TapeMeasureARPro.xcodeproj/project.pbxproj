@@ -24,6 +24,7 @@
 		57E712A45120EC1F39171A2E /* FloorPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2E9DB5F611E5C25596519F /* FloorPlan.swift */; };
 		5B1844E9703037E1F4C95592 /* OnbWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */; };
 		5EEC806565B98002230E9914 /* OnbCalibrateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6040C95B6A2583E5DBB4206B /* OnbCalibrateView.swift */; };
+		617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */; };
 		650EB1DECF310366FF7974CB /* Chip.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */; };
 		68783F56FDF5A4E09D1E63BC /* RoomScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7952A6746C94C008AE553685 /* RoomScanView.swift */; };
 		69D6689E4E6C89C9823ED6CA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */; };
@@ -36,6 +37,8 @@
 		B0E5E6C09D5F31F138C15C9E /* TapeMeasureARProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */; };
 		B2B4B8BF8508D8065DA1F753 /* UnitFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */; };
 		B7213F3F88F763A2DCF90013 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */; };
+		BADB2A4EEA313FD46BD3A337 /* MeasureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */; };
+		BD00AF879413A129E4B29C34 /* MeasureMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */; };
 		BF592A236331CCD85A175F8F /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63E32F053E2D0D2929E8319F /* HistoryView.swift */; };
 		BF5B701A0E7EA80D8344E3C9 /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F78D476098320E1D9357A55 /* PurchaseService.swift */; };
 		C0F00F48DA584A479953E9FF /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E5D402CBACEDB5272CF415 /* ExportView.swift */; };
@@ -74,6 +77,7 @@
 /* Begin PBXFileReference section */
 		02308EBCC17F244732D61EC5 /* Reticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reticle.swift; sourceTree = "<group>"; };
 		0B2E9DB5F611E5C25596519F /* FloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlan.swift; sourceTree = "<group>"; };
+		0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureMath.swift; sourceTree = "<group>"; };
 		13A1D8EAB15807296E75631F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
 		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +85,7 @@
 		37B369180E9061586B748293 /* RoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsView.swift; sourceTree = "<group>"; };
 		3968C15BB6FAA92E39C59E51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitFormatters.swift; sourceTree = "<group>"; };
+		41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureMathTests.swift; sourceTree = "<group>"; };
 		4280D7ABC74C9C8768A1A4AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4445267E139B05347C7E4A6A /* AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowView.swift; sourceTree = "<group>"; };
 		4F78D476098320E1D9357A55 /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
@@ -111,6 +116,7 @@
 		BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
 		C33295A46F03522A0D5E08D0 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		C354D269884E484AB77F6F78 /* CameraBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBackdrop.swift; sourceTree = "<group>"; };
+		C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureTypes.swift; sourceTree = "<group>"; };
 		C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbWelcomeView.swift; sourceTree = "<group>"; };
 		D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePill.swift; sourceTree = "<group>"; };
 		DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
@@ -171,6 +177,7 @@
 			children = (
 				B8FED12127CAEFB04DD62C86 /* App */,
 				DDF5B33CB4746EEB52A74F82 /* Components */,
+				B29FC1130E4A9FB2151676A2 /* Domain */,
 				55FF0D88EC78956CC7301A38 /* Resources */,
 				D80ECC71E4C3E3E7540B5300 /* Screens */,
 				F055BEB6C9D618D7595C7400 /* Services */,
@@ -211,6 +218,15 @@
 				50F0F62E8A1598538A27FA0D /* MeasureView.swift */,
 			);
 			path = Measure;
+			sourceTree = "<group>";
+		};
+		B29FC1130E4A9FB2151676A2 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */,
+				C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */,
+			);
+			path = Domain;
 			sourceTree = "<group>";
 		};
 		B8FED12127CAEFB04DD62C86 /* App */ = {
@@ -277,6 +293,7 @@
 			isa = PBXGroup;
 			children = (
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
+				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
 			);
 			path = TapeScanTests;
@@ -438,7 +455,9 @@
 				E86696095F32FB38EF7C89A8 /* MeasureBView.swift in Sources */,
 				16F225DC0C15AAA28F8BC785 /* MeasureCView.swift in Sources */,
 				4456D7997157B38BC63AD2ED /* MeasureControls.swift in Sources */,
+				BD00AF879413A129E4B29C34 /* MeasureMath.swift in Sources */,
 				9BFE95BAB6EDBCE4D0E5CB9B /* MeasureScene.swift in Sources */,
+				BADB2A4EEA313FD46BD3A337 /* MeasureTypes.swift in Sources */,
 				1E6BAB4453BD1B7C43283CD8 /* MeasureView.swift in Sources */,
 				5EEC806565B98002230E9914 /* OnbCalibrateView.swift in Sources */,
 				23ED6FDA8526D305D61BDC3A /* OnbPermissionView.swift in Sources */,
@@ -466,6 +485,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
+				617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */,
 				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
