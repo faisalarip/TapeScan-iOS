@@ -15,12 +15,18 @@ import SwiftUI
 public struct MeasureBView: View {
     @Environment(\.theme) private var theme
 
-    private let service: ARMeasureService
-    @State private var mode: MeasureMode = .distance
+    private let service: any ARMeasureService
 
-    public init(service: ARMeasureService = SimulatedARMeasureService()) {
+    public init(service: any ARMeasureService) {
         self.service = service
     }
+
+    @MainActor
+    public init() {
+        self.service = MeasureServiceFactory.make()
+    }
+
+    private var mode: MeasureMode { service.mode }
 
     public var body: some View {
         ZStack(alignment: .top) {
@@ -42,14 +48,16 @@ public struct MeasureBView: View {
         .onDisappear { service.stop() }
     }
 
-    // MARK: - AR geometry (single segment)
+    // MARK: - AR geometry (live)
 
     private var scene: some View {
-        MeasureScene(
+        let live = LiveSceneBuilder.build(service: service, unit: theme.unit)
+        return MeasureScene(
             accent: theme.accent,
-            pts: [ScenePoint(x: 96, y: 600), ScenePoint(x: 308, y: 656)],
-            segs: [SceneSegment(x: 202, y: 612,
-                                text: UnitFormat.length(2.18, theme.unit), active: true)],
+            pts: live.pts,
+            segs: live.segs,
+            area: live.area,
+            angle: live.angle,
             activeTo: ScenePoint(x: 201, y: 472))
         .ignoresSafeArea()
     }
@@ -107,7 +115,7 @@ public struct MeasureBView: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 0) {
-                    Text("1 segment")
+                    Text("\(service.result.segmentLengths.count) segment\(service.result.segmentLengths.count == 1 ? "" : "s")")
                         .foregroundStyle(Theme.ink2)
                     Text(theme.unit == .imperial ? "feet · in" : "meters")
                         .foregroundStyle(Theme.ink3)
@@ -167,7 +175,7 @@ public struct MeasureBView: View {
         }
         .fixedSize()
         .contentShape(Rectangle())
-        .onTapGesture { withAnimation(.easeOut(duration: 0.15)) { mode = m } }
+        .onTapGesture { withAnimation(.easeOut(duration: 0.15)) { service.mode = m } }
         .accessibilityLabel(m.label)
         .accessibilityAddTraits(on ? .isSelected : [])
     }
@@ -184,11 +192,12 @@ public struct MeasureBView: View {
     }
 
     private var value: String {
+        let result = service.result
         switch mode {
-        case .distance: return UnitFormat.length(2.18, theme.unit)
-        case .area:     return UnitFormat.area(4.21, theme.unit)
-        case .volume:   return UnitFormat.volume(1.86, theme.unit)
-        case .angle:    return UnitFormat.angle(118.4)
+        case .distance: return UnitFormat.lengthFractional(result.segmentLengths.last ?? 0, unit: theme.unit)
+        case .area:     return UnitFormat.area(result.area ?? 0, theme.unit)
+        case .volume:   return UnitFormat.volume(result.volume ?? 0, theme.unit)
+        case .angle:    return UnitFormat.angle(result.angleDegrees ?? 0)
         }
     }
 }
