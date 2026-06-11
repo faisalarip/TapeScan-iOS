@@ -1,10 +1,10 @@
 // MeasureView.swift — the Measure tab host.
 //
 // The design ships THREE visual directions of the live AR Measure screen
-// (Precision HUD / Minimal Focus / Pro Console). This host makes all three
-// reachable at runtime via a small floating "HUD style" picker pinned to the
-// top edge, so reviewers can compare directions without rebuilding — while the
-// chosen direction renders full-bleed underneath.
+// (Precision HUD / Minimal Focus / Pro Console). The shipped direction is
+// "Precision" (MeasureAView). In DEBUG builds a small floating "HUD style"
+// picker pinned to the top edge keeps all three reachable for design review;
+// Release builds render Precision full-bleed with no picker.
 //
 // A single `SimulatedARMeasureService` is created once and injected into the
 // active direction so AR intents (place/undo/finish) share one backend.
@@ -52,7 +52,9 @@ public struct MeasureView: View {
     public var body: some View {
         ZStack(alignment: .top) {
             direction
+            #if DEBUG
             stylePicker
+            #endif
         }
         .background(Theme.cameraBG.ignoresSafeArea())
     }
@@ -66,8 +68,9 @@ public struct MeasureView: View {
         }
     }
 
+    #if DEBUG
     /// Floating glass segmented picker for the HUD style, top-center, below the
-    /// status bar. Kept compact so it sits above each direction's own top HUD.
+    /// status bar. DEBUG-only design-review tool — never user-facing in Release.
     private var stylePicker: some View {
         HStack(spacing: 2) {
             ForEach(MeasureHUDStyle.allCases) { s in
@@ -95,6 +98,7 @@ public struct MeasureView: View {
         .padding(.top, 2)
         .allowsHitTesting(true)
     }
+    #endif
 }
 
 #Preview {

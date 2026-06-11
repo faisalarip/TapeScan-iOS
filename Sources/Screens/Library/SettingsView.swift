@@ -174,9 +174,17 @@ public struct SettingsView: View {
     private func themeGroup(accent: AccentOption,
                             setAccent: @escaping (AccentOption) -> Void,
                             brand: Binding<String>) -> some View {
-        DListSection(header: "Theme") {
+        // The brand-name field is a white-label/dev surface, not a user feature:
+        // it ships DEBUG-only. In Release the accent row is the section's last
+        // row, so it must suppress its bottom hairline.
+        #if DEBUG
+        let accentIsLast = false
+        #else
+        let accentIsLast = true
+        #endif
+        return DListSection(header: "Theme") {
             // Accent swatch picker — 5 options in design order.
-            DRow(icon: "grid", title: "Accent color", accessory: {
+            DRow(icon: "grid", title: "Accent color", last: accentIsLast, accessory: {
                 HStack(spacing: 10) {
                     ForEach(AccentOption.allCases) { option in
                         AccentSwatch(option: option,
@@ -186,10 +194,12 @@ public struct SettingsView: View {
                     }
                 }
             })
+            #if DEBUG
             // Brand-name field — drives the wordmark / Pro card / auth lockup.
             DRow(icon: "ruler2", title: "Brand name", last: true, accessory: {
                 BrandField(brand: brand)
             })
+            #endif
         }
     }
 }
