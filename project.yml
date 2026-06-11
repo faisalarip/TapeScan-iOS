@@ -39,6 +39,32 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_STRICT_CONCURRENCY: minimal
 
+  TapeScanTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - Tests/TapeScanTests
+    dependencies:
+      - target: TapeScan
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+  TapeScanUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - Tests/TapeScanUITests
+    dependencies:
+      - target: TapeScan
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.uitests
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   TapeScan:
     build:
@@ -46,6 +72,11 @@ schemes:
         TapeScan: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - TapeScanTests
+        - TapeScanUITests
     profile:
       config: Release
     analyze:

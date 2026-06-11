@@ -10,6 +10,7 @@
 		0A9B108D47176B9D158D529F /* RoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B369180E9061586B748293 /* RoomsView.swift */; };
 		13D72BB82D2E28E0C5D9FC1F /* MeasureAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */; };
 		16F225DC0C15AAA28F8BC785 /* MeasureCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A506848E51054BBE6D3F89 /* MeasureCView.swift */; };
+		175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */; };
 		184B5D9EDE69FC26A85F7E85 /* ValuePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */; };
 		1E6BAB4453BD1B7C43283CD8 /* MeasureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F0F62E8A1598538A27FA0D /* MeasureView.swift */; };
 		23ED6FDA8526D305D61BDC3A /* OnbPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */; };
@@ -29,6 +30,7 @@
 		94E8435400B188DDE786D3F6 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850CB15986A4D93B73F780D /* Icon.swift */; };
 		95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1D8EAB15807296E75631F /* AppState.swift */; };
 		9BFE95BAB6EDBCE4D0E5CB9B /* MeasureScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622523F0B707C36A93521FA0 /* MeasureScene.swift */; };
+		A64F26C86BA7E167EA61F3D4 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33295A46F03522A0D5E08D0 /* SmokeTests.swift */; };
 		B05465B8DB655BD0A33920A1 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */; };
 		B0E5E6C09D5F31F138C15C9E /* TapeMeasureARProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */; };
 		B2B4B8BF8508D8065DA1F753 /* UnitFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */; };
@@ -51,6 +53,23 @@
 		FC135E720CF81755DFD5C8A9 /* Shutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77950248AF8E8925748BFEAC /* Shutter.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		5E0CA1C11E35C0630C61EE41 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F122ADEC9B9E63256D6D0B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 05A75B0662002628944FCC28;
+			remoteInfo = TapeScan;
+		};
+		A7F71BBBC53CD1D67001A67E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F122ADEC9B9E63256D6D0B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 05A75B0662002628944FCC28;
+			remoteInfo = TapeScan;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		02308EBCC17F244732D61EC5 /* Reticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reticle.swift; sourceTree = "<group>"; };
 		0B2E9DB5F611E5C25596519F /* FloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlan.swift; sourceTree = "<group>"; };
@@ -70,8 +89,10 @@
 		622523F0B707C36A93521FA0 /* MeasureScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureScene.swift; sourceTree = "<group>"; };
 		63E32F053E2D0D2929E8319F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		63FAF7B6E03F5CD60157E24D /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
+		674376DA03859FB83A3B8BE9 /* TapeScanTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TapeScanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67FB94D7256A0FDE78036E47 /* IOSControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSControls.swift; sourceTree = "<group>"; };
 		6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureControls.swift; sourceTree = "<group>"; };
+		6EFD9F8D9FF0E08636D87786 /* TapeScanUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TapeScanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77950248AF8E8925748BFEAC /* Shutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shutter.swift; sourceTree = "<group>"; };
 		7952A6746C94C008AE553685 /* RoomScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanView.swift; sourceTree = "<group>"; };
 		8119FF31F81C5BACBD109115 /* ARMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMeasureService.swift; sourceTree = "<group>"; };
@@ -86,12 +107,14 @@
 		AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbPermissionView.swift; sourceTree = "<group>"; };
 		B2522359FDE1BAD3E5D96DF4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
+		C33295A46F03522A0D5E08D0 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		C354D269884E484AB77F6F78 /* CameraBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBackdrop.swift; sourceTree = "<group>"; };
 		C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbWelcomeView.swift; sourceTree = "<group>"; };
 		D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePill.swift; sourceTree = "<group>"; };
 		DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		E2E5D402CBACEDB5272CF415 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturePoints.swift; sourceTree = "<group>"; };
+		F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapeScanTests.swift; sourceTree = "<group>"; };
 		F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		F8A44956BDB1D755CA082147 /* GroupedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedList.swift; sourceTree = "<group>"; };
 		FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
@@ -108,6 +131,15 @@
 				3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		249F2A394DBE0E64E7468401 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				E2B954474B3FFE87D77C3A36 /* TapeScanTests */,
+				BDEBED75DEFAF4646DA93872 /* TapeScanUITests */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		4B4ACD89149DC5A7649E25C3 /* Rooms */ = {
@@ -192,10 +224,20 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		BDEBED75DEFAF4646DA93872 /* TapeScanUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C33295A46F03522A0D5E08D0 /* SmokeTests.swift */,
+			);
+			path = TapeScanUITests;
+			sourceTree = "<group>";
+		};
 		C5DC905A50168D5F2DA27108 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				23BC2ACFCD872AC7C1E32651 /* TapeScan.app */,
+				674376DA03859FB83A3B8BE9 /* TapeScanTests.xctest */,
+				6EFD9F8D9FF0E08636D87786 /* TapeScanUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -229,6 +271,14 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		E2B954474B3FFE87D77C3A36 /* TapeScanTests */ = {
+			isa = PBXGroup;
+			children = (
+				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
+			);
+			path = TapeScanTests;
+			sourceTree = "<group>";
+		};
 		F055BEB6C9D618D7595C7400 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,6 +291,7 @@
 			isa = PBXGroup;
 			children = (
 				7E327E836B205C873BF82DAC /* Sources */,
+				249F2A394DBE0E64E7468401 /* Tests */,
 				C5DC905A50168D5F2DA27108 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -276,6 +327,42 @@
 			productReference = 23BC2ACFCD872AC7C1E32651 /* TapeScan.app */;
 			productType = "com.apple.product-type.application";
 		};
+		821DCCDD32C06B10DE2AAE3C /* TapeScanTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7377904901C7685F5C1FE3B2 /* Build configuration list for PBXNativeTarget "TapeScanTests" */;
+			buildPhases = (
+				69C8C66AA209DE9AE3AD5442 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9D8F1E5F47220B0A9850C02 /* PBXTargetDependency */,
+			);
+			name = TapeScanTests;
+			packageProductDependencies = (
+			);
+			productName = TapeScanTests;
+			productReference = 674376DA03859FB83A3B8BE9 /* TapeScanTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E11860F11D40B31FA950E697 /* TapeScanUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78D90AD8C62CAB19BBE2A6B4 /* Build configuration list for PBXNativeTarget "TapeScanUITests" */;
+			buildPhases = (
+				CE0C1AF9C30F91ED473F88FC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8CB658D5153B8095BBD9C5B9 /* PBXTargetDependency */,
+			);
+			name = TapeScanUITests;
+			packageProductDependencies = (
+			);
+			productName = TapeScanUITests;
+			productReference = 6EFD9F8D9FF0E08636D87786 /* TapeScanUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -285,6 +372,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					E11860F11D40B31FA950E697 = {
+						TestTargetID = 05A75B0662002628944FCC28;
+					};
 				};
 			};
 			buildConfigurationList = 4B613ACA4F555E47FBD6E486 /* Build configuration list for PBXProject "TapeMeasureARPro" */;
@@ -302,6 +392,8 @@
 			projectRoot = "";
 			targets = (
 				05A75B0662002628944FCC28 /* TapeScan */,
+				821DCCDD32C06B10DE2AAE3C /* TapeScanTests */,
+				E11860F11D40B31FA950E697 /* TapeScanUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -366,7 +458,36 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		69C8C66AA209DE9AE3AD5442 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE0C1AF9C30F91ED473F88FC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A64F26C86BA7E167EA61F3D4 /* SmokeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8CB658D5153B8095BBD9C5B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 05A75B0662002628944FCC28 /* TapeScan */;
+			targetProxy = A7F71BBBC53CD1D67001A67E /* PBXContainerItemProxy */;
+		};
+		A9D8F1E5F47220B0A9850C02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 05A75B0662002628944FCC28 /* TapeScan */;
+			targetProxy = 5E0CA1C11E35C0630C61EE41 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		03C6C7FA2673C0ECF3FC3307 /* Debug */ = {
@@ -393,6 +514,24 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		66B10382045D65B762738E8C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.tuntun.tapescan.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TapeScan.app/TapeScan";
+			};
+			name = Release;
 		};
 		6C5B7BEA063FE452547F0BE9 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -461,6 +600,24 @@
 			};
 			name = Debug;
 		};
+		703474ABD96F4C504BD0D1A6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.tuntun.tapescan.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TapeScan.app/TapeScan";
+			};
+			name = Debug;
+		};
 		729BD917F0ADC5CE5B6B0507 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -483,6 +640,42 @@
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = minimal;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		93FC97D709D47AC209DEF7D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.tuntun.tapescan.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TapeScan;
+			};
+			name = Debug;
+		};
+		D968AA3946543A500EAB9B22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.tuntun.tapescan.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TapeScan;
 			};
 			name = Release;
 		};
@@ -563,6 +756,24 @@
 			buildConfigurations = (
 				03C6C7FA2673C0ECF3FC3307 /* Debug */,
 				729BD917F0ADC5CE5B6B0507 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7377904901C7685F5C1FE3B2 /* Build configuration list for PBXNativeTarget "TapeScanTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				703474ABD96F4C504BD0D1A6 /* Debug */,
+				66B10382045D65B762738E8C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		78D90AD8C62CAB19BBE2A6B4 /* Build configuration list for PBXNativeTarget "TapeScanUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93FC97D709D47AC209DEF7D2 /* Debug */,
+				D968AA3946543A500EAB9B22 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

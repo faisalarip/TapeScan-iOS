@@ -39,7 +39,31 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "821DCCDD32C06B10DE2AAE3C"
+               BuildableName = "TapeScanTests.xctest"
+               BlueprintName = "TapeScanTests"
+               ReferencedContainer = "container:TapeMeasureARPro.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E11860F11D40B31FA950E697"
+               BuildableName = "TapeScanUITests.xctest"
+               BlueprintName = "TapeScanUITests"
+               ReferencedContainer = "container:TapeMeasureARPro.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
