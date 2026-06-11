@@ -33,9 +33,11 @@ public struct MeasureView: View {
 
     @State private var style: MeasureHUDStyle
     /// Shared AR backend for whichever direction is active.
-    @State private var service = SimulatedARMeasureService()
+    @State private var service: any ARMeasureService
 
+    @MainActor
     public init() {
+        _service = State(initialValue: MeasureServiceFactory.make())
         var initial: MeasureHUDStyle = .precision
         #if DEBUG
         // DEBUG-only: `-uiMeasureDir precision|minimal|pro` sets the initial

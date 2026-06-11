@@ -18,15 +18,19 @@ import SwiftUI
 public struct MeasureCView: View {
     @Environment(\.theme) private var theme
 
-    private let service: ARMeasureService
-    @State private var mode: MeasureMode = .area
+    private let service: any ARMeasureService
     /// Active tool-rail item (source default: area).
     @State private var tool: String = "area"
 
     private let railTools = ["pin", "distance", "area", "volume", "angle"]
 
-    public init(service: ARMeasureService = SimulatedARMeasureService()) {
+    public init(service: any ARMeasureService) {
         self.service = service
+    }
+
+    @MainActor
+    public init() {
+        self.service = MeasureServiceFactory.make()
     }
 
     public var body: some View {
@@ -43,38 +47,21 @@ public struct MeasureCView: View {
             console
         }
         .background(Theme.cameraBG.ignoresSafeArea())
-        .onAppear { service.start() }
+        .onAppear { service.mode = .area; service.start() }
         .onDisappear { service.stop() }
     }
 
-    // MARK: - AR geometry (closed area polygon)
+    // MARK: - AR geometry (live)
 
     private var scene: some View {
-        MeasureScene(
+        let live = LiveSceneBuilder.build(service: service, unit: theme.unit)
+        return MeasureScene(
             accent: theme.accent,
-            pts: [ScenePoint(x: 92, y: 520),
-                  ScenePoint(x: 318, y: 556),
-                  ScenePoint(x: 286, y: 712),
-                  ScenePoint(x: 60, y: 668)],
-            segs: [
-                SceneSegment(x: 205, y: 524, text: UnitFormat.length(2.34, theme.unit)),
-                SceneSegment(x: 302, y: 634, text: UnitFormat.length(1.80, theme.unit)),
-                SceneSegment(x: 173, y: 706, text: UnitFormat.length(2.34, theme.unit)),
-                SceneSegment(x: 76, y: 600, text: UnitFormat.length(1.80, theme.unit)),
-            ],
-            area: SceneArea(x: 189, y: 614,
-                            text: areaValue, sub: areaSub))
+            pts: live.pts,
+            segs: live.segs,
+            area: live.area,
+            angle: live.angle)
         .ignoresSafeArea()
-    }
-
-    /// Floor area value split into number + unit, like the source's
-    /// `fmtArea(...).split(' ')`.
-    private var areaValue: String {
-        UnitFormat.area(4.21, theme.unit).components(separatedBy: " ").first ?? ""
-    }
-    private var areaSub: String {
-        let unit = UnitFormat.area(4.21, theme.unit).components(separatedBy: " ").dropFirst().first ?? ""
-        return unit.uppercased() + " · FLOOR"
     }
 
     // MARK: - Top-right status
@@ -133,7 +120,7 @@ public struct MeasureCView: View {
                 .padding(.bottom, 12)
 
             HStack(spacing: 12) {
-                ModeSwitch(accent: theme.accent, active: $mode, compact: true)
+                ModeSwitch(accent: theme.accent, active: modeBinding, compact: true)
                 Shutter(accent: theme.accent, size: 62, icon: "check") { service.finish() }
                     .accessibilityLabel("Finish measurement")
             }
@@ -193,11 +180,24 @@ public struct MeasureCView: View {
         }
     }
 
+    private var modeBinding: Binding<MeasureMode> {
+        Binding(get: { service.mode }, set: { service.mode = $0 })
+    }
+
+    /// Live perimeter runs: one chip per segment (plus the closing edge in
+    /// area mode), labeled Wall A, Wall B, …
     private var runlist: [(label: String, value: String)] {
-        [("Wall A", UnitFormat.length(2.34, theme.unit)),
-         ("Wall B", UnitFormat.length(1.80, theme.unit)),
-         ("Wall C", UnitFormat.length(2.34, theme.unit)),
-         ("Wall D", UnitFormat.length(1.80, theme.unit))]
+        let result = service.result
+        var lengths = result.segmentLengths
+        if service.mode == .area, service.points.count >= 3 {
+            let closing = result.totalLength - lengths.reduce(0, +)
+            if closing > 0 { lengths.append(closing) }
+        }
+        let letters = ["A", "B", "C", "D", "E", "F", "G", "H"]
+        return lengths.enumerated().map { i, len in
+            ("Wall \(letters[i % letters.count])",
+             UnitFormat.lengthFractional(len, unit: theme.unit))
+        }
     }
 
     private var secondaryRow: some View {
