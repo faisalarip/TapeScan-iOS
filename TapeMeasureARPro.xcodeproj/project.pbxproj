@@ -57,6 +57,7 @@
 		E15761CBCC13A49DF5564BC2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C7A01A4C164B6B13709437 /* Theme.swift */; };
 		E4013C34C559814D9DB70BF9 /* IOSControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67FB94D7256A0FDE78036E47 /* IOSControls.swift */; };
 		E6D8B7621910E53E200027AD /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F1882FED0A1E47F2DE1891 /* SignInView.swift */; };
+		E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */; };
 		E86696095F32FB38EF7C89A8 /* MeasureBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */; };
 		EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4445267E139B05347C7E4A6A /* AuthFlowView.swift */; };
 		EE8D34F74F597B4E1D028B28 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2522359FDE1BAD3E5D96DF4 /* RootView.swift */; };
@@ -132,6 +133,7 @@
 		C354D269884E484AB77F6F78 /* CameraBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBackdrop.swift; sourceTree = "<group>"; };
 		C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureTypes.swift; sourceTree = "<group>"; };
 		C5124BB5FB7F73707690AF26 /* OnbWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbWelcomeView.swift; sourceTree = "<group>"; };
+		CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateSettingsTests.swift; sourceTree = "<group>"; };
 		D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePill.swift; sourceTree = "<group>"; };
 		DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		E2E5D402CBACEDB5272CF415 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
@@ -322,6 +324,7 @@
 			isa = PBXGroup;
 			children = (
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
+				CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */,
 				B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */,
 				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				EB967D7619CDDCC48497F1EE /* PersistenceTests.swift */,
@@ -522,6 +525,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
+				E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */,
 				96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */,
 				617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */,
 				61F315C77457288AA9D52126 /* PersistenceTests.swift in Sources */,

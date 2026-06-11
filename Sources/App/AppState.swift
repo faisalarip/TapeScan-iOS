@@ -99,6 +99,21 @@ public enum AppPhase: Sendable {
     case main
 }
 
+/// A user-facing error/notice presented by the single global alert attached
+/// in ``RootView``. Purchase, auth, sync, export, and AR-session failures all
+/// surface through this — nothing fails silently.
+public struct AppAlert: Identifiable, Equatable {
+    public let id: UUID
+    public var title: String
+    public var message: String
+
+    public init(title: String, message: String) {
+        self.id = UUID()
+        self.title = title
+        self.message = message
+    }
+}
+
 /// Observable application state. Inject once at the root via
 /// `.environment(appState)` and read with `@Environment(AppState.self)`.
 ///
@@ -116,40 +131,63 @@ public final class AppState {
     /// DEBUG-only brand field in Settings can live-preview a reskin.
     public var brand: String = AppState.defaultBrand
 
-    // MARK: - Theme tweaks
+    // MARK: - Theme tweaks (persisted)
     /// Selected accent option (drives `accent`, `accentSoft`, etc. in ``Theme``).
-    public var accent: AccentOption = .blue
+    public var accent: AccentOption = .blue {
+        didSet { UserDefaults.standard.set(accent.rawValue, forKey: "accent") }
+    }
     /// Convenience accessor for the accent color.
     public var accentColor: Color { accent.color }
     /// Convenience accessor for the accent display name.
     public var accentName: String { accent.name }
 
     /// Active measurement unit system.
-    public var unit: MeasureUnit = .metric
+    public var unit: MeasureUnit = .metric {
+        didSet { UserDefaults.standard.set(unit.rawValue, forKey: "unit") }
+    }
     /// Active layout density.
-    public var density: Density = .regular
+    public var density: Density = .regular {
+        didSet { UserDefaults.standard.set(density.rawValue, forKey: "density") }
+    }
 
     // MARK: - AR feature flags
     /// Whether the device LiDAR sensor is active. `false` => visual-inertial fallback.
     /// Drives precision badges, chip color/label and the fallback guidance banner.
+    /// Session-only: real hardware capability is detected by the AR service (M4).
     public var lidar: Bool = true
+    /// Snap newly placed points to existing ones within a small world-space
+    /// threshold (closes polygons cleanly). Persisted user preference.
+    public var snapEnabled: Bool = true {
+        didSet { UserDefaults.standard.set(snapEnabled, forKey: "snapEnabled") }
+    }
 
     // MARK: - Monetization
-    /// Remaining free exports on the free tier (design starts at 2 of 3 used → 1 left,
-    /// but the spec's default is 2; kept configurable here).
-    public var freeExportsLeft: Int = 2
-    /// Pro entitlement. A successful purchase or restore flips this true, which
-    /// unlocks export (bypassing the free-export quota) everywhere it is gated.
+    /// Remaining free exports on the free tier (3 to start, persisted; the
+    /// quota must survive relaunch or it is trivially bypassable).
+    public var freeExportsLeft: Int = 3 {
+        didSet { UserDefaults.standard.set(freeExportsLeft, forKey: "freeExportsLeft") }
+    }
+    /// Pro entitlement mirror for the UI. NEVER persisted here — set only from
+    /// StoreKit entitlement checks (launch + Transaction.updates listener, M3).
     public var isPro: Bool = false
 
-    /// Grants the Pro entitlement after a successful purchase / restore.
-    public func grantPro() { isPro = true }
+    // MARK: - Error surface
+    /// The single global alert (attached in ``RootView``). Set via
+    /// ``presentAlert(title:message:)`` from any failure path.
+    public var alert: AppAlert?
+
+    /// Surfaces a user-facing failure through the global alert.
+    public func presentAlert(title: String, message: String) {
+        alert = AppAlert(title: title, message: message)
+    }
 
     // MARK: - Flow gating
     /// Set once the user has authenticated.
     public var isAuthenticated: Bool = false
-    /// Set once the onboarding flow has completed.
-    public var hasOnboarded: Bool = false
+    /// Set once the onboarding flow has completed (persisted).
+    public var hasOnboarded: Bool = false {
+        didSet { UserDefaults.standard.set(hasOnboarded, forKey: "hasOnboarded") }
+    }
     /// Currently selected main tab.
     public var selectedTab: AppTab = .measure
 
@@ -166,7 +204,17 @@ public final class AppState {
         return .main
     }
 
-    public init() {}
+    /// Loads persisted settings. Assignments inside `init` do not fire
+    /// `didSet`, so loading never echoes writes back to UserDefaults.
+    public init() {
+        let d = UserDefaults.standard
+        if let raw = d.string(forKey: "unit"), let v = MeasureUnit(rawValue: raw) { unit = v }
+        if let raw = d.string(forKey: "accent"), let v = AccentOption(rawValue: raw) { accent = v }
+        if let raw = d.string(forKey: "density"), let v = Density(rawValue: raw) { density = v }
+        if d.object(forKey: "snapEnabled") != nil { snapEnabled = d.bool(forKey: "snapEnabled") }
+        if d.object(forKey: "freeExportsLeft") != nil { freeExportsLeft = d.integer(forKey: "freeExportsLeft") }
+        hasOnboarded = d.bool(forKey: "hasOnboarded")
+    }
 
     /// Builds the root state, applying DEBUG-only launch arguments used for
     /// UI/screenshot verification. In release builds (or with no args) this is

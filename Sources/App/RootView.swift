@@ -32,7 +32,17 @@ public struct RootView: View {
         .animation(.easeInOut(duration: 0.25), value: appState.phase)
         // Derive + install the live theme; re-runs whenever any tweak changes.
         .installTheme(Theme(appState))
+        // The single global error surface — every failure path presents here
+        // via AppState.presentAlert (purchases, auth, sync, export, AR session).
+        .alert(item: alertBinding) { alert in
+            Alert(title: Text(alert.title), message: Text(alert.message))
+        }
         .modifier(DebugPaywallPresenter())
+    }
+
+    /// @Observable classes don't vend bindings directly; bridge manually.
+    private var alertBinding: Binding<AppAlert?> {
+        Binding(get: { appState.alert }, set: { appState.alert = $0 })
     }
 }
 

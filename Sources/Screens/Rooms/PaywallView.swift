@@ -308,7 +308,7 @@ public struct PaywallView: View {
         let result = await service.purchase(selectedPlan)
         isWorking = false
         if case .success = result {
-            appState.grantPro()   // unlock the Pro entitlement so export is no longer gated
+            appState.isPro = true   // M3 replaces this with a StoreKit entitlement check
             onClose()
         }
     }
@@ -319,7 +319,7 @@ public struct PaywallView: View {
         let result = await service.restore()
         isWorking = false
         if case .success = result {
-            appState.grantPro()   // restored purchase re-grants the Pro entitlement
+            appState.isPro = true   // M3 replaces this with a StoreKit entitlement check
             onClose()
         }
     }
