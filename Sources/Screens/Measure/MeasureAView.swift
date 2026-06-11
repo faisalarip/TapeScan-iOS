@@ -37,11 +37,12 @@ public struct MeasureAView: View {
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            // Camera + AR — mesh/grid density follow LiDAR availability.
-            CameraBackdrop(accent: theme.accent,
-                           mesh: theme.lidar,
-                           gridAlpha: theme.lidar ? 0.22 : 0.12)
-            FeaturePoints(accent: theme.accent)
+            // Camera + AR — live ARView on device, stylized stand-in in-sim.
+            MeasureBackdrop(service: service,
+                            accent: theme.accent,
+                            mesh: theme.lidar,
+                            gridAlpha: theme.lidar ? 0.22 : 0.12,
+                            showFeaturePoints: true)
 
             scene
             ReticleLayer(accent: theme.accent, label: theme.reticleGuidance)
@@ -54,6 +55,9 @@ public struct MeasureAView: View {
         .onAppear {
             service.snapEnabled = appState.snapEnabled
             service.start()
+            // Cache the real hardware capability so precision badges and the
+            // Settings status row reflect this device, not a design default.
+            appState.lidar = service.lidarAvailable
             offerResumeIfNeeded()
         }
         .onDisappear { service.stop() }

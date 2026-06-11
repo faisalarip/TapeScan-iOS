@@ -30,10 +30,11 @@ public struct MeasureBView: View {
 
     public var body: some View {
         ZStack(alignment: .top) {
-            CameraBackdrop(accent: theme.accent,
-                           warmth: 0.4,
-                           mesh: theme.lidar,
-                           gridAlpha: theme.lidar ? 0.22 : 0.12)
+            MeasureBackdrop(service: service,
+                            accent: theme.accent,
+                            warmth: 0.4,
+                            mesh: theme.lidar,
+                            gridAlpha: theme.lidar ? 0.22 : 0.12)
 
             scene
             ReticleLayer(accent: theme.accent,
