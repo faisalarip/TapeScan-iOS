@@ -11,13 +11,20 @@
 // `ARSession` request is fired by the AR seam later, not here.
 
 import SwiftUI
+import AVFoundation
 
-/// Onboarding permission primer. `onContinue` advances the flow to the calibrate step.
+/// Onboarding permission step. The CTA fires the REAL system camera prompt
+/// (`AVCaptureDevice.requestAccess`); denial shows a recovery path into the
+/// system Settings. `onContinue` advances the flow to the calibrate step.
 struct OnbPermissionView: View {
     @Environment(\.theme) private var theme
     @Environment(AppState.self) private var appState
+    @Environment(\.openURL) private var openURL
 
     var onContinue: () -> Void = {}
+
+    /// Set after the user denies the system prompt (or arrives pre-denied).
+    @State private var permissionDenied = false
 
     var body: some View {
         ZStack {
@@ -112,9 +119,27 @@ struct OnbPermissionView: View {
         VStack(spacing: 12) {
             OnbDots(count: 3, active: 1)
 
-            PrimaryButton(title: "Allow Camera Access", icon: "scan") { onContinue() }
+            if permissionDenied {
+                Text("Camera access is off. TapeScan can't measure without it — you can enable it in Settings.")
+                    .font(Theme.sans(12.5))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Theme.amber)
+                    .padding(.horizontal, 8)
+
+                PrimaryButton(title: "Open Settings", icon: "gear") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
+                }
+                .padding(.top, 2)
+                .accessibilityLabel("Open Settings")
+            } else {
+                PrimaryButton(title: "Allow Camera Access", icon: "scan") {
+                    requestCameraAccess()
+                }
                 .padding(.top, 6)
                 .accessibilityLabel("Allow camera access")
+            }
 
             Button(action: onContinue) {
                 Text("Not now")
@@ -128,6 +153,28 @@ struct OnbPermissionView: View {
         }
         .padding(.horizontal, 22)
         .padding(.bottom, 38)
+    }
+
+    /// Fires the system camera prompt. Pre-authorized users skip straight
+    /// through; a fresh denial (or a pre-existing one) flips to recovery mode.
+    private func requestCameraAccess() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            onContinue()
+        case .denied, .restricted:
+            permissionDenied = true
+        case .notDetermined:
+            Task {
+                let granted = await AVCaptureDevice.requestAccess(for: .video)
+                if granted {
+                    onContinue()
+                } else {
+                    permissionDenied = true
+                }
+            }
+        @unknown default:
+            onContinue()
+        }
     }
 }
 

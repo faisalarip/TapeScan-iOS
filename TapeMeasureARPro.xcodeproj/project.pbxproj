@@ -14,8 +14,10 @@
 		184B5D9EDE69FC26A85F7E85 /* ValuePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */; };
 		1AC0DC3698F35E24319A7A37 /* FloorPlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */; };
 		1E6BAB4453BD1B7C43283CD8 /* MeasureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F0F62E8A1598538A27FA0D /* MeasureView.swift */; };
+		22FE459D61F778BCE79B8E19 /* MeasureBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB542834AC03B736BD60F054 /* MeasureBackdrop.swift */; };
 		23ED6FDA8526D305D61BDC3A /* OnbPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */; };
 		24572D0C07F85AABC4A98BF5 /* Reticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02308EBCC17F244732D61EC5 /* Reticle.swift */; };
+		2B13706D8AC2FC630D84C5BA /* ARPlacementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160A7169F98D50FB48079639 /* ARPlacementTests.swift */; };
 		36F52922C6F0F66DF86CA2AF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */; };
 		37B5F3ECAECA81D3902B6210 /* FeaturePoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5FC2A7168A15722D974C5 /* FeaturePoints.swift */; };
 		3EEC02BAB323AC03DADF8CF9 /* UnitFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77AD7324051F8A6A75173DEF /* UnitFormatTests.swift */; };
@@ -34,12 +36,16 @@
 		69D6689E4E6C89C9823ED6CA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */; };
 		7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */; };
 		812B78BE07ED961F879EA2F0 /* MeasurementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5300EF69F268E8FF0CC4356B /* MeasurementRecord.swift */; };
+		861EF1E4E9188F0784711824 /* ARPlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8CB3AE74B68317B955F85A /* ARPlacement.swift */; };
 		8FED561765B5178BAF2F44B5 /* RoomRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01E25555DA98093B2A30CD6 /* RoomRecord.swift */; };
 		94E8435400B188DDE786D3F6 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850CB15986A4D93B73F780D /* Icon.swift */; };
 		95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1D8EAB15807296E75631F /* AppState.swift */; };
 		96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */; };
 		9BFE95BAB6EDBCE4D0E5CB9B /* MeasureScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622523F0B707C36A93521FA0 /* MeasureScene.swift */; };
 		9F40BB400097034BA19280C2 /* SimulatedARMeasureServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946BF90A9ECD2EA492D74F8A /* SimulatedARMeasureServiceTests.swift */; };
+		A1852581F22EEA5C412F2BF8 /* TrackingQualityMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CCDC4A4DD7DA34F5349950A /* TrackingQualityMappingTests.swift */; };
+		A5B8BD0DC0870BB6EB06B87A /* ARTrackingMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58509F8544E0CDE7D691B8F9 /* ARTrackingMapping.swift */; };
+		A62931A6545518B24331EC3F /* ARKitMeasureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36981A12FDDE1D097D9538C7 /* ARKitMeasureService.swift */; };
 		A64F26C86BA7E167EA61F3D4 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33295A46F03522A0D5E08D0 /* SmokeTests.swift */; };
 		ABD4F129C8B4BADFCC39E250 /* StoreKitPurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F2C3067D2B3F40E8C93F72 /* StoreKitPurchaseService.swift */; };
 		B05465B8DB655BD0A33920A1 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */; };
@@ -92,18 +98,22 @@
 		0B2E9DB5F611E5C25596519F /* FloorPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlan.swift; sourceTree = "<group>"; };
 		0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureMath.swift; sourceTree = "<group>"; };
 		13A1D8EAB15807296E75631F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		160A7169F98D50FB48079639 /* ARPlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlacementTests.swift; sourceTree = "<group>"; };
 		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
 		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
+		36981A12FDDE1D097D9538C7 /* ARKitMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARKitMeasureService.swift; sourceTree = "<group>"; };
 		37B369180E9061586B748293 /* RoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsView.swift; sourceTree = "<group>"; };
 		3968C15BB6FAA92E39C59E51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitFormatters.swift; sourceTree = "<group>"; };
 		41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureMathTests.swift; sourceTree = "<group>"; };
 		4280D7ABC74C9C8768A1A4AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4445267E139B05347C7E4A6A /* AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowView.swift; sourceTree = "<group>"; };
+		4F8CB3AE74B68317B955F85A /* ARPlacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlacement.swift; sourceTree = "<group>"; };
 		50F0F62E8A1598538A27FA0D /* MeasureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureView.swift; sourceTree = "<group>"; };
 		5300EF69F268E8FF0CC4356B /* MeasurementRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementRecord.swift; sourceTree = "<group>"; };
 		54C7A01A4C164B6B13709437 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		58509F8544E0CDE7D691B8F9 /* ARTrackingMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARTrackingMapping.swift; sourceTree = "<group>"; };
 		6040C95B6A2583E5DBB4206B /* OnbCalibrateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbCalibrateView.swift; sourceTree = "<group>"; };
 		622523F0B707C36A93521FA0 /* MeasureScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureScene.swift; sourceTree = "<group>"; };
 		63E32F053E2D0D2929E8319F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -118,6 +128,7 @@
 		8119FF31F81C5BACBD109115 /* ARMeasureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMeasureService.swift; sourceTree = "<group>"; };
 		83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapeMeasureARProApp.swift; sourceTree = "<group>"; };
 		8850CB15986A4D93B73F780D /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
+		8CCDC4A4DD7DA34F5349950A /* TrackingQualityMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingQualityMappingTests.swift; sourceTree = "<group>"; };
 		8ED38FEF71D0C5E27BE88E43 /* SessionDraftStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDraftStore.swift; sourceTree = "<group>"; };
 		8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -127,6 +138,7 @@
 		A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateBrandTests.swift; sourceTree = "<group>"; };
 		A9A506848E51054BBE6D3F89 /* MeasureCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureCView.swift; sourceTree = "<group>"; };
 		A9FB5B4D1601D87E6C8D53BB /* TapeScan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TapeScan.entitlements; sourceTree = "<group>"; };
+		AB542834AC03B736BD60F054 /* MeasureBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureBackdrop.swift; sourceTree = "<group>"; };
 		AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlanModel.swift; sourceTree = "<group>"; };
 		AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbPermissionView.swift; sourceTree = "<group>"; };
 		B01E25555DA98093B2A30CD6 /* RoomRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomRecord.swift; sourceTree = "<group>"; };
@@ -249,6 +261,7 @@
 			children = (
 				BE3FE6EA1598EA638F420976 /* LiveSceneBuilder.swift */,
 				17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */,
+				AB542834AC03B736BD60F054 /* MeasureBackdrop.swift */,
 				A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */,
 				6DC663AC61E6EE415EDF16D3 /* MeasureControls.swift */,
 				A9A506848E51054BBE6D3F89 /* MeasureCView.swift */,
@@ -333,12 +346,14 @@
 			children = (
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
 				CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */,
+				160A7169F98D50FB48079639 /* ARPlacementTests.swift */,
 				B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */,
 				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				EB967D7619CDDCC48497F1EE /* PersistenceTests.swift */,
 				ED75B031C6FA01AFF09D3ABF /* ProductMappingTests.swift */,
 				946BF90A9ECD2EA492D74F8A /* SimulatedARMeasureServiceTests.swift */,
 				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
+				8CCDC4A4DD7DA34F5349950A /* TrackingQualityMappingTests.swift */,
 				77AD7324051F8A6A75173DEF /* UnitFormatTests.swift */,
 			);
 			path = TapeScanTests;
@@ -347,7 +362,10 @@
 		F055BEB6C9D618D7595C7400 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				36981A12FDDE1D097D9538C7 /* ARKitMeasureService.swift */,
 				8119FF31F81C5BACBD109115 /* ARMeasureService.swift */,
+				4F8CB3AE74B68317B955F85A /* ARPlacement.swift */,
+				58509F8544E0CDE7D691B8F9 /* ARTrackingMapping.swift */,
 				C62B9BD32537555D9C604FCD /* PurchaseService.swift */,
 				E6F2C3067D2B3F40E8C93F72 /* StoreKitPurchaseService.swift */,
 			);
@@ -482,7 +500,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A62931A6545518B24331EC3F /* ARKitMeasureService.swift in Sources */,
 				CACF68FB1670F7B6D81F4AF4 /* ARMeasureService.swift in Sources */,
+				861EF1E4E9188F0784711824 /* ARPlacement.swift in Sources */,
+				A5B8BD0DC0870BB6EB06B87A /* ARTrackingMapping.swift in Sources */,
 				95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */,
 				EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */,
 				E0BC4C1DB5968F240F49CBCE /* CameraBackdrop.swift in Sources */,
@@ -502,6 +523,7 @@
 				F4FF90F876792C9F28387868 /* MainTabView.swift in Sources */,
 				13D72BB82D2E28E0C5D9FC1F /* MeasureAView.swift in Sources */,
 				E86696095F32FB38EF7C89A8 /* MeasureBView.swift in Sources */,
+				22FE459D61F778BCE79B8E19 /* MeasureBackdrop.swift in Sources */,
 				16F225DC0C15AAA28F8BC785 /* MeasureCView.swift in Sources */,
 				4456D7997157B38BC63AD2ED /* MeasureControls.swift in Sources */,
 				BD00AF879413A129E4B29C34 /* MeasureMath.swift in Sources */,
@@ -538,6 +560,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B13706D8AC2FC630D84C5BA /* ARPlacementTests.swift in Sources */,
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
 				E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */,
 				96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */,
@@ -546,6 +569,7 @@
 				CBEA9635CBB9D74186100389 /* ProductMappingTests.swift in Sources */,
 				9F40BB400097034BA19280C2 /* SimulatedARMeasureServiceTests.swift in Sources */,
 				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
+				A1852581F22EEA5C412F2BF8 /* TrackingQualityMappingTests.swift in Sources */,
 				3EEC02BAB323AC03DADF8CF9 /* UnitFormatTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

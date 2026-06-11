@@ -22,16 +22,12 @@ public struct SettingsView: View {
     @Environment(AppState.self) private var appState
 
     // Local interactive state for controls that are not global tweaks.
-    @State private var pointSnapping = true
-    @State private var planeDetection: PlaneMode = .all
     @State private var showPaywall = false
     @State private var showManageSubscriptions = false
     @State private var isRestoring = false
     @Environment(\.openURL) private var openURL
 
     public init() {}
-
-    private enum PlaneMode: String, CaseIterable, Hashable { case floor = "Floor", all = "All" }
 
     public var body: some View {
         // Bind directly to the observable app state so segmented/toggle controls
@@ -47,8 +43,9 @@ public struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 18) {
                         if !appState.isPro { proUpsell }
-                        measurementGroup(unit: $appState.unit)
-                        arEngineGroup(lidar: $appState.lidar)
+                        measurementGroup(unit: $appState.unit,
+                                         snap: $appState.snapEnabled)
+                        arEngineGroup
                         themeGroup(accent: appState.accent,
                                    setAccent: { appState.accent = $0 },
                                    brand: $appState.brand)
@@ -131,19 +128,22 @@ public struct SettingsView: View {
 
     // MARK: - Measurement
 
-    private func measurementGroup(unit: Binding<MeasureUnit>) -> some View {
+    private func measurementGroup(unit: Binding<MeasureUnit>,
+                                  snap: Binding<Bool>) -> some View {
         DListSection(header: "Measurement") {
             DRow(icon: "ruler2", title: "Units", accessory: {
                 IOSSegmented(options: MeasureUnit.allCases,
                              selection: unit) { $0.title }
                     .accessibilityLabel("Units")
             })
+            // Real setting: new points weld to existing ones within 2 cm
+            // (closes polygons cleanly). Persisted; the AR service reads it.
             DRow(icon: "pin", title: "Point snapping", accessory: {
-                IOSToggle(isOn: $pointSnapping)
+                IOSToggle(isOn: snap)
                     .accessibilityLabel("Point snapping")
-                    .accessibilityValue(pointSnapping ? "On" : "Off")
+                    .accessibilityValue(snap.wrappedValue ? "On" : "Off")
             })
-            // Precision is derived from the LiDAR flag: ±4 mm vs ±2 cm.
+            // Precision derives from the detected hardware: ±4 mm vs ±2 cm.
             DRow(icon: "distance",
                  title: "Precision",
                  detail: theme.precisionBadge,
@@ -157,22 +157,19 @@ public struct SettingsView: View {
 
     // MARK: - AR Engine
 
-    private func arEngineGroup(lidar: Binding<Bool>) -> some View {
+    /// Read-only hardware status — LiDAR is detected (cached by the Measure
+    /// screen from the AR service), never user-toggled.
+    private var arEngineGroup: some View {
         DListSection(header: "AR Engine") {
             DRow(icon: "lidar",
                  title: "LiDAR depth",
-                 subtitle: lidar.wrappedValue
-                    ? "Auto · device supported"
-                    : "Off · visual-inertial fallback", accessory: {
-                IOSToggle(isOn: lidar)
-                    .accessibilityLabel("LiDAR depth")
-                    .accessibilityValue(lidar.wrappedValue ? "On" : "Off")
+                 subtitle: appState.lidar
+                    ? "Active · mesh reconstruction"
+                    : "Not available · visual-inertial fallback",
+                 last: true, accessory: {
+                StatusDot(color: appState.lidar ? Theme.successGreen : Theme.amber)
             })
-            DRow(icon: "grid", title: "Plane detection", last: true, accessory: {
-                IOSSegmented(options: PlaneMode.allCases,
-                             selection: $planeDetection) { $0.rawValue }
-                    .accessibilityLabel("Plane detection")
-            })
+            .accessibilityLabel("LiDAR depth: \(appState.lidar ? "active" : "not available, visual fallback")")
         }
     }
 

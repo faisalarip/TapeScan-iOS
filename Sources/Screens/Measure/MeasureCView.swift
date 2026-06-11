@@ -35,10 +35,11 @@ public struct MeasureCView: View {
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            CameraBackdrop(accent: theme.accent,
-                           mesh: theme.lidar,
-                           gridAlpha: theme.lidar ? 0.22 : 0.12)
-            FeaturePoints(accent: theme.accent)
+            MeasureBackdrop(service: service,
+                            accent: theme.accent,
+                            mesh: theme.lidar,
+                            gridAlpha: theme.lidar ? 0.22 : 0.12,
+                            showFeaturePoints: true)
 
             scene
 

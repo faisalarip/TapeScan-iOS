@@ -14,9 +14,11 @@ import Observation
 import simd
 
 /// AR tracking quality, surfaced in telemetry strips and the calibrate screen.
+/// Limited states carry a short user-facing guidance string ("Move slower")
+/// so the HUD can coach instead of silently degrading accuracy.
 public enum TrackingQuality: Equatable, Sendable {
     case initializing
-    case limited
+    case limited(reason: String)
     case normal
     case notAvailable
 
@@ -71,14 +73,16 @@ public protocol ARMeasureService: AnyObject, Observable {
     func load(points: [WorldPoint], mode: MeasureMode)
 }
 
-/// Picks the AR backend for the current run environment. M4 swaps the device
-/// branch to `ARKitMeasureService`. MainActor-isolated; view inits that use it
-/// as a default argument are annotated @MainActor (SE-0411 isolated defaults).
+/// Selects the AR backend for the current run destination: the Simulator gets
+/// the simulated service; physical devices get the real ARKit backend.
 public enum MeasureServiceFactory {
     @MainActor
     public static func make() -> any ARMeasureService {
-        // M4: #if targetEnvironment(simulator) → simulated; #else → ARKit.
-        SimulatedARMeasureService()
+        #if targetEnvironment(simulator)
+        return SimulatedARMeasureService()
+        #else
+        return ARKitMeasureService()
+        #endif
     }
 }
 

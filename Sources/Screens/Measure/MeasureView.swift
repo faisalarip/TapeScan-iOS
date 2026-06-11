@@ -51,6 +51,8 @@ public struct MeasureView: View {
         _style = State(initialValue: initial)
     }
 
+    @Environment(\.scenePhase) private var scenePhase
+
     public var body: some View {
         ZStack(alignment: .top) {
             direction
@@ -59,6 +61,18 @@ public struct MeasureView: View {
             #endif
         }
         .background(Theme.cameraBG.ignoresSafeArea())
+        // Backgrounding mid-measure must pause the AR session (camera release
+        // + battery); returning resumes and ARKit relocalizes.
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .active:
+                service.start()
+            case .background, .inactive:
+                service.stop()
+            @unknown default:
+                break
+            }
+        }
     }
 
     @ViewBuilder
