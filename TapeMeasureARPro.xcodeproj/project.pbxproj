@@ -62,6 +62,7 @@
 		CD13EBA4B022C01978CBF588 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */; };
 		DA93A68683E035D3931C4D1E /* SessionDraftStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ED38FEF71D0C5E27BE88E43 /* SessionDraftStore.swift */; };
 		DFE360A5CF8102B91627C2AE /* LiveSceneBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3FE6EA1598EA638F420976 /* LiveSceneBuilder.swift */; };
+		E0B61E17DE666816E0EB4D32 /* CapturedRoomConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCD8ED77F51AF37F326C410B /* CapturedRoomConverter.swift */; };
 		E0BC4C1DB5968F240F49CBCE /* CameraBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = C354D269884E484AB77F6F78 /* CameraBackdrop.swift */; };
 		E15761CBCC13A49DF5564BC2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C7A01A4C164B6B13709437 /* Theme.swift */; };
 		E4013C34C559814D9DB70BF9 /* IOSControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67FB94D7256A0FDE78036E47 /* IOSControls.swift */; };
@@ -71,6 +72,7 @@
 		EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4445267E139B05347C7E4A6A /* AuthFlowView.swift */; };
 		EE8D34F74F597B4E1D028B28 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2522359FDE1BAD3E5D96DF4 /* RootView.swift */; };
 		F0DFFCC86BF09B288593038E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3968C15BB6FAA92E39C59E51 /* Assets.xcassets */; };
+		F173DD288879A312B9A574EB /* CapturedRoomConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */; };
 		F1A21734443D6CDFA477F774 /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62B9BD32537555D9C604FCD /* PurchaseService.swift */; };
 		F4FF90F876792C9F28387868 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */; };
 		FC135E720CF81755DFD5C8A9 /* Shutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77950248AF8E8925748BFEAC /* Shutter.swift */; };
@@ -134,6 +136,7 @@
 		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		946BF90A9ECD2EA492D74F8A /* SimulatedARMeasureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedARMeasureServiceTests.swift; sourceTree = "<group>"; };
 		A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureBView.swift; sourceTree = "<group>"; };
+		A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturedRoomConverterTests.swift; sourceTree = "<group>"; };
 		A3F1882FED0A1E47F2DE1891 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateBrandTests.swift; sourceTree = "<group>"; };
 		A9A506848E51054BBE6D3F89 /* MeasureCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureCView.swift; sourceTree = "<group>"; };
@@ -165,6 +168,7 @@
 		F8A44956BDB1D755CA082147 /* GroupedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedList.swift; sourceTree = "<group>"; };
 		FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
 		FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		FCD8ED77F51AF37F326C410B /* CapturedRoomConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturedRoomConverter.swift; sourceTree = "<group>"; };
 		FF8A69608238A83D96D8E9B5 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -274,6 +278,7 @@
 		B29FC1130E4A9FB2151676A2 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				FCD8ED77F51AF37F326C410B /* CapturedRoomConverter.swift */,
 				AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */,
 				0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */,
 				C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */,
@@ -347,6 +352,7 @@
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
 				CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */,
 				160A7169F98D50FB48079639 /* ARPlacementTests.swift */,
+				A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */,
 				B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */,
 				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				EB967D7619CDDCC48497F1EE /* PersistenceTests.swift */,
@@ -507,6 +513,7 @@
 				95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */,
 				EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */,
 				E0BC4C1DB5968F240F49CBCE /* CameraBackdrop.swift in Sources */,
+				E0B61E17DE666816E0EB4D32 /* CapturedRoomConverter.swift in Sources */,
 				650EB1DECF310366FF7974CB /* Chip.swift in Sources */,
 				B05465B8DB655BD0A33920A1 /* Color+Hex.swift in Sources */,
 				52FA790DB8A96E72BA089E0F /* CreateAccountView.swift in Sources */,
@@ -563,6 +570,7 @@
 				2B13706D8AC2FC630D84C5BA /* ARPlacementTests.swift in Sources */,
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
 				E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */,
+				F173DD288879A312B9A574EB /* CapturedRoomConverterTests.swift in Sources */,
 				96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */,
 				617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */,
 				61F315C77457288AA9D52126 /* PersistenceTests.swift in Sources */,
