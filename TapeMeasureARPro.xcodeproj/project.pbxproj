@@ -12,6 +12,7 @@
 		16F225DC0C15AAA28F8BC785 /* MeasureCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A506848E51054BBE6D3F89 /* MeasureCView.swift */; };
 		175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */; };
 		184B5D9EDE69FC26A85F7E85 /* ValuePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AC54FA770A82B8D6CA0C1E /* ValuePill.swift */; };
+		1AC0DC3698F35E24319A7A37 /* FloorPlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */; };
 		1E6BAB4453BD1B7C43283CD8 /* MeasureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F0F62E8A1598538A27FA0D /* MeasureView.swift */; };
 		23ED6FDA8526D305D61BDC3A /* OnbPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */; };
 		24572D0C07F85AABC4A98BF5 /* Reticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02308EBCC17F244732D61EC5 /* Reticle.swift */; };
@@ -31,6 +32,7 @@
 		7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */; };
 		94E8435400B188DDE786D3F6 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850CB15986A4D93B73F780D /* Icon.swift */; };
 		95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A1D8EAB15807296E75631F /* AppState.swift */; };
+		96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */; };
 		9BFE95BAB6EDBCE4D0E5CB9B /* MeasureScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622523F0B707C36A93521FA0 /* MeasureScene.swift */; };
 		A64F26C86BA7E167EA61F3D4 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33295A46F03522A0D5E08D0 /* SmokeTests.swift */; };
 		B05465B8DB655BD0A33920A1 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFF30AA1CBCAE8050BC3F84 /* Color+Hex.swift */; };
@@ -111,7 +113,9 @@
 		A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateBrandTests.swift; sourceTree = "<group>"; };
 		A9A506848E51054BBE6D3F89 /* MeasureCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureCView.swift; sourceTree = "<group>"; };
 		A9FB5B4D1601D87E6C8D53BB /* TapeScan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TapeScan.entitlements; sourceTree = "<group>"; };
+		AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlanModel.swift; sourceTree = "<group>"; };
 		AFAFB6B1232B7B52D13B8BEE /* OnbPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnbPermissionView.swift; sourceTree = "<group>"; };
+		B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlanModelTests.swift; sourceTree = "<group>"; };
 		B2522359FDE1BAD3E5D96DF4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BB7FB7B4E97A3D4BA41FB164 /* Chip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chip.swift; sourceTree = "<group>"; };
 		C33295A46F03522A0D5E08D0 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
@@ -223,6 +227,7 @@
 		B29FC1130E4A9FB2151676A2 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				AC9E9943D25B4A1AF88AACC7 /* FloorPlanModel.swift */,
 				0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */,
 				C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */,
 			);
@@ -293,6 +298,7 @@
 			isa = PBXGroup;
 			children = (
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
+				B06485D0178A2DFA4B49850D /* FloorPlanModelTests.swift */,
 				41B75DFA130AA41FF4178979 /* MeasureMathTests.swift */,
 				F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */,
 			);
@@ -445,6 +451,7 @@
 				C0F00F48DA584A479953E9FF /* ExportView.swift in Sources */,
 				37B5F3ECAECA81D3902B6210 /* FeaturePoints.swift in Sources */,
 				57E712A45120EC1F39171A2E /* FloorPlan.swift in Sources */,
+				1AC0DC3698F35E24319A7A37 /* FloorPlanModel.swift in Sources */,
 				CD13EBA4B022C01978CBF588 /* GlassCard.swift in Sources */,
 				53AD88BDE903AE1C1FC17263 /* GroupedList.swift in Sources */,
 				BF592A236331CCD85A175F8F /* HistoryView.swift in Sources */,
@@ -485,6 +492,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
+				96BFDD7B655A11FD8C8B560F /* FloorPlanModelTests.swift in Sources */,
 				617E9511089620A4E52B5F10 /* MeasureMathTests.swift in Sources */,
 				175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */,
 			);
