@@ -12,7 +12,7 @@ Prerequisite: Apple Developer Program membership active.
 | Platform | iOS |
 | Name | **TapeScan** |
 | Primary language | English (U.S.) |
-| Bundle ID | `co.tuntun.tapescan` (register it under Certificates → Identifiers first, with **In-App Purchase** + **Sign in with Apple** capabilities) |
+| Bundle ID | `com.faisalnurarif.tapescan` (register it under Certificates → Identifiers first, with **In-App Purchase** + **Sign in with Apple** capabilities) |
 | SKU | `tapescan-001` |
 
 ## 2. App Information

@@ -1,6 +1,6 @@
 name: TapeMeasureARPro
 options:
-  bundleIdPrefix: co.tuntun
+  bundleIdPrefix: com.faisalnurarif
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -15,13 +15,10 @@ settings:
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: minimal
     DEVELOPMENT_LANGUAGE: en
-    CODE_SIGNING_ALLOWED: NO
-    CODE_SIGNING_REQUIRED: NO
-    # Owner input: Apple Developer Team ID (Apple Developer portal → Membership).
-    # Uncomment and flip CODE_SIGNING_ALLOWED / CODE_SIGNING_REQUIRED to YES for
-    # device builds and archiving. Simulator builds stay unsigned on purpose so
-    # CI and local Simulator verification need no certificates.
-    # DEVELOPMENT_TEAM: REPLACE_WITH_TEAM_ID
+    # Automatic signing with the owner's team. Scripted Simulator builds pass
+    # CODE_SIGNING_ALLOWED=NO on the command line so CI needs no certificates.
+    DEVELOPMENT_TEAM: 5VHRN5SF2P
+    CODE_SIGN_STYLE: Automatic
 
 targets:
   TapeScan:
@@ -35,7 +32,7 @@ targets:
         product: Supabase
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan
+        PRODUCT_BUNDLE_IDENTIFIER: com.faisalnurarif.tapescan
         PRODUCT_NAME: TapeScan
         INFOPLIST_FILE: Sources/Resources/Info.plist
         GENERATE_INFOPLIST_FILE: NO
@@ -57,7 +54,7 @@ targets:
       - target: TapeScan
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.faisalnurarif.tapescan.tests
         GENERATE_INFOPLIST_FILE: YES
 
   TapeScanUITests:
@@ -70,7 +67,7 @@ targets:
       - target: TapeScan
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.faisalnurarif.tapescan.uitests
         GENERATE_INFOPLIST_FILE: YES
 
 schemes:

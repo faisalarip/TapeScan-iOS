@@ -5,7 +5,7 @@ angle, LiDAR + visual fallback), RoomPlan room scanning → parametric floor
 plans, exports (PDF / PNG / SVG / DXF / CSV / USDZ / glTF), optional Supabase
 accounts with offline-first sync, StoreKit 2 Pro subscription.
 
-Bundle: `co.tuntun.tapescan` · iOS 17+ · iPhone (room scan needs LiDAR).
+Bundle: `com.faisalnurarif.tapescan` · iOS 17+ · iPhone (room scan needs LiDAR).
 Legal/support pages: https://faisalarip.github.io/tapescan-legal/
 
 ## Build & run

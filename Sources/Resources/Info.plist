@@ -22,7 +22,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>co.tuntun.tapescan.auth</string>
+			<string>com.faisalnurarif.tapescan.auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>tapescan</string>
@@ -37,15 +37,15 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>TapeScan uses the camera to detect surfaces and place measurement points.</string>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string></string>
-	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
+	</dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string></string>
 	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
