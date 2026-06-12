@@ -28,19 +28,21 @@ public struct ExportView: View {
 
     private static let freeTotal = 3
 
-    /// A selectable export format card.
+    /// A selectable export format card backed by a real ExportFormat.
     private struct Format: Identifiable {
-        let id: String        // "glTF"
-        let detail: String    // "3D model"
-        let icon: String      // icon name
+        let format: ExportFormat
         var on: Bool
+        var id: String { format.id }
     }
 
     @State private var formats: [Format] = [
-        Format(id: "glTF", detail: "3D model", icon: "cube3d", on: true),
-        Format(id: "SVG", detail: "Vector plan", icon: "ruler2", on: true),
-        Format(id: "PNG", detail: "Image", icon: "grid", on: false),
-        Format(id: "PDF", detail: "Document", icon: "download", on: false),
+        Format(format: .pdf, on: true),
+        Format(format: .png, on: true),
+        Format(format: .svg, on: false),
+        Format(format: .dxf, on: false),
+        Format(format: .csv, on: false),
+        Format(format: .gltf, on: false),
+        Format(format: .usdz, on: false),
     ]
 
     @State private var includeDimensions = true
@@ -48,6 +50,11 @@ public struct ExportView: View {
     @State private var includeGrid = false
 
     @State private var showPaywall = false
+    @State private var isExporting = false
+    /// Generated files awaiting the share sheet.
+    @State private var shareURLs: [URL] = []
+    @State private var showShareSheet = false
+    @State private var exportService = ExportService()
 
     public init(room: RoomRecord? = nil, onClose: @escaping () -> Void = {}) {
         self.room = room
@@ -103,6 +110,16 @@ public struct ExportView: View {
             }
             .environment(appState)
             .installTheme(Theme(appState))
+        }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(items: shareURLs)
+        }
+        .onDisappear { exportService.cleanup() }
+        .onAppear {
+            // Hide the USDZ card when this room has no stored 3D capture.
+            if room?.usdzFilename == nil {
+                formats.removeAll { $0.format == .usdz }
+            }
         }
     }
 
@@ -267,16 +284,16 @@ public struct ExportView: View {
             formats[i].on.toggle()
         } label: {
             HStack(spacing: 11) {
-                Icon(f.icon, size: 19, weight: 1.8, color: f.on ? theme.accent : Theme.ink2)
+                Icon(f.format.icon, size: 19, weight: 1.8, color: f.on ? theme.accent : Theme.ink2)
                     .frame(width: 36, height: 36)
                     .background(
                         RoundedRectangle(cornerRadius: theme.r(10), style: .continuous)
                             .fill(f.on ? theme.accent.withA(0.25) : Color.white.opacity(0.06)))
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(f.id)
+                    Text(f.format.displayName)
                         .font(Theme.sans(14.5, weight: .semibold))
                         .foregroundStyle(Theme.ink)
-                    Text(f.detail)
+                    Text(f.format.detail)
                         .font(Theme.sans(11.5))
                         .foregroundStyle(Theme.ink3)
                 }
@@ -296,7 +313,7 @@ public struct ExportView: View {
                                   lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(f.id), \(f.detail)")
+        .accessibilityLabel("\(f.format.displayName), \(f.format.detail)")
         .accessibilityValue(f.on ? "included" : "not included")
         .accessibilityAddTraits(f.on ? [.isSelected, .isButton] : .isButton)
     }
@@ -334,7 +351,11 @@ public struct ExportView: View {
     private var ctaBar: some View {
         Button(action: exportTapped) {
             HStack(spacing: 9) {
-                Icon(locked ? "cube3d" : "share", size: 19, weight: 2.2, color: .white)
+                if isExporting {
+                    ProgressView().tint(.white)
+                } else {
+                    Icon(locked ? "cube3d" : "share", size: 19, weight: 2.2, color: .white)
+                }
                 Text(locked ? "Upgrade to export" : "Export \(enabledCount) \(enabledCount == 1 ? "file" : "files")")
                     .font(Theme.sans(16, weight: .semibold))
             }
@@ -347,7 +368,7 @@ public struct ExportView: View {
             .shadow(color: locked ? .clear : theme.accent.withA(0.4), radius: 13, y: 8)
         }
         .buttonStyle(.plain)
-        .disabled(!locked && enabledCount == 0)
+        .disabled(isExporting || (!locked && enabledCount == 0))
         .opacity(!locked && enabledCount == 0 ? 0.5 : 1)
         .padding(.horizontal, 18)
         .padding(.top, 14)
@@ -357,21 +378,58 @@ public struct ExportView: View {
 
     // MARK: - Actions
 
+    /// Generates every selected format, hands the files to the share sheet,
+    /// and spends one free export ONLY after successful generation.
     private func exportTapped() {
         // Locked (no quota left, not Pro): straight to the paywall.
         guard !locked else {
             showPaywall = true
             return
         }
-        // Pro users export without touching the free quota.
-        guard !appState.isPro else { return }
-        // Spend one free export.
-        appState.freeExportsLeft = max(0, appState.freeExportsLeft - 1)
-        // If that was the last one, surface the paywall.
-        if appState.freeExportsLeft <= 0 {
-            showPaywall = true
+        guard !isExporting, enabledCount > 0 else { return }
+        isExporting = true
+
+        let selected = formats.filter(\.on).map(\.format)
+        let exportPlan = plan
+        let name = room?.name ?? "Floor Plan"
+        let usdzFilename = room?.usdzFilename
+
+        var urls: [URL] = []
+        do {
+            for format in selected {
+                urls.append(try exportService.export(plan: exportPlan,
+                                                     name: name,
+                                                     usdzFilename: usdzFilename,
+                                                     format: format,
+                                                     unit: theme.unit))
+            }
+        } catch {
+            isExporting = false
+            appState.presentAlert(title: "Export failed",
+                                  message: error.localizedDescription)
+            return
         }
+
+        // Quota: spent only on a successful free-tier export. Pro = unlimited.
+        if !appState.isPro {
+            appState.freeExportsLeft = max(0, appState.freeExportsLeft - 1)
+        }
+
+        isExporting = false
+        shareURLs = urls
+        showShareSheet = true
     }
+}
+
+/// UIActivityViewController bridge for sharing the generated files.
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [URL]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }
 
 #Preview {

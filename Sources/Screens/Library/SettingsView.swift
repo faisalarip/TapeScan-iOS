@@ -101,7 +101,7 @@ public struct SettingsView: View {
                     Text("\(appState.brand) Pro")
                         .font(Theme.sans(16, weight: .bold))
                         .foregroundStyle(Theme.ink)
-                    Text("glTF export · unlimited rooms")
+                    Text("USDZ + glTF export · unlimited rooms")
                         .font(Theme.sans(12.5))
                         .foregroundStyle(Color.white.opacity(0.85))
                 }
