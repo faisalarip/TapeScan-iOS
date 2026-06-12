@@ -19,6 +19,7 @@ public struct Reticle: View {
     }
 
     @State private var animate = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public var body: some View {
         VStack(spacing: 0) {
@@ -62,7 +63,7 @@ public struct Reticle: View {
         }
         .allowsHitTesting(false)
         .onAppear {
-            guard pulse else { return }
+            guard pulse, !reduceMotion else { return }
             withAnimation(.easeOut(duration: 2.4).repeatForever(autoreverses: true)) {
                 animate = true
             }
