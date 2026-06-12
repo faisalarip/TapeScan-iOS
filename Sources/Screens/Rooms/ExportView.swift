@@ -50,6 +50,7 @@ public struct ExportView: View {
     @State private var includeGrid = false
 
     @State private var showPaywall = false
+    @State private var showPlanEditor = false
     @State private var isExporting = false
     /// Generated files awaiting the share sheet.
     @State private var shareURLs: [URL] = []
@@ -113,6 +114,13 @@ public struct ExportView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(items: shareURLs)
+        }
+        .fullScreenCover(isPresented: $showPlanEditor) {
+            if let room {
+                FloorPlanEditorView(room: room)
+                    .environment(appState)
+                    .installTheme(Theme(appState))
+            }
         }
         .onDisappear { exportService.cleanup() }
         .onAppear {
@@ -220,12 +228,28 @@ public struct ExportView: View {
             .padding(.top, 12)
 
             // Auto-quantities strip (perimeter / wall area / volume) — the
-            // renovation math competitors charge for (benchmark parity item).
+            // renovation math competitors charge for (benchmark parity item) —
+            // plus the plan-editor entry (fix any scan inaccuracy in seconds).
             HStack(spacing: 12) {
                 quantityChip("PERIM", UnitFormat.lengthFractional(quantities.perimeterMeters, unit: theme.unit))
                 quantityChip("WALLS", UnitFormat.area(quantities.wallAreaSquareMeters, theme.unit))
                 quantityChip("VOL", UnitFormat.volume(quantities.volumeCubicMeters, theme.unit))
                 Spacer(minLength: 0)
+                if room != nil {
+                    Button { showPlanEditor = true } label: {
+                        HStack(spacing: 5) {
+                            Icon("ruler2", size: 12, weight: 2, color: theme.accent)
+                            Text("Edit Plan")
+                                .font(Theme.sans(11.5, weight: .bold))
+                                .foregroundStyle(theme.accent)
+                        }
+                        .padding(.horizontal, 10)
+                        .frame(minHeight: 28)
+                        .background(Capsule().fill(theme.accent.withA(0.15)))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Edit floor plan")
+                }
             }
             .padding(.horizontal, 14)
             .frame(maxHeight: .infinity, alignment: .bottom)
