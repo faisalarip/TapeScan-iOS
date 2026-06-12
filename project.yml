@@ -5,6 +5,11 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
 
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift
+    majorVersion: 2.0.0
+
 settings:
   base:
     SWIFT_VERSION: "5.0"
@@ -25,6 +30,9 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - Sources
+    dependencies:
+      - package: Supabase
+        product: Supabase
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.tuntun.tapescan

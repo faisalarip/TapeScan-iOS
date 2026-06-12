@@ -1,48 +1,39 @@
-// AuthFlowView.swift — the Auth phase coordinator.
+// AuthFlowView.swift — the optional sign-in flow (M7).
 //
-// Owns the SignIn ⇄ CreateAccount cross-link that neither screen can own alone
-// (the `.auth` phase only knows the user is unauthenticated). It presents:
-//
-//   SignIn ──"Create account"──▶ CreateAccount ──"Verify & Continue"──▶ Verify
-//      ▲                              │                                    │
-//      └──────── back chevron ────────┘                  completeAuth() ───┘
-//
-// `CreateAccountView` presents `VerifyCodeView` itself (via a fullScreenCover),
-// and both `VerifyCodeView` and `SignInView`'s social buttons call
-// `appState.completeAuth()`, which advances the RootView out of `.auth`.
+// Presented as a sheet (never a gate): post-onboarding once, and from
+// Settings' "Back up & sync" entry. Passwordless: SignIn (Apple / Google /
+// email) → VerifyCode for the emailed one-time code. Every path out —
+// signed in, verified, or "continue without account" — just dismisses.
 
 import SwiftUI
 
-/// Coordinates the two-screen auth surface (Sign In / Create Account) and the
-/// cross-link between them. Presented by ``RootView`` for ``AppPhase/auth``.
+/// Hosts the optional SignIn → VerifyCode flow.
 public struct AuthFlowView: View {
+    @Environment(AppState.self) private var appState
 
-    /// Whether the create-account screen is on top of sign-in.
-    @State private var showCreateAccount = false
+    /// Dismiss handler (sign-in success, verification success, or skip).
+    private let onDone: () -> Void
 
-    public init() {}
+    /// Email awaiting one-time-code verification; nil shows the sign-in screen.
+    @State private var pendingEmail: String?
+
+    public init(onDone: @escaping () -> Void = {}) {
+        self.onDone = onDone
+    }
 
     public var body: some View {
         ZStack {
-            if showCreateAccount {
-                CreateAccountView(
-                    showSignIn: Binding(
-                        get: { !showCreateAccount },
-                        set: { backToSignIn in
-                            // CreateAccount's back chevron sets `showSignIn = true`.
-                            if backToSignIn { showCreateAccount = false }
-                        }
-                    )
-                )
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+            if let email = pendingEmail {
+                VerifyCodeView(email: email, onVerified: onDone)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
             } else {
-                SignInView {
-                    showCreateAccount = true
-                }
-                .transition(.opacity)
+                SignInView(onCodeSent: { email in pendingEmail = email },
+                           onSignedIn: onDone,
+                           onSkip: onDone)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: showCreateAccount)
+        .animation(.easeInOut(duration: 0.25), value: pendingEmail != nil)
     }
 }
 

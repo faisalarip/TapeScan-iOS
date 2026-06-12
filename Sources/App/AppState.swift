@@ -197,9 +197,10 @@ public final class AppState {
     public var debugPaywallContext: PaywallContext?
     #endif
 
-    /// Derived app phase the root view switches on.
+    /// Derived app phase the root view switches on. Accounts are OPTIONAL —
+    /// auth never gates the app (Guideline 5.1.1); sign-in is offered as a
+    /// dismissible sheet after onboarding and from Settings.
     public var phase: AppPhase {
-        if !isAuthenticated { return .auth }
         if !hasOnboarded { return .onboarding }
         return .main
     }
@@ -231,8 +232,8 @@ public final class AppState {
             return args[i + 1]
         }
         switch value("-uiPhase") {
-        case "onboarding": state.isAuthenticated = true
-        case "main":       state.isAuthenticated = true; state.hasOnboarded = true
+        case "onboarding": state.hasOnboarded = false
+        case "main":       state.hasOnboarded = true
         default: break
         }
         if let tab = value("-uiTab").flatMap(AppTab.init(rawValue:)) { state.selectedTab = tab }
@@ -248,14 +249,13 @@ public final class AppState {
     }
 
     // MARK: - Intents
-    /// Marks the user as signed in (advances Auth → Onboarding).
+    /// Mirrors a successful sign-in (sync becomes available).
     public func completeAuth() { isAuthenticated = true }
     /// Marks onboarding complete (advances Onboarding → Main).
     public func completeOnboarding() { hasOnboarded = true }
-    /// Signs out and resets the flow back to Auth.
+    /// Clears the signed-in mirror. Local data and onboarding state stay —
+    /// signing out never costs the user anything.
     public func signOut() {
         isAuthenticated = false
-        hasOnboarded = false
-        selectedTab = .measure
     }
 }
