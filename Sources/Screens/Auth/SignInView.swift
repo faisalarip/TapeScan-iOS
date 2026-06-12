@@ -16,20 +16,35 @@ public struct SignInView: View {
     @Environment(\.theme) private var theme
     @Environment(AppState.self) private var appState
 
-    @State private var email = "alex@studio.co"
-    @State private var password = ""
-    @State private var showPassword = false
-    @State private var showForgotPassword = false
+    @State private var email = ""
+    @State private var isWorking = false
+    @State private var appleCoordinator = AppleSignInCoordinator()
 
-    /// Cross-link to the create-account screen. The `.auth` phase only knows the
-    /// user is unauthenticated, so the SignIn ⇄ CreateAccount toggle is owned by
-    /// the parent ``AuthFlowView`` and threaded in here. Default no-op keeps the
-    /// screen renderable standalone (#Preview / isolated use).
-    private let onCreateAccount: () -> Void
+    /// Real auth backend (Apple / Google / email OTP via Supabase).
+    private let auth: any AuthService
+    /// A code was sent — the parent pushes VerifyCodeView for this address.
+    private let onCodeSent: (String) -> Void
+    /// Signed in (Apple/Google) — the parent dismisses.
+    private let onSignedIn: () -> Void
+    /// "Continue without account" — accounts never gate the app.
+    private let onSkip: () -> Void
 
-    /// - Parameter onCreateAccount: invoked when the "Create account" link is tapped.
-    public init(onCreateAccount: @escaping () -> Void = {}) {
-        self.onCreateAccount = onCreateAccount
+    public init(auth: any AuthService,
+                onCodeSent: @escaping (String) -> Void = { _ in },
+                onSignedIn: @escaping () -> Void = {},
+                onSkip: @escaping () -> Void = {}) {
+        self.auth = auth
+        self.onCodeSent = onCodeSent
+        self.onSignedIn = onSignedIn
+        self.onSkip = onSkip
+    }
+
+    @MainActor
+    public init(onCodeSent: @escaping (String) -> Void = { _ in },
+                onSignedIn: @escaping () -> Void = {},
+                onSkip: @escaping () -> Void = {}) {
+        self.init(auth: SupabaseAuthService.shared,
+                  onCodeSent: onCodeSent, onSignedIn: onSignedIn, onSkip: onSkip)
     }
 
     public var body: some View {
@@ -43,12 +58,61 @@ public struct SignInView: View {
                 footer
             }
         }
-        // Password reset is an `auth` backend seam (see GO-LIVE.md). The stub
-        // surfaces an honest confirmation alert rather than silently no-op'ing.
-        .alert("Reset password", isPresented: $showForgotPassword) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("We'll email a reset link to \(email.isEmpty ? "your account" : email).")
+    }
+
+    // MARK: - Auth actions
+
+    private var emailIsValid: Bool {
+        email.contains("@") && email.contains(".") && email.count >= 5
+    }
+
+    private func appleTapped() {
+        guard !isWorking else { return }
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            do {
+                let (token, nonce) = try await appleCoordinator.signIn()
+                try await auth.signInWithApple(idToken: token, nonce: nonce)
+                appState.completeAuth()
+                onSignedIn()
+            } catch is CancellationError {
+                // user dismissed the Apple sheet — silent
+            } catch {
+                appState.presentAlert(title: "Sign in didn't complete",
+                                      message: error.localizedDescription)
+            }
+        }
+    }
+
+    private func googleTapped() {
+        guard !isWorking else { return }
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            do {
+                try await auth.signInWithGoogle()
+                appState.completeAuth()
+                onSignedIn()
+            } catch {
+                appState.presentAlert(title: "Sign in didn't complete",
+                                      message: error.localizedDescription)
+            }
+        }
+    }
+
+    private func sendCodeTapped() {
+        guard !isWorking, emailIsValid else { return }
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            do {
+                try await auth.sendEmailOTP(to: email)
+                onCodeSent(email)
+            } catch {
+                appState.presentAlert(title: "Couldn't send the code",
+                                      message: error.localizedDescription)
+            }
         }
     }
 
@@ -65,7 +129,7 @@ public struct SignInView: View {
 
             VStack {
                 Spacer()
-                BrandLockup(sub: "Sign in to sync your measurements")
+                BrandLockup(sub: "Back up & sync your measurements")
                     .padding(.bottom, 18)
             }
         }
@@ -73,68 +137,48 @@ public struct SignInView: View {
         .clipped()
     }
 
-    // MARK: - Form
+    // MARK: - Form (passwordless: Apple / Google / email one-time code)
 
     private var form: some View {
         VStack(spacing: 12) {
-            SocialButton(kind: .apple) { appState.completeAuth() }
-            SocialButton(kind: .google) { appState.completeAuth() }
+            SocialButton(kind: .apple, action: appleTapped)
+            SocialButton(kind: .google, action: googleTapped)
 
             OrDivider().padding(.vertical, 4)
 
             AuthField(label: "Email", text: $email, placeholder: "you@studio.co")
-            AuthField(label: "Password",
-                      text: $password,
-                      placeholder: "••••••••••",
-                      isSecure: !showPassword,
-                      trailing: {
-                          Button(showPassword ? "Hide" : "Show") {
-                              showPassword.toggle()
-                          }
-                          .font(Theme.sans(12.5, weight: .semibold))
-                          .foregroundStyle(theme.accent)
-                          .buttonStyle(.plain)
-                      })
 
-            HStack {
-                Spacer()
-                // Tappable per the spec; keeps the source's resting look
-                // (right-aligned, ink2, 13pt) while meeting the 44pt target.
-                Button { showForgotPassword = true } label: {
-                    Text("Forgot password?")
-                        .font(Theme.sans(13))
-                        .foregroundStyle(Theme.ink2)
-                        .frame(minHeight: 44, alignment: .trailing)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Forgot password")
-            }
-            .padding(.top, -2)
+            Text("We'll email you a one-time code — no password needed.")
+                .font(Theme.sans(12))
+                .foregroundStyle(Theme.ink3)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 24)
         .padding(.top, 22)
+        .disabled(isWorking)
+        .opacity(isWorking ? 0.7 : 1)
     }
 
-    // MARK: - Footer (CTA + create-account link)
+    // MARK: - Footer (send code + skip)
 
     private var footer: some View {
         VStack(spacing: 16) {
-            PrimaryButton(title: "Sign In") { appState.completeAuth() }
-                .accessibilityLabel("Sign in")
+            PrimaryButton(title: isWorking ? "Working…" : "Email me a code") {
+                sendCodeTapped()
+            }
+            .accessibilityLabel("Email me a sign-in code")
+            .disabled(isWorking || !emailIsValid)
+            .opacity(emailIsValid ? 1 : 0.5)
 
-            Button(action: onCreateAccount) {
-                HStack(spacing: 4) {
-                    Text("New here?")
-                        .foregroundStyle(Theme.ink3)
-                    Text("Create account")
-                        .foregroundStyle(theme.accent)
-                        .fontWeight(.semibold)
-                }
-                .font(Theme.sans(14))
-                .frame(minHeight: 44)
+            // Accounts are optional — the app never gates on sign-in.
+            Button(action: onSkip) {
+                Text("Continue without account")
+                    .font(Theme.sans(14, weight: .semibold))
+                    .foregroundStyle(Theme.ink2)
+                    .frame(minHeight: 44)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Create account")
+            .accessibilityLabel("Continue without account")
         }
         .padding(.horizontal, 24)
         .padding(.top, 14)

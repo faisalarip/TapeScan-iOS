@@ -2,14 +2,20 @@
 
 import SwiftUI
 
-/// The application root. Switches between the auth flow, onboarding flow and
-/// the main tabbed experience based on ``AppState/phase``:
+/// The application root. Switches between onboarding and the main tabbed
+/// experience based on ``AppState/phase``:
 ///
-///   .auth       → ``AuthFlowView``       (SignIn ⇄ CreateAccount → Verify)
 ///   .onboarding → ``OnboardingFlowView`` (Welcome → Permission → Calibrate)
 ///   .main       → ``MainTabView``        (Measure / Rooms / History / Settings)
+///
+/// Sign-in is OPTIONAL: offered once as a dismissible sheet right after
+/// onboarding, and forever after from Settings ("Back up & sync").
 public struct RootView: View {
     @Environment(AppState.self) private var appState
+
+    /// One-time post-onboarding sign-in offer (never shown again after).
+    @AppStorage("authOffered") private var authOffered = false
+    @State private var showAuthSheet = false
 
     public init() {}
 
@@ -18,10 +24,7 @@ public struct RootView: View {
             Theme.screenBG.ignoresSafeArea()
 
             switch appState.phase {
-            case .auth:
-                AuthFlowView()
-                    .transition(.opacity)
-            case .onboarding:
+            case .auth, .onboarding:
                 OnboardingFlowView()
                     .transition(.opacity)
             case .main:
@@ -30,6 +33,17 @@ public struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: appState.phase)
+        .onChange(of: appState.phase) { _, phase in
+            if phase == .main, !authOffered, !appState.isAuthenticated {
+                authOffered = true
+                showAuthSheet = true
+            }
+        }
+        .sheet(isPresented: $showAuthSheet) {
+            AuthFlowView { showAuthSheet = false }
+                .environment(appState)
+                .installTheme(Theme(appState))
+        }
         // Derive + install the live theme; re-runs whenever any tweak changes.
         .installTheme(Theme(appState))
         // The single global error surface — every failure path presents here

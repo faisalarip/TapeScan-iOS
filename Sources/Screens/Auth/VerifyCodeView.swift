@@ -26,18 +26,30 @@ public struct VerifyCodeView: View {
 
     /// Destination address shown in the body copy.
     private let email: String
+    /// Real auth backend.
+    private let auth: any AuthService
+    /// Verified successfully — the parent dismisses the auth flow.
+    private let onVerified: () -> Void
 
-    /// Backing store for the OTP. Seeded with the source mock "4821".
-    @State private var code: String = "4821"
+    @State private var code: String = ""
+    @State private var isWorking = false
     @FocusState private var fieldFocused: Bool
 
-    /// Seconds remaining before "Resend" becomes tappable (source shows 0:24).
+    /// Seconds remaining before "Resend" becomes tappable.
     @State private var secondsRemaining = 24
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    /// - Parameter email: address the code was sent to (shown in the copy).
-    public init(email: String = "alex@studio.co") {
+    public init(email: String,
+                auth: any AuthService,
+                onVerified: @escaping () -> Void = {}) {
         self.email = email
+        self.auth = auth
+        self.onVerified = onVerified
+    }
+
+    @MainActor
+    public init(email: String, onVerified: @escaping () -> Void = {}) {
+        self.init(email: email, auth: SupabaseAuthService.shared, onVerified: onVerified)
     }
 
     public var body: some View {
@@ -173,13 +185,27 @@ public struct VerifyCodeView: View {
             HStack(spacing: 4) {
                 Text("Didn't get it?")
                     .foregroundStyle(Theme.ink3)
-                Button("Resend") { secondsRemaining = 24 }
+                Button("Resend") { resend() }
                     .foregroundStyle(theme.accent)
                     .fontWeight(.semibold)
                     .buttonStyle(.plain)
                     .accessibilityLabel("Resend code")
             }
             .font(Theme.sans(13.5))
+        }
+    }
+
+    /// Actually re-sends the one-time code, then restarts the countdown.
+    private func resend() {
+        guard !isWorking else { return }
+        Task {
+            do {
+                try await auth.sendEmailOTP(to: email)
+                secondsRemaining = 24
+            } catch {
+                appState.presentAlert(title: "Couldn't resend the code",
+                                      message: error.localizedDescription)
+            }
         }
     }
 
@@ -193,13 +219,33 @@ public struct VerifyCodeView: View {
     // MARK: - Footer CTA
 
     private var footer: some View {
-        PrimaryButton(title: "Verify & Continue") {
-            appState.completeAuth()
+        PrimaryButton(title: isWorking ? "Verifying…" : "Verify & Continue") {
+            verify()
         }
         .accessibilityLabel("Verify and continue")
+        .disabled(isWorking || code.count < Self.codeLength)
+        .opacity(code.count < Self.codeLength ? 0.5 : 1)
         .padding(.horizontal, 24)
         .padding(.top, 14)
         .padding(.bottom, 36)
+    }
+
+    /// Verifies the code against the real backend; success advances the flow.
+    private func verify() {
+        guard !isWorking, code.count == Self.codeLength else { return }
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            do {
+                try await auth.verifyEmailOTP(email: email, code: code)
+                appState.completeAuth()
+                onVerified()
+            } catch {
+                appState.presentAlert(title: "That code didn't work",
+                                      message: error.localizedDescription)
+                code = ""
+            }
+        }
     }
 }
 
@@ -226,7 +272,7 @@ private struct BlinkingCaret: View {
 }
 
 #Preview {
-    VerifyCodeView()
+    VerifyCodeView(email: "you@studio.co")
         .environment(AppState())
         .environment(\.theme, Theme(accent: AccentOption.blue.color))
 }

@@ -25,6 +25,9 @@ public struct SettingsView: View {
     @State private var showPaywall = false
     @State private var showManageSubscriptions = false
     @State private var isRestoring = false
+    @State private var showAuthSheet = false
+    @State private var showDeleteConfirm = false
+    @State private var isDeletingAccount = false
     @Environment(\.openURL) private var openURL
 
     public init() {}
@@ -49,6 +52,7 @@ public struct SettingsView: View {
                         themeGroup(accent: appState.accent,
                                    setAccent: { appState.accent = $0 },
                                    brand: $appState.brand)
+                        accountGroup
                         purchasesGroup
                         aboutGroup
                     }
@@ -59,6 +63,21 @@ public struct SettingsView: View {
             }
         }
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
+        .sheet(isPresented: $showAuthSheet) {
+            AuthFlowView { showAuthSheet = false }
+                .environment(appState)
+                .installTheme(Theme(appState))
+        }
+        .confirmationDialog("Delete account?",
+                            isPresented: $showDeleteConfirm,
+                            titleVisibility: .visible) {
+            Button("Delete account and synced data", role: .destructive) {
+                Task { await deleteAccount() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This permanently deletes your account and everything synced to it. Measurements and rooms on this device are kept.")
+        }
         .fullScreenCover(isPresented: $showPaywall) {
             // The Settings card is always a proactive upsell, so the headline must
             // not falsely claim the free quota is spent.
@@ -204,6 +223,69 @@ public struct SettingsView: View {
                 BrandField(brand: brand)
             })
             #endif
+        }
+    }
+
+    // MARK: - Account (optional — backup & sync only)
+
+    @ViewBuilder
+    private var accountGroup: some View {
+        let auth = SupabaseAuthService.shared
+        DListSection(header: "Account") {
+            if let email = auth.userEmail ?? (auth.userID != nil ? "Signed in" : nil) {
+                DRow(icon: "share",
+                     title: "Backed up & syncing",
+                     subtitle: email, accessory: {
+                    StatusDot(color: Theme.successGreen)
+                })
+                .accessibilityLabel("Signed in as \(email)")
+                DRow(icon: "undo", title: "Sign Out",
+                     action: { Task { await signOut() } }, accessory: {
+                    Chevron()
+                })
+                .accessibilityLabel("Sign out")
+                DRow(icon: "close", title: "Delete Account",
+                     subtitle: "Removes your account and synced data",
+                     last: true,
+                     action: { showDeleteConfirm = true }, accessory: {
+                    Chevron()
+                })
+                .accessibilityLabel("Delete account")
+            } else {
+                DRow(icon: "share",
+                     title: "Back up & sync",
+                     subtitle: "Optional — your data stays on this device either way",
+                     last: true,
+                     action: { showAuthSheet = true }, accessory: {
+                    Chevron()
+                })
+                .accessibilityLabel("Sign in to back up and sync")
+            }
+        }
+    }
+
+    private func signOut() async {
+        do {
+            try await SupabaseAuthService.shared.signOut()
+            appState.signOut()
+        } catch {
+            appState.presentAlert(title: "Sign out didn't complete",
+                                  message: error.localizedDescription)
+        }
+    }
+
+    private func deleteAccount() async {
+        guard !isDeletingAccount else { return }
+        isDeletingAccount = true
+        defer { isDeletingAccount = false }
+        do {
+            try await SupabaseAuthService.shared.deleteAccount()
+            appState.signOut()
+            appState.presentAlert(title: "Account deleted",
+                                  message: "Your account and synced data were removed. Everything on this device is still here.")
+        } catch {
+            appState.presentAlert(title: "Couldn't delete account",
+                                  message: error.localizedDescription)
         }
     }
 
