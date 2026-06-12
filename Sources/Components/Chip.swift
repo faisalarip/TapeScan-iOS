@@ -13,6 +13,7 @@ public struct StatusDot: View {
     }
 
     @State private var on = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public var body: some View {
         Circle()
@@ -21,7 +22,7 @@ public struct StatusDot: View {
             .shadow(color: color, radius: 3)
             .opacity(blink ? (on ? 1 : 0.35) : 1)
             .onAppear {
-                guard blink else { return }
+                guard blink, !reduceMotion else { return }
                 withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
                     on = false
                 }

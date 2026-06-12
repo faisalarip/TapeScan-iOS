@@ -14,6 +14,7 @@
 // installs the live theme into the environment via `.installTheme(...)`.
 
 import SwiftUI
+import UIKit
 
 public struct Theme: Equatable, Sendable {
 
@@ -105,15 +106,35 @@ public struct Theme: Equatable, Sendable {
     /// Purple `#8b5cf6` (volume icon tint).
     public static let purple = Color(hex: "#8b5cf6")
 
-    // MARK: - Fonts
+    // MARK: - Fonts (Dynamic Type aware)
 
-    /// SF Pro (system default sans).
+    /// SF Pro (system default sans), scaling with the user's text size: the
+    /// design's point sizes stay exact at the default setting and scale via
+    /// UIFontMetrics anchored to the nearest semantic text style.
     public static func sans(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight, design: .default)
+        .system(size: scaledSize(size), weight: weight, design: .default)
     }
-    /// SF Mono (`.monospaced`) for telemetry / numbers.
+    /// SF Mono (`.monospaced`) for telemetry / numbers, scaling likewise.
     public static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight, design: .monospaced)
+        .system(size: scaledSize(size), weight: weight, design: .monospaced)
+    }
+
+    /// Design pt → user-scaled pt. SwiftUI re-evaluates bodies on text-size
+    /// changes, so fonts rebuilt here track the live setting. Mapping table:
+    /// ≤11 caption2 · ≤13 footnote · ≤15 subheadline · ≤17 body · ≤20 title3
+    /// · ≤24 title2 · ≤30 title · larger largeTitle.
+    private static func scaledSize(_ size: CGFloat) -> CGFloat {
+        let style: UIFont.TextStyle = switch size {
+        case ..<11.5:  .caption2
+        case ..<13.5:  .footnote
+        case ..<15.75: .subheadline
+        case ..<18:    .body
+        case ..<21:    .title3
+        case ..<25:    .title2
+        case ..<31:    .title1
+        default:       .largeTitle
+        }
+        return UIFontMetrics(forTextStyle: style).scaledValue(for: size)
     }
 }
 

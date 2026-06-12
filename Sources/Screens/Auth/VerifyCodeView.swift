@@ -257,6 +257,7 @@ private struct BlinkingCaret: View {
     let color: Color
     let height: CGFloat
     @State private var visible = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Rectangle()
@@ -264,6 +265,7 @@ private struct BlinkingCaret: View {
             .frame(width: 1.5, height: height)
             .opacity(visible ? 1 : 0)
             .onAppear {
+                guard !reduceMotion else { return }
                 withAnimation(.linear(duration: 1).repeatForever(autoreverses: true)) {
                     visible = false
                 }

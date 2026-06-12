@@ -38,6 +38,7 @@ public struct CameraBackdrop: View {
     }
 
     @State private var scanPhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public var body: some View {
         GeometryReader { geo in
@@ -105,6 +106,7 @@ public struct CameraBackdrop: View {
                     .position(x: w / 2, y: h * (scanPhase))
                     .opacity(scanPhase < 0.2 || scanPhase > 1.0 ? 0 : 0.5)
                     .onAppear {
+                        guard !reduceMotion else { return }
                         withAnimation(.easeInOut(duration: 3.4).repeatForever(autoreverses: false)) {
                             scanPhase = 1.3
                         }

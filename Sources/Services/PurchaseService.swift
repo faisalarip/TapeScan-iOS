@@ -16,12 +16,15 @@ import Observation
 
 /// Centralized legal URLs surfaced on the paywall and in Settings
 /// (Guideline 3.1.2 requires functional Terms/EULA + privacy policy links).
-/// M8 swaps `privacy` (and optionally `terms`) to the hosted TapeScan pages.
+/// Hosted from the github.com/faisalarip/tapescan-legal repository (sources
+/// in legal-site/); the same privacy/support URLs go in App Store Connect.
 public enum LegalLinks {
-    /// Terms of Use (EULA). Apple's standard EULA is acceptable for IAP apps.
-    public static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
-    /// Privacy policy. M8 replaces this with the hosted TapeScan policy URL.
-    public static let privacy = URL(string: "https://www.apple.com/legal/privacy/")!
+    /// TapeScan Terms of Use (incorporates Apple's standard EULA).
+    public static let terms = URL(string: "https://faisalarip.github.io/tapescan-legal/terms.html")!
+    /// TapeScan privacy policy.
+    public static let privacy = URL(string: "https://faisalarip.github.io/tapescan-legal/privacy.html")!
+    /// Support page.
+    public static let support = URL(string: "https://faisalarip.github.io/tapescan-legal/support.html")!
 }
 
 // MARK: - Offering model
