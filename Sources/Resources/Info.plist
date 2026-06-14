@@ -37,6 +37,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>TapeScan uses the camera to detect surfaces and place measurement points.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TapeScan saves your exported floor plans and images to your Photos library.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

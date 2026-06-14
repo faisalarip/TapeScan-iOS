@@ -45,7 +45,8 @@ public struct MeasureAView: View {
                             showFeaturePoints: true)
 
             scene
-            ReticleLayer(accent: theme.accent, label: theme.reticleGuidance)
+            ReticleLayer(accent: theme.accent,
+                         label: service.tracking.guidance(default: theme.reticleGuidance))
 
             topHUD
             bigReadout
@@ -54,13 +55,14 @@ public struct MeasureAView: View {
         .background(Theme.cameraBG.ignoresSafeArea())
         .onAppear {
             service.snapEnabled = appState.snapEnabled
-            service.start()
             // Cache the real hardware capability so precision badges and the
             // Settings status row reflect this device, not a design default.
             appState.lidar = service.lidarAvailable
             offerResumeIfNeeded()
+            // NOTE: the shared AR session is started/stopped by the MeasureView
+            // host (single owner) — NOT here. Starting/stopping it per direction
+            // raced on style switches and froze the camera (see MeasureView).
         }
-        .onDisappear { service.stop() }
         .onChange(of: appState.snapEnabled) { _, snap in service.snapEnabled = snap }
         .alert("Resume previous session?", isPresented: $showResumePrompt) {
             Button("Resume") {
@@ -88,7 +90,9 @@ public struct MeasureAView: View {
             segs: live.segs,
             area: live.area,
             angle: live.angle,
-            activeTo: ScenePoint(x: 201, y: 470))
+            // The lead line terminates exactly at the reticle pinpoint (single
+            // source of truth in SceneMapping) — keeps them aligned 1:1 on any screen.
+            activeTo: SceneMapping.reticleTarget)
         .ignoresSafeArea()
     }
 
@@ -231,8 +235,8 @@ public struct MeasureAView: View {
             }
         }
         .padding(.horizontal, 14)
+        // Tab-bar clearance is reserved once by the MeasureView host (TabBarMetrics).
         .frame(maxHeight: .infinity, alignment: .bottom)
-        .padding(.bottom, 40)
     }
 
     private var modeBinding: Binding<MeasureMode> {
@@ -243,14 +247,7 @@ public struct MeasureAView: View {
     // MARK: - Persistence (autosave + finish)
 
     /// Crash-recovery: persist the in-progress session after every change.
-    private func autosaveDraft() {
-        if service.points.isEmpty {
-            SessionDraftStore.clear()
-        } else {
-            SessionDraftStore.save(MeasureSessionDraft(
-                mode: service.mode, points: service.points, savedAt: Date()))
-        }
-    }
+    private func autosaveDraft() { MeasureSession.autosave(service) }
 
     /// Offer to resume a recent (< 24 h) crash-recovered draft once.
     private func offerResumeIfNeeded() {
@@ -264,22 +261,7 @@ public struct MeasureAView: View {
 
     /// Finalize: persist a MeasurementRecord into History, clear the draft.
     private func finishTapped() {
-        let points = service.points
-        guard let result = service.finish() else { return }
-        SessionDraftStore.clear()
-        do {
-            let count = (try? modelContext.fetchCount(FetchDescriptor<MeasurementRecord>())) ?? 0
-            let record = try MeasurementRecord(name: "Measurement \(count + 1)",
-                                               mode: result.mode,
-                                               points: points,
-                                               result: result)
-            modelContext.insert(record)
-            try modelContext.save()
-        } catch {
-            appState.presentAlert(
-                title: "Couldn't save measurement",
-                message: error.localizedDescription)
-        }
+        MeasureSession.finish(service, context: modelContext, appState: appState)
     }
 }
 

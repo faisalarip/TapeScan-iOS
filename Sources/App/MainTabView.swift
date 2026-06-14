@@ -51,7 +51,7 @@ public struct MainTabView: View {
     /// Reserves room under the scrollable tabs so the floating bar never covers
     /// the last row. Measure/Rooms are full-bleed and intentionally bleed under it.
     private var tabBarSpacer: some View {
-        Color.clear.frame(height: 64)
+        Color.clear.frame(height: TabBarMetrics.scrollSpacer)
     }
 }
 
@@ -62,8 +62,42 @@ public struct MainTabView: View {
 struct TabBar: View {
     @Environment(\.theme) private var theme
     @Binding var selection: AppTab
+    /// Morph namespace so the selected accent pill slides between tabs.
+    @Namespace private var pillNS
 
     var body: some View {
+        if #available(iOS 26.0, *) {
+            floatingCapsule
+        } else {
+            legacyDeck
+        }
+    }
+
+    // MARK: iOS 26 — floating Liquid Glass capsule
+
+    /// The iOS-26 system silhouette: a glass capsule that floats above the home
+    /// indicator with side margins. One `.regular` glass over the whole bar stays
+    /// legible over the live AR camera and avoids glass-on-glass artifacts.
+    @available(iOS 26.0, *)
+    private var floatingCapsule: some View {
+        HStack(spacing: 4) {
+            ForEach(AppTab.allCases) { tab in
+                FloatingTabItem(tab: tab, selected: tab == selection, pillNS: pillNS) {
+                    withAnimation(.bouncy(duration: 0.34)) { selection = tab }
+                }
+            }
+        }
+        .padding(6)
+        .glassEffect(.regular.interactive())
+        .padding(.horizontal, 16)
+        .padding(.bottom, TabBarMetrics.floatingBottomGap)
+        // Deliberately NO .ignoresSafeArea — the capsule floats ABOVE the safe area.
+        .accessibilityElement(children: .contain)
+    }
+
+    // MARK: iOS 17–25 — existing solid deck (verbatim fallback)
+
+    private var legacyDeck: some View {
         HStack(spacing: 0) {
             ForEach(AppTab.allCases) { tab in
                 TabBarItem(tab: tab, selected: tab == selection) {
@@ -85,6 +119,75 @@ struct TabBar: View {
                 .ignoresSafeArea(edges: .bottom)
         )
         .accessibilityElement(children: .contain)
+    }
+}
+
+/// iOS 26 capsule item; the selected accent pill slides between tabs via
+/// `matchedGeometryEffect`. Idle glyph/label use ink/ink2 (not ink3) for
+/// legibility over a bright, moving camera feed behind the glass.
+@available(iOS 26.0, *)
+private struct FloatingTabItem: View {
+    @Environment(\.theme) private var theme
+    let tab: AppTab
+    let selected: Bool
+    let pillNS: Namespace.ID
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 3) {
+                ZStack {
+                    if selected {
+                        Capsule()
+                            .fill(theme.accentSoft)
+                            .frame(width: 52, height: 32)
+                            .matchedGeometryEffect(id: "tabpill", in: pillNS)
+                    }
+                    Icon(tab.iconName, size: 22, weight: 1.9,
+                         color: selected ? theme.accent : Theme.ink)
+                }
+                .frame(height: 32)
+
+                Text(tab.title)
+                    .font(Theme.sans(10.5, weight: selected ? .semibold : .medium))
+                    .foregroundStyle(selected ? theme.accent : Theme.ink2)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tab.title)
+        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
+    }
+}
+
+// MARK: - Tab bar metrics
+
+/// Single source of truth for how much bottom space the tab bar occupies, so
+/// full-bleed Measure/Rooms controls and scrollable History/Settings clear it.
+/// Branches per-OS: the iOS 26 floating capsule respects the safe area and floats
+/// with a bottom gap (taller above-safe-area footprint), whereas the iOS 17–25
+/// deck bleeds under the home indicator.
+enum TabBarMetrics {
+    /// Gap between the floating capsule and the home indicator (iOS 26 only).
+    static let floatingBottomGap: CGFloat = 12
+    /// Comfort gap so controls never kiss the bar.
+    private static let comfortGap: CGFloat = 12
+    /// Legacy deck (17–25): item minHeight 44 + .top 8 + .bottom 6 = 58.
+    private static let legacyOccupied: CGFloat = 58
+    /// Floating capsule (26): item ~44 + 6·2 padding ≈ 56 → 60, plus the bottom gap.
+    private static let floatingOccupied: CGFloat = 60 + floatingBottomGap // 72
+
+    /// Bottom clearance the full-bleed Measure/Rooms controls reserve.
+    static var contentClearance: CGFloat {
+        if #available(iOS 26.0, *) { return floatingOccupied + comfortGap } // 84
+        return legacyOccupied + comfortGap                                  // 70
+    }
+    /// Spacer reserved under scrollable tabs (History/Settings).
+    static var scrollSpacer: CGFloat {
+        if #available(iOS 26.0, *) { return floatingOccupied + 4 }          // 76
+        return 64
     }
 }
 

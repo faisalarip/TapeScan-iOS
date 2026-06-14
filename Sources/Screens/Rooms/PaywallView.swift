@@ -108,6 +108,8 @@ public struct PaywallView: View {
             if service.plans.isEmpty { await service.loadProducts() }
             if selectionID.isEmpty { selectionID = service.defaultSelectionID }
         }
+        // Surface purchase/restore failures even though this is presented as a cover.
+        .appAlert(appState)
     }
 
     // MARK: - Hero band

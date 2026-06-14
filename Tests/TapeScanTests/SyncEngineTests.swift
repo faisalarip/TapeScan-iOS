@@ -99,6 +99,28 @@ final class SyncEngineTests: XCTestCase {
         XCTAssertTrue(remaining.isEmpty)
     }
 
+    // MARK: - Sign-out hygiene (cross-account leak prevention)
+
+    func testPurgeRemovesSyncedRowsKeepsLocalAndClearsWatermark() throws {
+        let context = container.mainContext
+        // A cloud-derived (synced) row + a never-synced local-only row.
+        let synced = try makeMeasurement(name: "Synced")
+        synced.remoteSyncedAt = synced.updatedAt
+        let localOnly = try makeMeasurement(name: "LocalOnly")   // remoteSyncedAt stays nil
+        context.insert(synced)
+        context.insert(localOnly)
+        try context.save()
+        UserDefaults.standard.set(Date(), forKey: SyncEngine.lastPulledAtKey)
+
+        SyncEngine.purgeLocalSyncState(context: context)
+
+        let remaining = try context.fetch(FetchDescriptor<MeasurementRecord>())
+        XCTAssertEqual(remaining.map(\.name), ["LocalOnly"],
+                       "synced (cloud-derived) rows are purged; local-only work is kept")
+        XCTAssertNil(UserDefaults.standard.object(forKey: SyncEngine.lastPulledAtKey),
+                     "pull watermark is cleared so the next account re-pulls fresh")
+    }
+
     // MARK: - Pull
 
     func testPullInsertsUnknownRemoteRecord() async throws {

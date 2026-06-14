@@ -37,6 +37,8 @@ public struct RoomScanView: View {
             content
         }
         .onAppear { service.start() }
+        // Surface "Scan failed" even though this screen is presented as a cover.
+        .appAlert(appState)
         .onDisappear { if service.phase == .scanning { service.cancel() } }
         .onChange(of: service.phase) { _, phase in
             switch phase {
@@ -236,7 +238,10 @@ public struct RoomScanView: View {
                         .fill(theme.accent.withA(0.95)))
             }
             .buttonStyle(.plain)
-            .disabled(service.wallCount == 0 && service.coveragePercent == 0)
+            // Require at least one captured wall before finishing — the coverage
+            // heuristic alone can read >0 from a floor-only scan, which would save
+            // and export a blank plan (and spend a free export on nothing).
+            .disabled(service.wallCount == 0)
             .accessibilityLabel("Finish scan")
         }
     }

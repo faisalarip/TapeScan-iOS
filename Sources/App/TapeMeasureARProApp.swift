@@ -37,6 +37,11 @@ struct TapeMeasureARProApp: App {
                         Task { await syncIfSignedIn() }
                     }
                 }
+                .onChange(of: appState.isAuthenticated) { _, isAuth in
+                    // Sign-in mid-session: push guest data + pull the account's
+                    // records now, instead of waiting for the next cold launch.
+                    if isAuth { Task { await syncIfSignedIn() } }
+                }
         }
     }
 

@@ -16,10 +16,12 @@
 
 import SwiftUI
 import StoreKit
+import SwiftData
 
 public struct SettingsView: View {
     @Environment(\.theme) private var theme
     @Environment(AppState.self) private var appState
+    @Environment(\.modelContext) private var modelContext
 
     // Local interactive state for controls that are not global tweaks.
     @State private var showPaywall = false
@@ -163,13 +165,12 @@ public struct SettingsView: View {
                     .accessibilityValue(snap.wrappedValue ? "On" : "Off")
             })
             // Precision derives from the detected hardware: ±4 mm vs ±2 cm.
+            // Read-only status row (precision derives from hardware). No chevron/
+            // tap — it isn't a drill-in.
             DRow(icon: "distance",
                  title: "Precision",
                  detail: theme.precisionBadge,
-                 last: true,
-                 action: {}) {
-                Chevron()
-            }
+                 last: true)
             .accessibilityLabel("Precision \(theme.precisionBadge)")
         }
     }
@@ -268,6 +269,9 @@ public struct SettingsView: View {
         do {
             try await SupabaseAuthService.shared.signOut()
             appState.signOut()
+            // Remove this account's synced data + pull watermark so it can't leak
+            // into the next account on a shared device (re-sign-in re-pulls it).
+            SyncEngine.purgeLocalSyncState(context: modelContext)
         } catch {
             appState.presentAlert(title: "Sign out didn't complete",
                                   message: error.localizedDescription)
@@ -281,8 +285,10 @@ public struct SettingsView: View {
         do {
             try await SupabaseAuthService.shared.deleteAccount()
             appState.signOut()
+            // Purge the now-deleted account's synced rows + pull watermark locally.
+            SyncEngine.purgeLocalSyncState(context: modelContext)
             appState.presentAlert(title: "Account deleted",
-                                  message: "Your account and synced data were removed. Everything on this device is still here.")
+                                  message: "Your account and its synced data were removed. Anything you saved only on this device stays here.")
         } catch {
             appState.presentAlert(title: "Couldn't delete account",
                                   message: error.localizedDescription)

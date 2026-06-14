@@ -192,6 +192,12 @@ public struct RoomsView: View {
     }
 
     private func delete(_ room: RoomRecord) {
+        // Remove the on-disk 3D capture too — the USDZ is device-local (never
+        // synced), so a tombstone+sync purge would otherwise leak the file forever.
+        if let filename = room.usdzFilename {
+            try? FileManager.default.removeItem(
+                at: RoomScanService.roomsDirectory.appendingPathComponent(filename))
+        }
         room.markDeleted()
         do {
             try modelContext.save()

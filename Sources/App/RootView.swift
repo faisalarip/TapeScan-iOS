@@ -46,17 +46,12 @@ public struct RootView: View {
         }
         // Derive + install the live theme; re-runs whenever any tweak changes.
         .installTheme(Theme(appState))
-        // The single global error surface — every failure path presents here
-        // via AppState.presentAlert (purchases, auth, sync, export, AR session).
-        .alert(item: alertBinding) { alert in
-            Alert(title: Text(alert.title), message: Text(alert.message))
-        }
+        // The single global error surface. `appAlert` is ALSO applied to each
+        // modal root (Export/Paywall/Scan/Editor) so failures raised inside a
+        // fullScreenCover/sheet aren't swallowed — SwiftUI presents an alert only
+        // on the topmost context, never on a view that a cover is covering.
+        .appAlert(appState)
         .modifier(DebugPaywallPresenter())
-    }
-
-    /// @Observable classes don't vend bindings directly; bridge manually.
-    private var alertBinding: Binding<AppAlert?> {
-        Binding(get: { appState.alert }, set: { appState.alert = $0 })
     }
 }
 
@@ -81,6 +76,22 @@ private struct DebugPaywallPresenter: ViewModifier {
         #else
         content
         #endif
+    }
+}
+
+// MARK: - Global alert
+
+extension View {
+    /// Surfaces the single global ``AppState/alert``. Applied to RootView AND to
+    /// every modal root (fullScreenCover/sheet): SwiftUI presents an alert only on
+    /// the topmost context, so an alert bound only on RootView never appears over a
+    /// presented cover — silently swallowing in-modal failures (export, purchase,
+    /// scan, editor). Binding the same source on each modal fixes that.
+    func appAlert(_ appState: AppState) -> some View {
+        alert(item: Binding(get: { appState.alert },
+                            set: { appState.alert = $0 })) { alert in
+            Alert(title: Text(alert.title), message: Text(alert.message))
+        }
     }
 }
 

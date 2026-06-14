@@ -84,6 +84,25 @@ public final class SyncEngine {
         self.remote = remote
     }
 
+    /// Sign-out / account-switch hygiene. Forgets the pull watermark and removes
+    /// CLOUD-DERIVED rows (`remoteSyncedAt != nil`) so the previous account's
+    /// synced data can't leak into — or be re-uploaded under — the NEXT account on
+    /// a shared device. Rows that were only ever local (never synced) are the
+    /// device's own work and are kept. A re-sign-in re-pulls the owner's data
+    /// fresh (since = nil), so signing out still never costs the owner anything.
+    public static func purgeLocalSyncState(context: ModelContext) {
+        UserDefaults.standard.removeObject(forKey: lastPulledAtKey)
+        let measurements = (try? context.fetch(FetchDescriptor<MeasurementRecord>())) ?? []
+        for record in measurements where record.remoteSyncedAt != nil {
+            context.delete(record)
+        }
+        let rooms = (try? context.fetch(FetchDescriptor<RoomRecord>())) ?? []
+        for record in rooms where record.remoteSyncedAt != nil {
+            context.delete(record)
+        }
+        try? context.save()
+    }
+
     /// One full push + pull + merge cycle.
     public func syncNow(context: ModelContext) async throws {
         try await push(context: context)

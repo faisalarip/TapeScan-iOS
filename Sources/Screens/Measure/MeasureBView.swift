@@ -11,9 +11,12 @@
 // reticle guidance when `theme.lidar` is false.
 
 import SwiftUI
+import SwiftData
 
 public struct MeasureBView: View {
     @Environment(\.theme) private var theme
+    @Environment(\.modelContext) private var modelContext
+    @Environment(AppState.self) private var appState
 
     private let service: any ARMeasureService
 
@@ -38,15 +41,19 @@ public struct MeasureBView: View {
 
             scene
             ReticleLayer(accent: theme.accent,
-                         label: theme.lidar ? "Tap to drop point"
-                                            : "MOVE SIDE-TO-SIDE TO TRIANGULATE")
+                         label: service.tracking.guidance(
+                            default: theme.lidar ? "Tap to drop point"
+                                                 : "MOVE SIDE-TO-SIDE TO TRIANGULATE"))
 
             topPill
             bottomCard
         }
         .background(Theme.cameraBG.ignoresSafeArea())
-        .onAppear { service.start() }
-        .onDisappear { service.stop() }
+        // The shared AR session is started/stopped by the MeasureView host
+        // (single owner) — NOT here. Starting/stopping it per direction raced
+        // on style switches and froze the camera (see MeasureView).
+        .onAppear { service.snapEnabled = appState.snapEnabled }
+        .onChange(of: appState.snapEnabled) { _, snap in service.snapEnabled = snap }
     }
 
     // MARK: - AR geometry (live)
@@ -59,7 +66,8 @@ public struct MeasureBView: View {
             segs: live.segs,
             area: live.area,
             angle: live.angle,
-            activeTo: ScenePoint(x: 201, y: 472))
+            // Lead line ends exactly at the reticle pinpoint (shared SceneMapping anchor).
+            activeTo: SceneMapping.reticleTarget)
         .ignoresSafeArea()
     }
 
@@ -137,13 +145,20 @@ public struct MeasureBView: View {
 
             // controls
             HStack {
-                MeasureCircleBtn(icon: "undo", size: 48, solid: true) { service.undo() }
+                MeasureCircleBtn(icon: "undo", size: 48, solid: true) {
+                    service.undo()
+                    MeasureSession.autosave(service)
+                }
                     .accessibilityLabel("Undo last point")
                 Spacer()
-                Shutter(accent: theme.accent, size: 76, icon: "plus") { _ = service.placePoint() }
+                Shutter(accent: theme.accent, size: 76, icon: "plus") {
+                    MeasureSession.place(service, appState: appState)
+                }
                     .accessibilityLabel("Add measurement point")
                 Spacer()
-                MeasureCircleBtn(icon: "check", size: 48, solid: true) { service.finish() }
+                MeasureCircleBtn(icon: "check", size: 48, solid: true) {
+                    MeasureSession.finish(service, context: modelContext, appState: appState)
+                }
                     .accessibilityLabel("Finish measurement")
             }
         }
@@ -158,8 +173,8 @@ public struct MeasureBView: View {
         )
         .shadow(color: .black.opacity(0.5), radius: 25, y: 16)
         .padding(.horizontal, 16)
+        // Tab-bar clearance is reserved once by the MeasureView host (TabBarMetrics).
         .frame(maxHeight: .infinity, alignment: .bottom)
-        .padding(.bottom, 40)
     }
 
     @ViewBuilder
@@ -207,4 +222,5 @@ public struct MeasureBView: View {
     MeasureBView()
         .environment(AppState())
         .environment(\.theme, Theme(accent: AccentOption.blue.color))
+        .modelContainer(ModelContainerFactory.makeInMemory())
 }

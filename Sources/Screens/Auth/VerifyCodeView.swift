@@ -202,6 +202,7 @@ public struct VerifyCodeView: View {
             do {
                 try await auth.sendEmailOTP(to: email)
                 secondsRemaining = 24
+                code = ""   // the new code invalidates anything already typed
             } catch {
                 appState.presentAlert(title: "Couldn't resend the code",
                                       message: error.localizedDescription)

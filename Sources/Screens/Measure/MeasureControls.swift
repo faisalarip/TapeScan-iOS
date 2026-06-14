@@ -7,6 +7,69 @@
 // Sources/Components and are reused verbatim.
 
 import SwiftUI
+import SwiftData
+import UIKit
+
+// MARK: - Shared finish / autosave (production parity across Precision/Minimal/Pro)
+
+/// Persistence shared by all three Measure HUD directions so they behave
+/// identically: finishing saves a `MeasurementRecord` to History and clears the
+/// crash-recovery draft; every change autosaves the draft; placing a point
+/// surfaces the standard guidance alert on a miss.
+@MainActor
+enum MeasureSession {
+    /// Finalize the current measurement: persist to History (SwiftData) + clear
+    /// the autosave draft. No-op if nothing was measured.
+    static func finish(_ service: any ARMeasureService,
+                       context: ModelContext,
+                       appState: AppState) {
+        let points = service.points
+        guard let result = service.finish() else { return }
+        SessionDraftStore.clear()
+        do {
+            let count = (try? context.fetchCount(FetchDescriptor<MeasurementRecord>())) ?? 0
+            let record = try MeasurementRecord(name: "Measurement \(count + 1)",
+                                               mode: result.mode,
+                                               points: points,
+                                               result: result)
+            context.insert(record)
+            try context.save()
+            // Tactile confirmation the measurement was saved (the screen also
+            // clears + a new History row appears) — finishing isn't silent.
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        } catch {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            appState.presentAlert(title: "Couldn't save measurement",
+                                  message: error.localizedDescription)
+        }
+    }
+
+    /// Crash-recovery autosave after any change (clears when empty).
+    static func autosave(_ service: any ARMeasureService) {
+        if service.points.isEmpty {
+            SessionDraftStore.clear()
+        } else {
+            SessionDraftStore.save(MeasureSessionDraft(
+                mode: service.mode, points: service.points, savedAt: Date()))
+        }
+    }
+
+    /// Drop a point at the reticle; on a miss surface the standard guidance alert.
+    /// Always autosaves. Returns whether a point was placed.
+    @discardableResult
+    static func place(_ service: any ARMeasureService, appState: AppState) -> Bool {
+        let placed = service.placePoint() != nil
+        if placed {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        } else {
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            appState.presentAlert(title: "No surface found",
+                                  message: "Aim the reticle at a flat surface and try again.")
+        }
+        autosave(service)
+        return placed
+    }
+}
 
 /// Bottom mode switcher: a glass segmented control of measurement modes.
 /// `compact` drops the text label (icon-only) — used by Direction C's console.
@@ -117,6 +180,21 @@ extension Theme {
     }
 }
 
+/// User-facing reticle/HUD guidance for the current AR tracking state, so degraded
+/// tracking is never silent (accuracy guardrail — the service computes these
+/// coaching strings but the HUD must show them).
+extension TrackingQuality {
+    /// Returns `defaultLabel` when tracking is normal; a short coaching string otherwise.
+    func guidance(default defaultLabel: String) -> String {
+        switch self {
+        case .normal:           return defaultLabel
+        case .limited(let why): return why
+        case .initializing:     return "Starting AR — move slowly to map the area"
+        case .notAvailable:     return "Tracking lost — aim at a lit, textured surface"
+        }
+    }
+}
+
 /// Positions the center targeting `Reticle` at the source's 47% vertical anchor
 /// (matching measure.jsx `top: 47%`) regardless of safe-area chrome.
 struct ReticleLayer: View {
@@ -126,7 +204,8 @@ struct ReticleLayer: View {
     var body: some View {
         GeometryReader { geo in
             Reticle(accent: accent, label: label)
-                .position(x: geo.size.width / 2, y: geo.size.height * 0.47)
+                .position(x: geo.size.width / 2,
+                          y: geo.size.height * SceneMapping.reticleAnchorY)
         }
         .allowsHitTesting(false)
         .ignoresSafeArea()

@@ -60,7 +60,26 @@ public struct MeasureView: View {
             stylePicker
             #endif
         }
+        // Cold-start loading state so a launch isn't perceived as "stuck": the
+        // camera feed is black until ARKit delivers its first tracked frame.
+        .overlay { arLoadingOverlay }
+        .animation(.easeInOut(duration: 0.3), value: isInitializing)
         .background(Theme.cameraBG.ignoresSafeArea())
+        // SINGLE-OWNER AR session lifecycle. The shared `service` (one ARView /
+        // ARSession) is started/stopped ONLY here, on the host. The per-direction
+        // views (MeasureA/B/CView) swap on `style` WITHOUT tearing down this host,
+        // so the session survives direction switches untouched.
+        //
+        // Previously each direction also called start()/stop() in its own
+        // onAppear/onDisappear. On a style switch SwiftUI inserts the new direction
+        // and removes the old one in an UNSPECIFIED order, so the outgoing view's
+        // stop() (session.pause) could run *after* the incoming view's start()
+        // (a no-op while `isRunning` is still true) — leaving the session paused
+        // with nothing to restart it. That froze the camera on the last frame
+        // while the rest of the UI stayed live. Owning lifecycle on the stable
+        // host removes that race for every Precision⇄Minimal⇄Pro transition.
+        .onAppear { service.start() }
+        .onDisappear { service.stop() }
         // Backgrounding mid-measure must pause the AR session (camera release
         // + battery); returning resumes and ARKit relocalizes.
         .onChange(of: scenePhase) { _, phase in
@@ -75,12 +94,51 @@ public struct MeasureView: View {
         }
     }
 
+    /// True while the AR session is warming up (camera + world tracking starting).
+    private var isInitializing: Bool {
+        if case .initializing = service.tracking { return true }
+        return false
+    }
+
+    /// Cold-start loading overlay. The camera is black until ARKit's first tracked
+    /// frame (and first-launch Metal/shader warm-up), so show a spinner instead of
+    /// a frozen-looking black screen. No-op in the Simulator (simulated backend
+    /// reports `.normal`), so it never affects previews/screenshots.
+    @ViewBuilder
+    private var arLoadingOverlay: some View {
+        if isInitializing {
+            ZStack {
+                Theme.cameraBG.ignoresSafeArea()
+                VStack(spacing: 14) {
+                    ProgressView()
+                        .controlSize(.large)
+                        .tint(theme.accent)
+                    Text("Starting camera…")
+                        .font(Theme.sans(14, weight: .medium))
+                        .foregroundStyle(Theme.ink2)
+                }
+            }
+            .transition(.opacity)
+            .allowsHitTesting(false)
+        }
+    }
+
     @ViewBuilder
     private var direction: some View {
-        switch style {
-        case .precision: MeasureAView(service: service)
-        case .minimal:   MeasureBView(service: service)
-        case .pro:       MeasureCView(service: service)
+        Group {
+            switch style {
+            case .precision: MeasureAView(service: service)
+            case .minimal:   MeasureBView(service: service)
+            case .pro:       MeasureCView(service: service)
+            }
+        }
+        // Reserve real layout space for the floating tab bar so the controls are
+        // never cropped by it. Camera/AR layers inside each direction keep their
+        // own .ignoresSafeArea() and stay full-bleed — only the controls lift.
+        // (Applied to `direction` only, NOT the ZStack, so the host's AR session
+        // lifecycle in `body` is untouched.)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Color.clear.frame(height: TabBarMetrics.contentClearance)
         }
     }
 

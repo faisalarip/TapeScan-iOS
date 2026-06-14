@@ -69,6 +69,11 @@ public final class RoomScanService {
         return view
     }()
     @ObservationIgnored private let proxy = RoomScanProxy()
+
+    // Live-update coalescing (see handleLiveUpdate): keep only the LATEST room
+    // and convert at most one at a time, off the main actor.
+    @ObservationIgnored private var pendingLiveRoom: CapturedRoom?
+    @ObservationIgnored private var isConvertingLiveRoom = false
     #endif
 
     @ObservationIgnored private var simulatedScanTask: Task<Void, Never>?
@@ -106,6 +111,7 @@ public final class RoomScanService {
             self.phase = .done
         }
         #else
+        pendingLiveRoom = nil   // stop draining live updates; we're processing now
         captureView.captureSession.stop()
         // RoomPlan now processes; RoomScanProxy.didPresent delivers the result.
         #endif
@@ -118,6 +124,7 @@ public final class RoomScanService {
         if phase == .scanning {
             captureView.captureSession.stop(pauseARSession: true)
         }
+        pendingLiveRoom = nil
         #endif
         phase = .idle
         resetOutputs()
@@ -153,27 +160,87 @@ public final class RoomScanService {
 
     #if !targetEnvironment(simulator)
     fileprivate func handleLiveUpdate(_ room: CapturedRoom) {
-        wallCount = room.walls.count
+        // RoomPlan streams `didUpdate` many times per second. Converting the room
+        // to a FloorPlanModel and redrawing the live plan on EVERY update floods
+        // the main actor (unbounded Task backlog + per-update geometry + Canvas
+        // redraw) and freezes the UI mid-scan. Coalesce to the LATEST room and run
+        // at most one conversion at a time, OFF the main actor — bursts collapse to
+        // "latest wins" and the heavy geometry never blocks the UI.
+        guard phase == .scanning else { return }
+        pendingLiveRoom = room
+        pumpLiveUpdatesIfIdle()
+    }
+
+    private func pumpLiveUpdatesIfIdle() {
+        guard phase == .scanning, !isConvertingLiveRoom, let room = pendingLiveRoom else { return }
+        pendingLiveRoom = nil
+        isConvertingLiveRoom = true
+        let capturedAt = Date()
+        Task.detached(priority: .utility) { [weak self] in
+            let snapshot = RoomScanService.liveSnapshot(of: room, capturedAt: capturedAt)
+            await MainActor.run {
+                guard let self else { return }
+                self.isConvertingLiveRoom = false
+                if self.phase == .scanning { self.apply(snapshot) }
+                // Drain whatever arrived while this conversion was running.
+                self.pumpLiveUpdatesIfIdle()
+            }
+        }
+    }
+
+    private func apply(_ snapshot: LiveSnapshot) {
+        wallCount = snapshot.wallCount
+        estimatedAreaSqM = snapshot.areaSqM
+        coveragePercent = snapshot.coverage
+        livePlan = snapshot.plan
+    }
+
+    /// Immutable result of converting one captured room off the main actor.
+    private struct LiveSnapshot {
+        let wallCount: Int
+        let areaSqM: Double
+        let coverage: Int
+        let plan: FloorPlanModel
+    }
+
+    /// Pure + main-actor-free: derive the live metrics and parametric plan for one
+    /// captured room. Runs on a background task so heavy geometry never blocks UI.
+    nonisolated private static func liveSnapshot(of room: CapturedRoom,
+                                                 capturedAt: Date) -> LiveSnapshot {
+        let walls = room.walls.count
         let floorArea = room.floors.reduce(0.0) {
             $0 + Double($1.dimensions.x) * Double($1.dimensions.y)
         }
-        estimatedAreaSqM = floorArea
         // Coverage heuristic: walls dominate, floor detection adds the rest.
-        coveragePercent = min(95, room.walls.count * 22 + (room.floors.isEmpty ? 0 : 12))
-        livePlan = CapturedRoomConverter.convert(Self.extract(room), capturedAt: Date())
+        let coverage = min(95, walls * 22 + (room.floors.isEmpty ? 0 : 12))
+        let plan = CapturedRoomConverter.convert(extract(room), capturedAt: capturedAt)
+        return LiveSnapshot(wallCount: walls, areaSqM: floorArea, coverage: coverage, plan: plan)
     }
 
     fileprivate func handleProcessedResult(_ room: CapturedRoom) {
-        let filename = UUID().uuidString + ".usdz"
-        do {
-            try room.export(to: Self.roomsDirectory.appendingPathComponent(filename),
-                            exportOptions: .parametric)
-            usdzFilename = filename
-        } catch {
-            usdzFilename = nil   // plan still usable without the 3D capture
+        // Export (USDZ disk write) + conversion are heavy; doing them on the main
+        // actor froze the UI during "Processing". Run them off-main, then publish
+        // the result and advance to .done back on the main actor.
+        let dir = Self.roomsDirectory
+        let capturedAt = Date()
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let filename = UUID().uuidString + ".usdz"
+            var savedFilename: String? = filename
+            do {
+                try room.export(to: dir.appendingPathComponent(filename),
+                                exportOptions: .parametric)
+            } catch {
+                savedFilename = nil   // plan still usable without the 3D capture
+            }
+            let plan = CapturedRoomConverter.convert(RoomScanService.extract(room),
+                                                     capturedAt: capturedAt)
+            await MainActor.run {
+                guard let self else { return }
+                self.usdzFilename = savedFilename
+                self.finishedPlan = plan
+                self.phase = .done
+            }
         }
-        finishedPlan = CapturedRoomConverter.convert(Self.extract(room), capturedAt: Date())
-        phase = .done
     }
 
     fileprivate func handleFailure(_ error: Error) {
@@ -181,7 +248,8 @@ public final class RoomScanService {
     }
 
     /// Thin extraction shim: CapturedRoom → the pure ScannedRoomData.
-    private static func extract(_ room: CapturedRoom) -> ScannedRoomData {
+    /// `nonisolated` so it can run on the background conversion task.
+    nonisolated private static func extract(_ room: CapturedRoom) -> ScannedRoomData {
         var surfaces: [ScannedRoomData.Surface] = []
         surfaces += room.walls.map {
             ScannedRoomData.Surface(transform: $0.transform, width: $0.dimensions.x,

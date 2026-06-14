@@ -20,6 +20,7 @@ struct OnbPermissionView: View {
     @Environment(\.theme) private var theme
     @Environment(AppState.self) private var appState
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
 
     var onContinue: () -> Void = {}
 
@@ -36,6 +37,13 @@ struct OnbPermissionView: View {
                 Spacer(minLength: 0)
                 footer
             }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Returning from Settings with camera now enabled → advance automatically
+            // instead of stranding the user on the "access is off" recovery screen.
+            guard phase == .active, permissionDenied,
+                  AVCaptureDevice.authorizationStatus(for: .video) == .authorized else { return }
+            onContinue()
         }
     }
 

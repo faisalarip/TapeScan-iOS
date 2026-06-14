@@ -60,6 +60,16 @@ struct SceneMapping {
     static let designW: CGFloat = 402
     static let designH: CGFloat = 874
 
+    /// Vertical screen fraction the center reticle sits at (see ReticleLayer in
+    /// MeasureControls.swift). Single source of truth shared by the reticle AND
+    /// the active lead-line endpoint so they can never drift apart again.
+    static let reticleAnchorY: CGFloat = 0.47
+    /// Design-space (402×874) target the active dashed lead line points to: the
+    /// reticle center. x = 0.50·designW = 201; y = 0.47·designH ≈ 410.78.
+    static var reticleTarget: ScenePoint {
+        ScenePoint(x: designW * 0.5, y: designH * reticleAnchorY)
+    }
+
     let size: CGSize
 
     func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {

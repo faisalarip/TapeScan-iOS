@@ -19,6 +19,9 @@ public struct FloorPlanEditorView: View {
     @State private var lengthInput = ""
     @State private var dragActive = false
     @State private var showDiscardConfirm = false
+    @FocusState private var lengthFocused: Bool
+    /// Bumped to fire a warning haptic when a length entry is rejected.
+    @State private var lengthInvalidBump = 0
 
     public init(room: RoomRecord) {
         self.room = room
@@ -50,6 +53,8 @@ public struct FloorPlanEditorView: View {
             Button("Discard", role: .destructive) { dismiss() }
             Button("Keep editing", role: .cancel) {}
         }
+        // Surface editor save failures even though this is presented as a cover.
+        .appAlert(appState)
     }
 
     // MARK: - Toolbar
@@ -203,9 +208,18 @@ public struct FloorPlanEditorView: View {
                     TextField("", text: $lengthInput,
                               prompt: Text(lengthPlaceholder).foregroundColor(Theme.ink3))
                         .keyboardType(.decimalPad)
+                        .focused($lengthFocused)
+                        .sensoryFeedback(.warning, trigger: lengthInvalidBump)
                         .font(Theme.mono(16, weight: .bold))
                         .foregroundStyle(Theme.ink)
                         .frame(width: 90)
+                        .toolbar {
+                            // decimalPad has no return key — give an explicit Done.
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Done") { lengthFocused = false }
+                            }
+                        }
                     Text(theme.unit == .imperial ? "ft" : "m")
                         .font(Theme.sans(13))
                         .foregroundStyle(Theme.ink3)
@@ -297,10 +311,14 @@ public struct FloorPlanEditorView: View {
 
     private func applyLength(to wallID: UUID) {
         let normalized = lengthInput.replacingOccurrences(of: ",", with: ".")
-        guard let value = Double(normalized), value > 0 else { return }
+        guard let value = Double(normalized), value > 0 else {
+            lengthInvalidBump += 1   // reject with a warning haptic, not silently
+            return
+        }
         let meters = theme.unit == .imperial ? value / 3.28084 : value
         editor.setLength(of: wallID, to: meters)
         lengthInput = ""
+        lengthFocused = false
     }
 
     private func save() {

@@ -14,15 +14,17 @@
 // off when `theme.lidar` is false.
 
 import SwiftUI
+import SwiftData
 
 public struct MeasureCView: View {
     @Environment(\.theme) private var theme
+    @Environment(\.modelContext) private var modelContext
+    @Environment(AppState.self) private var appState
 
     private let service: any ARMeasureService
-    /// Active tool-rail item (source default: area).
-    @State private var tool: String = "area"
 
-    private let railTools = ["pin", "distance", "area", "volume", "angle"]
+    /// Tool-rail items; each reflects + drives the live measurement mode.
+    private let railTools = ["distance", "area", "volume", "angle"]
 
     public init(service: any ARMeasureService) {
         self.service = service
@@ -42,14 +44,22 @@ public struct MeasureCView: View {
                             showFeaturePoints: true)
 
             scene
+            trackingBanner
 
             topRightStatus
             toolRail
             console
         }
         .background(Theme.cameraBG.ignoresSafeArea())
-        .onAppear { service.mode = .area; service.start() }
-        .onDisappear { service.stop() }
+        // Pro console defaults to AREA mode. The shared AR session is started/
+        // stopped by the MeasureView host (single owner) — NOT here. Starting/
+        // stopping it per direction raced on style switches and froze the camera
+        // (see MeasureView).
+        .onAppear {
+            service.mode = .area
+            service.snapEnabled = appState.snapEnabled
+        }
+        .onChange(of: appState.snapEnabled) { _, snap in service.snapEnabled = snap }
     }
 
     // MARK: - AR geometry (live)
@@ -77,6 +87,26 @@ public struct MeasureCView: View {
         .padding(.top, 8)
     }
 
+    /// Center coaching banner when AR tracking is degraded. Pro has no reticle
+    /// label, so without this the tracking guidance would be invisible here.
+    @ViewBuilder
+    private var trackingBanner: some View {
+        if case .normal = service.tracking {
+            EmptyView()
+        } else {
+            Text(service.tracking.guidance(default: ""))
+                .font(Theme.sans(13, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+                .multilineTextAlignment(.center)
+                .shadow(color: .black.opacity(0.7), radius: 6, y: 2)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(Color.black.opacity(0.5)))
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 120)
+        }
+    }
+
     // MARK: - Left tool rail
 
     private var toolRail: some View {
@@ -100,7 +130,8 @@ public struct MeasureCView: View {
 
     @ViewBuilder
     private func railButton(_ ic: String) -> some View {
-        let on = ic == tool
+        let mode = MeasureMode(rawValue: ic)
+        let on = mode == service.mode
         Icon(ic, size: 20, weight: 1.8, color: on ? .white : Theme.ink3)
             .frame(width: 42, height: 42)
             .background(
@@ -108,8 +139,11 @@ public struct MeasureCView: View {
                     .fill(on ? theme.accent.withA(0.92) : .clear)
             )
             .contentShape(Rectangle())
-            .onTapGesture { withAnimation(.easeOut(duration: 0.15)) { tool = ic } }
-            .accessibilityLabel("\(ic) tool")
+            .onTapGesture {
+                guard let mode else { return }
+                withAnimation(.easeOut(duration: 0.15)) { service.mode = mode }
+            }
+            .accessibilityLabel("\(ic) mode")
             .accessibilityAddTraits(on ? .isSelected : [])
     }
 
@@ -122,8 +156,17 @@ public struct MeasureCView: View {
 
             HStack(spacing: 12) {
                 ModeSwitch(accent: theme.accent, active: modeBinding, compact: true)
-                Shutter(accent: theme.accent, size: 62, icon: "check") { service.finish() }
+                Spacer(minLength: 8)
+                MeasureCircleBtn(icon: "check", size: 48, solid: true) {
+                    MeasureSession.finish(service, context: modelContext, appState: appState)
+                }
                     .accessibilityLabel("Finish measurement")
+                // Primary action: drop a measurement point at the reticle. Pro
+                // previously had ONLY a finish button, so you could not measure.
+                Shutter(accent: theme.accent, size: 62, icon: "plus") {
+                    MeasureSession.place(service, appState: appState)
+                }
+                    .accessibilityLabel("Add measurement point")
             }
             .padding(.horizontal, 14)
 
@@ -132,10 +175,8 @@ public struct MeasureCView: View {
                 .padding(.top, 12)
         }
         .padding(.top, 14)
-        // Lift the console above the floating tab bar (~58pt over the safe area)
-        // so the secondary tool row + unit indicator aren't occluded. The camera
-        // backdrop stays full-bleed; only the controls clear the bar.
-        .padding(.bottom, 72)
+        // Tab-bar clearance is reserved once by the MeasureView host (TabBarMetrics);
+        // the camera backdrop gradient below stays full-bleed.
         .background(
             LinearGradient(
                 stops: [
@@ -204,9 +245,13 @@ public struct MeasureCView: View {
     private var secondaryRow: some View {
         HStack {
             HStack(spacing: 22) {
-                secondaryTool("undo", "Undo") { service.undo() }
-                secondaryTool("layers", "Layers") {}
-                secondaryTool("grid", "Snap") {}
+                secondaryTool("undo", "Undo") {
+                    service.undo()
+                    MeasureSession.autosave(service)
+                }
+                secondaryTool("grid", "Snap", active: appState.snapEnabled) {
+                    appState.snapEnabled.toggle()
+                }
             }
             Spacer()
             unitIndicator
@@ -214,18 +259,20 @@ public struct MeasureCView: View {
     }
 
     @ViewBuilder
-    private func secondaryTool(_ ic: String, _ label: String, action: @escaping () -> Void) -> some View {
+    private func secondaryTool(_ ic: String, _ label: String, active: Bool = false,
+                               action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 4) {
-                Icon(ic, size: 19, weight: 1.8, color: Theme.ink2)
+                Icon(ic, size: 19, weight: 1.8, color: active ? theme.accent : Theme.ink2)
                 Text(label)
                     .font(Theme.sans(9.5))
-                    .foregroundStyle(Theme.ink3)
+                    .foregroundStyle(active ? theme.accent : Theme.ink3)
             }
             .frame(minWidth: 44, minHeight: 44)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+        .accessibilityAddTraits(active ? .isSelected : [])
     }
 
     /// Read-only M / FT indicator reflecting the live unit (driven by Settings).
@@ -250,4 +297,5 @@ public struct MeasureCView: View {
     MeasureCView()
         .environment(AppState())
         .environment(\.theme, Theme(accent: AccentOption.blue.color))
+        .modelContainer(ModelContainerFactory.makeInMemory())
 }

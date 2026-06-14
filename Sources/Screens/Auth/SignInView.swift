@@ -62,8 +62,18 @@ public struct SignInView: View {
 
     // MARK: - Auth actions
 
+    /// Trimmed + lowercased address used for BOTH validation and sending, so a
+    /// stray leading space or uppercase doesn't send an OTP to a bad/mismatched address.
+    private var normalizedEmail: String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
     private var emailIsValid: Bool {
-        email.contains("@") && email.contains(".") && email.count >= 5
+        let e = normalizedEmail
+        guard !e.contains(" "),
+              let at = e.firstIndex(of: "@"), at != e.startIndex else { return false }
+        let domain = e[e.index(after: at)...]
+        return domain.contains(".") && domain.first != "." && domain.last != "."
     }
 
     private func appleTapped() {
@@ -103,12 +113,13 @@ public struct SignInView: View {
 
     private func sendCodeTapped() {
         guard !isWorking, emailIsValid else { return }
+        let address = normalizedEmail
         isWorking = true
         Task {
             defer { isWorking = false }
             do {
-                try await auth.sendEmailOTP(to: email)
-                onCodeSent(email)
+                try await auth.sendEmailOTP(to: address)
+                onCodeSent(address)
             } catch {
                 appState.presentAlert(title: "Couldn't send the code",
                                       message: error.localizedDescription)

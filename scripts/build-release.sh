@@ -39,7 +39,10 @@ fi
 
 echo "▸ placeholder audit"
 if grep -rn 'REPLACE-WITH-PROJECT\|REPLACE_WITH_ANON_KEY' Sources --include='*.swift' >/dev/null; then
-  echo "⚠ SupabaseConfig still has placeholder credentials (sync will report 'not configured')"
+  if [[ "${RELEASE_ARCHIVE:-0}" == "1" ]]; then
+    echo "✗ SupabaseConfig still has placeholder credentials — refusing to archive (auth, sync, and account deletion would fail at runtime)"; exit 1
+  fi
+  echo "⚠ SupabaseConfig still has placeholder credentials (sync reports 'not configured'). Set RELEASE_ARCHIVE=1 to make this a hard failure for archive builds."
 fi
 if grep -rn '"TapeMeasure\|OWNER-INPUT\|OWNER-GITHUB' Sources --include='*.swift'; then
   echo "✗ unresolved placeholders"; exit 1

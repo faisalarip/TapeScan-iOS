@@ -47,8 +47,12 @@ enum LiveSceneBuilder {
                     text: UnitFormat.lengthFractional(closing, unit: unit)))
             }
             if service.mode == .area || service.mode == .volume {
-                let cx = pts.map(\.x).reduce(0, +) / CGFloat(pts.count)
-                let cy = pts.map(\.y).reduce(0, +) / CGFloat(pts.count)
+                let rawCx = pts.map(\.x).reduce(0, +) / CGFloat(pts.count)
+                let rawCy = pts.map(\.y).reduce(0, +) / CGFloat(pts.count)
+                // Clamp the readout center to a safe inset so it never clips at the
+                // viewport edge when the polygon centroid is near the frame border.
+                let cx = min(max(rawCx, 80), SceneMapping.designW - 80)
+                let cy = min(max(rawCy, 120), SceneMapping.designH - 200)
                 let formatted = UnitFormat.area(area, unit).components(separatedBy: " ")
                 scene.area = SceneArea(
                     x: cx, y: cy,

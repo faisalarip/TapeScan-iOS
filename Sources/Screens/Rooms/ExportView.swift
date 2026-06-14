@@ -113,7 +113,14 @@ public struct ExportView: View {
             .installTheme(Theme(appState))
         }
         .sheet(isPresented: $showShareSheet) {
-            ShareSheet(items: shareURLs)
+            ShareSheet(items: shareURLs) { completed in
+                // Spend one free export ONLY when the user actually shared/saved a
+                // file (completed == true). Cancelling the share costs nothing.
+                // Pro is unlimited.
+                if completed, !appState.isPro {
+                    appState.freeExportsLeft = max(0, appState.freeExportsLeft - 1)
+                }
+            }
         }
         .fullScreenCover(isPresented: $showPlanEditor) {
             if let room {
@@ -129,6 +136,8 @@ public struct ExportView: View {
                 formats.removeAll { $0.format == .usdz }
             }
         }
+        // Surface "Export failed" even though this screen is presented as a cover.
+        .appAlert(appState)
     }
 
     // MARK: - Header
@@ -417,40 +426,52 @@ public struct ExportView: View {
         let exportPlan = plan
         let name = room?.name ?? "Floor Plan"
         let usdzFilename = room?.usdzFilename
+        let unit = theme.unit
 
-        var urls: [URL] = []
-        do {
-            for format in selected {
-                urls.append(try exportService.export(plan: exportPlan,
-                                                     name: name,
-                                                     usdzFilename: usdzFilename,
-                                                     format: format,
-                                                     unit: theme.unit))
+        // Generate off the synchronous button path. Each format must render on the
+        // main actor (PDF/PNG use ImageRenderer/UIGraphics), but yielding between
+        // formats keeps the runloop live so the spinner animates and the app never
+        // freezes for the whole batch (was a hard freeze → force-quit).
+        Task { @MainActor in
+            var urls: [URL] = []
+            do {
+                for format in selected {
+                    await Task.yield()
+                    urls.append(try exportService.export(plan: exportPlan,
+                                                         name: name,
+                                                         usdzFilename: usdzFilename,
+                                                         format: format,
+                                                         unit: unit))
+                }
+            } catch {
+                isExporting = false
+                appState.presentAlert(title: "Export failed",
+                                      message: error.localizedDescription)
+                return
             }
-        } catch {
             isExporting = false
-            appState.presentAlert(title: "Export failed",
-                                  message: error.localizedDescription)
-            return
+            shareURLs = urls
+            showShareSheet = true
+            // NOTE: the free-export quota is spent on share COMPLETION, not here —
+            // generating then cancelling the share must not cost a free export.
+            // See the ShareSheet onComplete handler.
         }
-
-        // Quota: spent only on a successful free-tier export. Pro = unlimited.
-        if !appState.isPro {
-            appState.freeExportsLeft = max(0, appState.freeExportsLeft - 1)
-        }
-
-        isExporting = false
-        shareURLs = urls
-        showShareSheet = true
     }
 }
 
 /// UIActivityViewController bridge for sharing the generated files.
+/// `onComplete(true)` fires only when the user actually shared/saved (not cancel),
+/// so the caller can spend the free-export quota fairly.
 private struct ShareSheet: UIViewControllerRepresentable {
     let items: [URL]
+    var onComplete: (Bool) -> Void = { _ in }
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.completionWithItemsHandler = { _, completed, _, _ in
+            onComplete(completed)
+        }
+        return controller
     }
 
     func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}

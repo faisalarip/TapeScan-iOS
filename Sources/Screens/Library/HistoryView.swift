@@ -113,15 +113,14 @@ public struct HistoryView: View {
     @ViewBuilder
     private func row(_ record: MeasurementRecord, last: Bool) -> some View {
         let detailText = detail(for: record)
+        // Read-only row (delete via the context menu below). No dead chevron/tap:
+        // there is no measurement-detail screen, so it must not look drillable.
         DRow(icon: icon(for: record.mode),
              iconBackground: iconBackground(for: record.mode),
              title: record.name,
              subtitle: record.mode.label,
              detail: detailText,
-             last: last,
-             action: {}) {
-            Chevron()
-        }
+             last: last)
         .accessibilityLabel("\(record.name), \(record.mode.label), \(detailText)")
         .contextMenu {
             Button(role: .destructive) {
