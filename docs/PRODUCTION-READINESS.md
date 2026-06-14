@@ -22,16 +22,15 @@ Status legend: ✅ done · 🔧 in progress · ⬜ todo · 👤 user/deployment 
 
 **Done ✅:** dead chevron rows (History + Settings Precision → read-only) · `NSPhotoLibraryAddUsageDescription` added · snap synced to B/C · no-surface feedback in B (via MeasureSession) · USDZ file cleanup on room delete · email OTP normalize+validate · resend clears stale code · permission re-check on foreground · empty/wall-less plan save guard · 1024 icon alpha flattened · release gate hard-fails on placeholder creds · editor keyboard Done + invalid-input feedback · success/place haptics. **Bonus:** AR warm-up loading overlay (user-requested).
 
-**Remaining ⬜:**
-- `appState.lidar` launch detection (badge lies until Measure opens) — needs an ARKit-import-safe capability check.
-- Redo control not exposed in any Measure variant (service supports it).
-- No empty/initial state — zeroed readout shown before first point.
-- No success TOAST/navigation after finish (haptic added; visual toast pending).
-- Sign-in mid-session doesn't trigger sync (needs in-flight-guarded trigger).
-- History rows: read-only now; no detail screen / no swipe-delete + confirmation.
+**Also done ✅ (since):** launch-time LiDAR detection · sign-in-triggers-sync · "Measurement saved" success toast + haptics · delete confirmation (History + Rooms) · Pro area-label viewport clamp (defensive).
+
+**Remaining ⬜ (increasingly device-verification-dependent):**
+- Redo control not exposed in any Measure variant (service supports it) — layout/disabled-state work.
+- No empty/initial state — zeroed readout shown before first point (hard to verify in-sim: simulated backend is seeded; needs an unseeded launch arg or device).
+- History rows have no detail screen (read-only + confirmed-delete is in place).
 - Editor: rename-room implemented in model but no UI affordance.
-- App-icon set still declares iPad/Mac/Watch idioms (iPhone-only target) — cosmetic/asset bloat (Xcode ignores them; alpha already fixed).
-- Pro area/floor readout centroid not clamped to viewport.
+- App-icon set still declares iPad/Mac/Watch idioms (iPhone-only target) — cosmetic (Xcode ignores them; alpha already fixed).
+- **Pro area/floor readout renders top-left in area mode** — clamp didn't fix it (centroid is in-bounds); a deeper MeasureScene positioning bug needing on-device/Xcode-preview debugging. DEBUG-only Pro screen; would also affect Precision in area mode.
 - Volume mode draws same overlay as area (misleading geometry).
 
 ## P2/P3 — polish (27)

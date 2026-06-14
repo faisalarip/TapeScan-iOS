@@ -19,6 +19,7 @@ public struct HistoryView: View {
 
     @State private var query: String = ""
     @FocusState private var searchFocused: Bool
+    @State private var pendingDelete: MeasurementRecord?
 
     public init() {}
 
@@ -30,6 +31,17 @@ public struct HistoryView: View {
                 title
                 searchField
                 list
+            }
+        }
+        // Confirm before deleting — it tombstones + syncs (removes from the cloud too).
+        .confirmationDialog("Delete this measurement?",
+                            isPresented: Binding(get: { pendingDelete != nil },
+                                                 set: { if !$0 { pendingDelete = nil } }),
+                            titleVisibility: .visible,
+                            presenting: pendingDelete) { record in
+            Button("Delete", role: .destructive) {
+                delete(record)
+                pendingDelete = nil
             }
         }
     }
@@ -124,7 +136,7 @@ public struct HistoryView: View {
         .accessibilityLabel("\(record.name), \(record.mode.label), \(detailText)")
         .contextMenu {
             Button(role: .destructive) {
-                delete(record)
+                pendingDelete = record
             } label: {
                 Label("Delete", systemImage: "trash")
             }

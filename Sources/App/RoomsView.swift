@@ -20,6 +20,7 @@ public struct RoomsView: View {
 
     @State private var showScan = false
     @State private var exportRoom: RoomRecord?
+    @State private var pendingDeleteRoom: RoomRecord?
 
     public init() {}
 
@@ -55,6 +56,17 @@ public struct RoomsView: View {
             }
             .environment(appState)
             .installTheme(Theme(appState))
+        }
+        // Confirm before deleting — it tombstones + syncs (removes from the cloud too).
+        .confirmationDialog("Delete this room?",
+                            isPresented: Binding(get: { pendingDeleteRoom != nil },
+                                                 set: { if !$0 { pendingDeleteRoom = nil } }),
+                            titleVisibility: .visible,
+                            presenting: pendingDeleteRoom) { room in
+            Button("Delete", role: .destructive) {
+                delete(room)
+                pendingDeleteRoom = nil
+            }
         }
     }
 
@@ -164,7 +176,7 @@ public struct RoomsView: View {
                     .accessibilityLabel("\(room.name), \(UnitFormat.area(room.areaSquareMeters, theme.unit))")
                     .contextMenu {
                         Button(role: .destructive) {
-                            delete(room)
+                            pendingDeleteRoom = room
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
