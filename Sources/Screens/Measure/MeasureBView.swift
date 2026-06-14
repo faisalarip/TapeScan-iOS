@@ -150,6 +150,12 @@ public struct MeasureBView: View {
                     MeasureSession.autosave(service)
                 }
                     .accessibilityLabel("Undo last point")
+                MeasureCircleBtn(icon: "undo", size: 48, solid: true, flip: true,
+                                 enabled: service.canRedo) {
+                    service.redo()
+                    MeasureSession.autosave(service)
+                }
+                    .accessibilityLabel("Redo last point")
                 Spacer()
                 Shutter(accent: theme.accent, size: 76, icon: "plus") {
                     MeasureSession.place(service, appState: appState)

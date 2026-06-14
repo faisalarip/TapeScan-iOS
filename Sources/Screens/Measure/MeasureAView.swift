@@ -219,6 +219,11 @@ public struct MeasureAView: View {
                     autosaveDraft()
                 }
                 .accessibilityLabel("Undo last point")
+                MeasureCircleBtn(icon: "undo", flip: true, enabled: service.canRedo) {
+                    service.redo()
+                    autosaveDraft()
+                }
+                .accessibilityLabel("Redo last point")
                 Spacer()
                 Shutter(accent: theme.accent, icon: "plus") {
                     if service.placePoint() == nil {

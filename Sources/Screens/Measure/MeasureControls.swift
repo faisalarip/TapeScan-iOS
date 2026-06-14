@@ -132,11 +132,16 @@ struct MeasureCircleBtn: View {
     let icon: String
     var size: CGFloat = 44
     var solid: Bool = false
+    /// Mirror the glyph horizontally — used to render "redo" from the "undo" icon.
+    var flip: Bool = false
+    /// Dim + disable (e.g. redo when there's nothing to redo).
+    var enabled: Bool = true
     var action: () -> Void = {}
 
     var body: some View {
         Button(action: action) {
             Icon(icon, size: size * 0.42, weight: 1.9, color: .white)
+                .scaleEffect(x: flip ? -1 : 1)
                 .frame(width: size, height: size)
                 .background(
                     Circle().fill(solid
@@ -147,6 +152,8 @@ struct MeasureCircleBtn: View {
         }
         .buttonStyle(.plain)
         .frame(minWidth: 44, minHeight: 44)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.4)
     }
 }
 
