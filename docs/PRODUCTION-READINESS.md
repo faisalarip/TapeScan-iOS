@@ -24,14 +24,17 @@ Status legend: ✅ done · 🔧 in progress · ⬜ todo · 👤 user/deployment 
 
 **Also done ✅ (since):** launch-time LiDAR detection · sign-in-triggers-sync · "Measurement saved" success toast + haptics · delete confirmation (History + Rooms) · Pro area-label viewport clamp (defensive).
 
-**Remaining ⬜ (increasingly device-verification-dependent):**
-- Redo control not exposed in any Measure variant (service supports it) — layout/disabled-state work.
-- No empty/initial state — zeroed readout shown before first point (hard to verify in-sim: simulated backend is seeded; needs an unseeded launch arg or device).
-- History rows have no detail screen (read-only + confirmed-delete is in place).
-- Editor: rename-room implemented in model but no UI affordance.
-- App-icon set still declares iPad/Mac/Watch idioms (iPhone-only target) — cosmetic (Xcode ignores them; alpha already fixed).
-- **Pro area/floor readout renders top-left in area mode** — clamp didn't fix it (centroid is in-bounds); a deeper MeasureScene positioning bug needing on-device/Xcode-preview debugging. DEBUG-only Pro screen; would also affect Precision in area mode.
-- Volume mode draws same overlay as area (misleading geometry).
+**Also done ✅ (since):** redo control in Precision + Minimal (undo/redo paired).
+
+**Remaining ⬜ (features needing prioritization / device verification):**
+- History rows have no detail screen (read-only + confirmed-delete is in place) — a new view.
+- Editor: rename-room implemented in model but no UI affordance — new affordance.
+- Empty/initial measure state (the reticle "ALIGN · TAP TO SET POINT" guidance already covers first-run; low value).
+- App-icon set still declares iPad/Mac/Watch idioms (iPhone-only) — cosmetic (Xcode ignores them; alpha already fixed).
+- Volume mode draws same overlay as area (niche, misleading geometry).
+
+**Diagnosed — NOT a production bug:**
+- Pro/area floor-readout renders top-left **in the Simulator only**: the simulated backend's seeded *projected* screen coords are degenerate (0,0), so the polygon centroid collapses to the origin. On device, `ARKitMeasureService` projects real screen coords, so the label positions correctly. Confirmed via instrumented screenshot (`g=402×874 p0=0,0`). (Optional: fix the simulated backend's seeded projections so previews/sim render the geometry, but it has no device impact.)
 
 ## P2/P3 — polish (27)
 
