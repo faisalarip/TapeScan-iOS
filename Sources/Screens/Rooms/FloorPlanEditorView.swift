@@ -33,20 +33,20 @@ public struct FloorPlanEditorView: View {
     }
 
     public var body: some View {
-        ZStack {
-            Theme.screenBG.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                toolbar
-                canvas
-                    .padding(14)
-                if selectedWallID != nil {
-                    wallPanel
-                        .padding(.horizontal, 14)
-                        .padding(.bottom, 20)
-                }
+        VStack(spacing: 0) {
+            toolbar
+            canvas
+                .padding(14)
+            if selectedWallID != nil {
+                wallPanel
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 20)
             }
         }
+        // Content respects the safe area (the toolbar clears the status bar); only
+        // the background bleeds full-screen. See ExportView for the same fix.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Theme.screenBG.ignoresSafeArea())
         .confirmationDialog("Discard changes?",
                             isPresented: $showDiscardConfirm,
                             titleVisibility: .visible) {

@@ -32,11 +32,12 @@ public struct RoomScanView: View {
     }
 
     public var body: some View {
-        ZStack {
-            backdrop
-            content
-        }
-        .onAppear { service.start() }
+        content
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // The camera/capture backdrop bleeds full-screen; the status chips +
+            // progress deck respect the safe area (same fix as ExportView).
+            .background(backdrop)
+            .onAppear { service.start() }
         // Surface "Scan failed" even though this screen is presented as a cover.
         .appAlert(appState)
         .onDisappear { if service.phase == .scanning { service.cancel() } }
