@@ -21,6 +21,8 @@ public struct RoomsView: View {
     @State private var showScan = false
     @State private var exportRoom: RoomRecord?
     @State private var pendingDeleteRoom: RoomRecord?
+    @State private var renameRoomRecord: RoomRecord?
+    @State private var renameText = ""
 
     public init() {}
 
@@ -67,6 +69,13 @@ public struct RoomsView: View {
                 delete(room)
                 pendingDeleteRoom = nil
             }
+        }
+        .alert("Rename room",
+               isPresented: Binding(get: { renameRoomRecord != nil },
+                                    set: { if !$0 { renameRoomRecord = nil } })) {
+            TextField("Name", text: $renameText)
+            Button("Save") { commitRename() }
+            Button("Cancel", role: .cancel) { renameRoomRecord = nil }
         }
     }
 
@@ -175,6 +184,12 @@ public struct RoomsView: View {
                     })
                     .accessibilityLabel("\(room.name), \(UnitFormat.area(room.areaSquareMeters, theme.unit))")
                     .contextMenu {
+                        Button {
+                            renameText = room.name
+                            renameRoomRecord = room
+                        } label: {
+                            Label("Rename", systemImage: "pencil")
+                        }
                         Button(role: .destructive) {
                             pendingDeleteRoom = room
                         } label: {
@@ -215,6 +230,21 @@ public struct RoomsView: View {
             try modelContext.save()
         } catch {
             appState.presentAlert(title: "Couldn't delete",
+                                  message: error.localizedDescription)
+        }
+    }
+
+    private func commitRename() {
+        defer { renameRoomRecord = nil }
+        guard let room = renameRoomRecord else { return }
+        let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != room.name else { return }
+        room.name = trimmed
+        room.updatedAt = Date()   // bump so the rename syncs
+        do {
+            try modelContext.save()
+        } catch {
+            appState.presentAlert(title: "Couldn't rename",
                                   message: error.localizedDescription)
         }
     }

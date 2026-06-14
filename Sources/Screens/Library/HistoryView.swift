@@ -20,6 +20,8 @@ public struct HistoryView: View {
     @State private var query: String = ""
     @FocusState private var searchFocused: Bool
     @State private var pendingDelete: MeasurementRecord?
+    @State private var renameRecord: MeasurementRecord?
+    @State private var renameText = ""
 
     public init() {}
 
@@ -43,6 +45,13 @@ public struct HistoryView: View {
                 delete(record)
                 pendingDelete = nil
             }
+        }
+        .alert("Rename measurement",
+               isPresented: Binding(get: { renameRecord != nil },
+                                    set: { if !$0 { renameRecord = nil } })) {
+            TextField("Name", text: $renameText)
+            Button("Save") { commitRename() }
+            Button("Cancel", role: .cancel) { renameRecord = nil }
         }
     }
 
@@ -135,6 +144,12 @@ public struct HistoryView: View {
              last: last)
         .accessibilityLabel("\(record.name), \(record.mode.label), \(detailText)")
         .contextMenu {
+            Button {
+                renameText = record.name
+                renameRecord = record
+            } label: {
+                Label("Rename", systemImage: "pencil")
+            }
             Button(role: .destructive) {
                 pendingDelete = record
             } label: {
@@ -240,6 +255,21 @@ public struct HistoryView: View {
             try modelContext.save()
         } catch {
             appState.presentAlert(title: "Couldn't delete",
+                                  message: error.localizedDescription)
+        }
+    }
+
+    private func commitRename() {
+        defer { renameRecord = nil }
+        guard let record = renameRecord else { return }
+        let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != record.name else { return }
+        record.name = trimmed
+        record.updatedAt = Date()   // bump so the rename syncs
+        do {
+            try modelContext.save()
+        } catch {
+            appState.presentAlert(title: "Couldn't rename",
                                   message: error.localizedDescription)
         }
     }
