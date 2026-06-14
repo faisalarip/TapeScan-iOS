@@ -34,8 +34,9 @@ enum MeasureSession {
                                                result: result)
             context.insert(record)
             try context.save()
-            // Tactile confirmation the measurement was saved (the screen also
-            // clears + a new History row appears) — finishing isn't silent.
+            // Confirm the save: a visible toast + a success haptic (the screen also
+            // clears and a new History row appears) — finishing is never silent.
+            appState.presentNotice("Measurement saved")
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         } catch {
             UINotificationFeedbackGenerator().notificationOccurred(.error)

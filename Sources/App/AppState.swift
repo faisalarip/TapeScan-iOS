@@ -181,6 +181,13 @@ public final class AppState {
         alert = AppAlert(title: title, message: message)
     }
 
+    /// A transient, non-modal confirmation banner (e.g. "Measurement saved").
+    /// Surfaced + auto-dismissed by ``RootView``; distinct from the modal ``alert``.
+    public var notice: String?
+
+    /// Shows a transient confirmation toast.
+    public func presentNotice(_ message: String) { notice = message }
+
     // MARK: - Flow gating
     /// Set once the user has authenticated.
     public var isAuthenticated: Bool = false

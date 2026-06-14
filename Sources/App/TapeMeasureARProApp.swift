@@ -2,6 +2,7 @@
 
 import SwiftUI
 import SwiftData
+import ARKit
 
 @main
 struct TapeMeasureARProApp: App {
@@ -18,6 +19,15 @@ struct TapeMeasureARProApp: App {
                 .modelContainer(modelContainer)
                 .preferredColorScheme(.dark)
                 .task {
+                    // Detect real LiDAR capability at launch so the precision badge
+                    // + Settings reflect THIS device before the Measure tab is ever
+                    // opened (previously defaulted true until Measure's onAppear ran).
+                    #if targetEnvironment(simulator)
+                    appState.lidar = true
+                    #else
+                    appState.lidar = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+                    #endif
+
                     // Restore any signed-in session, then sync.
                     await SupabaseAuthService.shared.loadSession()
                     appState.isAuthenticated = SupabaseAuthService.shared.userID != nil

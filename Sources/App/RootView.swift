@@ -51,7 +51,35 @@ public struct RootView: View {
         // fullScreenCover/sheet aren't swallowed — SwiftUI presents an alert only
         // on the topmost context, never on a view that a cover is covering.
         .appAlert(appState)
+        .overlay(alignment: .top) { noticeToast }
+        .animation(.spring(duration: 0.35), value: appState.notice)
+        .onChange(of: appState.notice) { _, notice in
+            // Auto-dismiss after a beat; only clear if a newer notice hasn't replaced it.
+            guard let notice else { return }
+            Task {
+                try? await Task.sleep(nanoseconds: 2_200_000_000)
+                if appState.notice == notice { appState.notice = nil }
+            }
+        }
         .modifier(DebugPaywallPresenter())
+    }
+
+    /// Transient confirmation toast (top), auto-dismissed by the onChange above.
+    @ViewBuilder
+    private var noticeToast: some View {
+        if let notice = appState.notice {
+            Text(notice)
+                .font(Theme.sans(14, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(Capsule().fill(Theme.deck))
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+                .shadow(color: .black.opacity(0.4), radius: 12, y: 4)
+                .padding(.top, 10)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .accessibilityAddTraits(.isStaticText)
+        }
     }
 }
 
