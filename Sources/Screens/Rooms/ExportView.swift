@@ -83,26 +83,28 @@ public struct ExportView: View {
     private var enabledCount: Int { formats.filter(\.on).count }
 
     public var body: some View {
-        ZStack {
-            Theme.screenBG.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                header
-                quotaMeter
-                    .padding(.horizontal, 18)
-                    .padding(.bottom, 14)
-                preview
-                    .padding(.horizontal, 18)
-                formatGrid
-                    .padding(.horizontal, 18)
-                    .padding(.top, 18)
-                includeToggles
-                    .padding(.horizontal, 18)
-                    .padding(.top, 16)
-                Spacer(minLength: 14)
-                ctaBar
-            }
+        // Content respects the safe area (the header clears the status bar / Dynamic
+        // Island); only the background bleeds full-screen. A ZStack sibling color
+        // with .ignoresSafeArea() previously let the whole column render full-bleed
+        // under the status bar.
+        VStack(spacing: 0) {
+            header
+            quotaMeter
+                .padding(.horizontal, 18)
+                .padding(.bottom, 14)
+            preview
+                .padding(.horizontal, 18)
+            formatGrid
+                .padding(.horizontal, 18)
+                .padding(.top, 18)
+            includeToggles
+                .padding(.horizontal, 18)
+                .padding(.top, 16)
+            Spacer(minLength: 14)
+            ctaBar
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Theme.screenBG.ignoresSafeArea())
         .fullScreenCover(isPresented: $showPaywall) {
             // Context-aware copy: at 0 free exports the canonical "used all 3"
             // headline is truthful; with quota remaining show the proactive line.

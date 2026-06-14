@@ -38,6 +38,8 @@ public struct PaywallView: View {
 
     @State private var selectionID: String
     @State private var isWorking = false
+    @State private var showAuthSheet = false
+    @State private var pendingPlan: SubscriptionPlan?
 
     public init(service: any PurchaseService,
                 context: PaywallContext = .quotaExhausted,
@@ -110,6 +112,20 @@ public struct PaywallView: View {
         }
         // Surface purchase/restore failures even though this is presented as a cover.
         .appAlert(appState)
+        .sheet(isPresented: $showAuthSheet) {
+            AuthFlowView(onDone: {
+                showAuthSheet = false
+                // Continue the gated purchase only if they actually signed in.
+                if appState.isAuthenticated, let plan = pendingPlan {
+                    pendingPlan = nil
+                    Task { await commitPurchase(plan) }
+                } else {
+                    pendingPlan = nil
+                }
+            })
+            .environment(appState)
+            .installTheme(Theme(appState))
+        }
     }
 
     // MARK: - Hero band
@@ -305,7 +321,14 @@ public struct PaywallView: View {
         VStack(spacing: 10) {
             if let plan = selectedPlan {
                 PrimaryButton(title: plan.ctaLabel) {
-                    Task { await commitPurchase(plan) }
+                    // Require an account before subscribing — Pro includes cloud sync
+                    // of unlimited rooms/history, so the subscription is account-tied.
+                    if appState.isAuthenticated {
+                        Task { await commitPurchase(plan) }
+                    } else {
+                        pendingPlan = plan
+                        showAuthSheet = true
+                    }
                 }
                 .accessibilityLabel(plan.ctaLabel)
                 .disabled(isWorking)
@@ -318,6 +341,9 @@ public struct PaywallView: View {
                     .lineSpacing(1.5)
                     .foregroundStyle(Theme.ink3)
                     .multilineTextAlignment(.center)
+                    // Never truncate the required auto-renew billing terms (Guideline
+                    // 3.1.2) when vertical space is tight — wrap to full height.
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 6)
             }
 
