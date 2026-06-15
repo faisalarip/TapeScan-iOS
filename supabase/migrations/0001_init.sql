@@ -44,5 +44,8 @@ as $$
   delete from auth.users where id = auth.uid();
 $$;
 
-revoke execute on function public.delete_user() from anon;
+-- Lock the SECURITY DEFINER function to signed-in users only. Must revoke from
+-- PUBLIC (not just anon): Postgres grants EXECUTE to PUBLIC by default, and anon
+-- inherits it — `revoke ... from anon` alone leaves the function callable by anon.
+revoke execute on function public.delete_user() from public, anon;
 grant execute on function public.delete_user() to authenticated;

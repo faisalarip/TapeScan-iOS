@@ -9,10 +9,11 @@ import Foundation
 
 public enum SupabaseConfig {
     /// e.g. https://abcdefgh.supabase.co — the BASE project URL (no /rest/v1 path).
-    public static let url = URL(string: "https://ujipouimfepmsiseomxq.supabase.co")!
+    /// Dedicated project "TapeScan-iOS" (ejapwzjrnwvgusqqueky).
+    public static let url = URL(string: "https://ejapwzjrnwvgusqqueky.supabase.co")!
     /// The project's anon (public) API key. Public by design — RLS is the real
     /// protection (see supabase/migrations/0001_init.sql).
-    public static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqaXBvdWltZmVwbXNpc2VvbXhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzMwMjMsImV4cCI6MjA5NTEwOTAyM30.vAsq9q93xe5I51GeflD4MvWVlMrG030PVTwjGQLv9rM"
+    public static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqYXB3empybnd2Z3VzcXF1ZWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MjkwNDksImV4cCI6MjA5NzEwNTA0OX0.unxsLcEdzPBfBgr23w-msP-2Ggd6K50KrnQiVGA5Unk"
 
     /// True once real credentials are in place. Auth/sync UI stays functional
     /// but surfaces an honest "not configured" failure until then — it never
