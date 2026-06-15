@@ -82,6 +82,14 @@ public struct ExportView: View {
     private var locked: Bool { !appState.isPro && left <= 0 }
     private var enabledCount: Int { formats.filter(\.on).count }
 
+    /// TEMP DIAGNOSTIC line for the header. `trace-v2` confirms a fresh build;
+    /// `app` is the captured inset; `manual` is whether the iOS-26 spacer path runs.
+    private var diagnosticLine: String {
+        let manual: Bool
+        if #available(iOS 26, *) { manual = true } else { manual = false }
+        return "⚑ trace-v2 · app \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom)) · manual \(manual ? 1 : 0)"
+    }
+
     public var body: some View {
         // Background bleeds full-screen; content is laid out inside the device
         // safe area via the key window's real insets. iOS 26 `.fullScreenCover`
@@ -135,6 +143,7 @@ public struct ExportView: View {
         }
         .onDisappear { exportService.cleanup() }
         .onAppear {
+            print("🔵SA ExportView.onAppear: appState insets top \(appState.safeAreaInsets.top) / bottom \(appState.safeAreaInsets.bottom)")
             // Hide the USDZ card when this room has no stored 3D capture.
             if room?.usdzFilename == nil {
                 formats.removeAll { $0.format == .usdz }
@@ -156,8 +165,8 @@ public struct ExportView: View {
                 Text(headerSubtitle)
                     .font(Theme.sans(13))
                     .foregroundStyle(Theme.ink3)
-                // TEMP DIAGNOSTIC — proves this build is running + shows captured insets.
-                Text("⚑ insets \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom))")
+                // TEMP DIAGNOSTIC — build tag confirms a fresh build; values trace the pipeline.
+                Text(diagnosticLine)
                     .font(Theme.mono(12, weight: .bold))
                     .foregroundStyle(.red)
             }

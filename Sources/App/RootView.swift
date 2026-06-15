@@ -39,8 +39,12 @@ public struct RootView: View {
         // content the device insets, and reading them at the cover's own body time
         // is unreliable. Re-read on each activation so rotation / dynamic changes
         // stay correct.
-        .onAppear { appState.safeAreaInsets = WindowSafeArea.insets }
+        .onAppear {
+            print("🔵SA ▶︎ BUILD trace-v2 · RootView.onAppear — capturing window insets")
+            appState.safeAreaInsets = WindowSafeArea.insets
+        }
         .onChange(of: scenePhase) { _, phase in
+            print("🔵SA RootView scenePhase → \(phase)")
             if phase == .active { appState.safeAreaInsets = WindowSafeArea.insets }
         }
         .animation(.easeInOut(duration: 0.25), value: appState.phase)

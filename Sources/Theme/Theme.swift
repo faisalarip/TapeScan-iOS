@@ -186,6 +186,7 @@ public extension View {
         // it. `insets` are the device's real values captured at the app root.
         let needsManualInset: Bool
         if #available(iOS 26, *) { needsManualInset = true } else { needsManualInset = false }
+        print("🔵SA coverSafeAreaPadding: insets top \(insets.top) / bottom \(insets.bottom) · needsManual=\(needsManualInset) · topSpacer=\(needsManualInset ? insets.top : 0)")
         return VStack(spacing: 0) {
             if needsManualInset {
                 Color.clear.frame(height: insets.top)
@@ -208,11 +209,11 @@ public extension View {
 public enum WindowSafeArea {
     @MainActor
     public static var insets: EdgeInsets {
-        let inset = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: \.isKeyWindow)?
-            .safeAreaInsets ?? .zero
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let windows = scenes.flatMap(\.windows)
+        let keyWindow = windows.first(where: \.isKeyWindow)
+        let inset = keyWindow?.safeAreaInsets ?? .zero
+        print("🔵SA WindowSafeArea.insets: scenes=\(scenes.count) windows=\(windows.count) keyWindow=\(keyWindow != nil) → top \(inset.top) / bottom \(inset.bottom)")
         return EdgeInsets(top: inset.top, leading: inset.left,
                           bottom: inset.bottom, trailing: inset.right)
     }

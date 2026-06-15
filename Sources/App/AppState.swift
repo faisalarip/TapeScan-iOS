@@ -203,7 +203,9 @@ public final class AppState {
     /// iOS 26 `.fullScreenCover` does NOT hand its content the device insets, so
     /// covers can't measure them locally — they read this instead. See
     /// `View.coverSafeAreaPadding(_:)`.
-    public var safeAreaInsets: EdgeInsets = EdgeInsets()
+    public var safeAreaInsets: EdgeInsets = EdgeInsets() {
+        didSet { print("🔵SA AppState.safeAreaInsets = top \(safeAreaInsets.top) / bottom \(safeAreaInsets.bottom)  (was top \(oldValue.top))") }
+    }
 
     #if DEBUG
     /// DEBUG-only: when set, ``RootView`` auto-presents the paywall on launch with
