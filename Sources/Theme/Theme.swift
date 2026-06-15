@@ -176,16 +176,27 @@ public extension View {
         // so no manual inset is needed there. iOS 26 (Apple's year-based renumber
         // directly after 18 — there are NO versions in between, so this boundary is
         // exact, not a guess) does NOT: its cover content lays out from y=0 under
-        // the status bar. So pad by the device's real insets (captured at the app
-        // root) only on 26+. Deliberately NO `.ignoresSafeArea()` in this content
-        // chain — it composed unreliably on device (worked in the simulator, silently
-        // ate the top pad on a physical device). Plain padding can't be absorbed.
+        // the status bar.
+        //
+        // On 26+, offset with REAL fixed-height spacer views (not `.padding`, not
+        // `.ignoresSafeArea` — both composed unreliably on physical devices,
+        // rendering correctly in the simulator while silently collapsing on device).
+        // A `Color.clear` with a fixed `.frame(height:)` is a concrete subview the
+        // stack MUST allocate space for; nothing in the safe-area system can absorb
+        // it. `insets` are the device's real values captured at the app root.
         let needsManualInset: Bool
         if #available(iOS 26, *) { needsManualInset = true } else { needsManualInset = false }
-        return self
-            .padding(.top, needsManualInset ? insets.top : 0)
-            .padding(.bottom, needsManualInset ? insets.bottom : 0)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        return VStack(spacing: 0) {
+            if needsManualInset {
+                Color.clear.frame(height: insets.top)
+            }
+            self
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            if needsManualInset {
+                Color.clear.frame(height: insets.bottom)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
