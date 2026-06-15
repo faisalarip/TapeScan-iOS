@@ -82,38 +82,43 @@ public struct ExportView: View {
     private var locked: Bool { !appState.isPro && left <= 0 }
     private var enabledCount: Int { formats.filter(\.on).count }
 
-    /// TEMP DIAGNOSTIC line for the header. `trace-v2` confirms a fresh build;
-    /// `app` is the captured inset; `manual` is whether the iOS-26 spacer path runs.
-    private var diagnosticLine: String {
-        let manual: Bool
-        if #available(iOS 26, *) { manual = true } else { manual = false }
-        return "⚑ trace-v3 · app \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom)) · manual \(manual ? 1 : 0)"
-    }
-
     public var body: some View {
-        // Background bleeds full-screen; content is laid out inside the device
-        // safe area via the key window's real insets. iOS 26 `.fullScreenCover`
-        // doesn't hand its content the device insets (see `coverSafeAreaPadding`).
-        ZStack(alignment: .top) {
+        // The content can exceed the screen (especially with all 7 formats on a
+        // short device), so it SCROLLS — fitting every iPhone size. iOS 26
+        // `.fullScreenCover` drops the device safe area (cover content sees
+        // top=0), so status-bar / home-indicator clearance is applied manually via
+        // `.safeAreaInset` using the insets captured at the app root; `.coverManual`
+        // zeroes that on iOS 17/18 where the cover already supplies it. The CTA is
+        // pinned at the bottom so it's always reachable instead of scrolling away.
+        let m = appState.safeAreaInsets.coverManual
+        return ZStack {
             Theme.screenBG.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                header
-                quotaMeter
-                    .padding(.horizontal, 18)
-                    .padding(.bottom, 14)
-                preview
-                    .padding(.horizontal, 18)
-                formatGrid
-                    .padding(.horizontal, 18)
-                    .padding(.top, 18)
-                includeToggles
-                    .padding(.horizontal, 18)
-                    .padding(.top, 16)
-                Spacer(minLength: 14)
-                ctaBar
+            ScrollView {
+                VStack(spacing: 0) {
+                    header
+                    quotaMeter
+                        .padding(.horizontal, 18)
+                        .padding(.bottom, 14)
+                    preview
+                        .padding(.horizontal, 18)
+                    formatGrid
+                        .padding(.horizontal, 18)
+                        .padding(.top, 18)
+                    includeToggles
+                        .padding(.horizontal, 18)
+                        .padding(.top, 16)
+                }
+                .padding(.bottom, 16)
             }
-            .coverSafeAreaPadding(appState.safeAreaInsets)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                Color.clear.frame(height: m.top)
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                ctaBar
+                    .padding(.bottom, m.bottom)
+                    .background(Theme.screenBG)
+            }
         }
         .fullScreenCover(isPresented: $showPaywall) {
             // Context-aware copy: at 0 free exports the canonical "used all 3"
@@ -143,7 +148,6 @@ public struct ExportView: View {
         }
         .onDisappear { exportService.cleanup() }
         .onAppear {
-            print("🔵SA ExportView.onAppear: appState insets top \(appState.safeAreaInsets.top) / bottom \(appState.safeAreaInsets.bottom)")
             // Hide the USDZ card when this room has no stored 3D capture.
             if room?.usdzFilename == nil {
                 formats.removeAll { $0.format == .usdz }
@@ -165,10 +169,6 @@ public struct ExportView: View {
                 Text(headerSubtitle)
                     .font(Theme.sans(13))
                     .foregroundStyle(Theme.ink3)
-                // TEMP DIAGNOSTIC — build tag confirms a fresh build; values trace the pipeline.
-                Text(diagnosticLine)
-                    .font(Theme.mono(12, weight: .bold))
-                    .foregroundStyle(.red)
             }
             Spacer()
             Button(action: onClose) {

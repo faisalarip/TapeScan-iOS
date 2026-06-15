@@ -33,10 +33,14 @@ public struct FloorPlanEditorView: View {
     }
 
     public var body: some View {
-        // Background bleeds full-screen; content is laid out inside the device
-        // safe area via the key window's real insets — iOS 26 `.fullScreenCover`
-        // doesn't hand its content the device insets (see `coverSafeAreaPadding`).
-        ZStack(alignment: .top) {
+        // The toolbar must clear the status bar and the canvas fills the rest.
+        // iOS 26 `.fullScreenCover` drops the device safe area (cover content sees
+        // top=0), so clearance is applied manually via `.safeAreaInset` using the
+        // insets captured at the app root; `.coverManual` zeroes that on iOS 17/18
+        // where the cover already supplies it. No ScrollView — the canvas is the
+        // flexible element that absorbs height.
+        let m = appState.safeAreaInsets.coverManual
+        return ZStack(alignment: .top) {
             Theme.screenBG.ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -49,8 +53,10 @@ public struct FloorPlanEditorView: View {
                         .padding(.bottom, 20)
                 }
             }
-            .coverSafeAreaPadding(appState.safeAreaInsets)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+        .safeAreaInset(edge: .top, spacing: 0) { Color.clear.frame(height: m.top) }
+        .safeAreaInset(edge: .bottom, spacing: 0) { Color.clear.frame(height: m.bottom) }
         .confirmationDialog("Discard changes?",
                             isPresented: $showDiscardConfirm,
                             titleVisibility: .visible) {

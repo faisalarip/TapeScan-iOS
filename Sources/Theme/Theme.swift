@@ -159,73 +159,35 @@ public extension View {
         environment(\.theme, theme)
     }
 
-    /// Lays out modal-cover content inside the device safe area using `insets`,
-    /// then opts the content out of the cover's own safe area.
-    ///
-    /// Why this exists: on iOS 26 a `.fullScreenCover` does NOT propagate the
-    /// top/bottom safe-area insets to its SwiftUI content — the content lands at
-    /// y = 0 under the status bar / Dynamic Island even with no `.ignoresSafeArea()`,
-    /// and a `GeometryReader` *inside* the cover reports `inset.top == 0`, so the
-    /// cover can't measure them locally. Pass the REAL insets captured at the app
-    /// root (``AppState/safeAreaInsets``); the content opts out of the cover's safe
-    /// area and pads by them for one identical, correct result on iOS 17 through 26.
-    /// Pair with a full-bleed background sibling:
-    /// `ZStack { Theme.screenBG.ignoresSafeArea(); content.coverSafeAreaPadding(insets) }`.
-    func coverSafeAreaPadding(_ insets: EdgeInsets) -> some View {
-        // iOS 17/18 `.fullScreenCover` applies the device safe area to its content,
-        // so no manual inset is needed there. iOS 26 (Apple's year-based renumber
-        // directly after 18 — there are NO versions in between, so this boundary is
-        // exact, not a guess) does NOT: its cover content lays out from y=0 under
-        // the status bar.
-        //
-        // On 26+, offset with REAL fixed-height spacer views (not `.padding`, not
-        // `.ignoresSafeArea` — both composed unreliably on physical devices,
-        // rendering correctly in the simulator while silently collapsing on device).
-        // A `Color.clear` with a fixed `.frame(height:)` is a concrete subview the
-        // stack MUST allocate space for; nothing in the safe-area system can absorb
-        // it. `insets` are the device's real values captured at the app root.
-        let needsManualInset: Bool
-        if #available(iOS 26, *) { needsManualInset = true } else { needsManualInset = false }
-        print("🔵SA coverSafeAreaPadding: insets top \(insets.top) / bottom \(insets.bottom) · needsManual=\(needsManualInset) · topSpacer=\(needsManualInset ? insets.top : 0)")
-        return VStack(spacing: 0) {
-            if needsManualInset {
-                // TEMP DIAGNOSTIC: red band = the top spacer. If it's visible and
-                // ~62pt tall the spacer works; if absent it collapsed.
-                Color.red.opacity(0.5).frame(height: insets.top)
-            }
-            self
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .border(Color.green, width: 3) // TEMP DIAGNOSTIC: green box = content bounds
-                .overlay(alignment: .topLeading) {
-                    // TEMP DIAGNOSTIC: log the content's ACTUAL on-screen position +
-                    // the safe area the cover gives it ON DEVICE (not the simulator).
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            print("🔵SA content frame: global.minY=\(proxy.frame(in: .global).minY) · cover safeArea.top=\(proxy.safeAreaInsets.top)")
-                        }
-                    }
-                }
-            if needsManualInset {
-                Color.red.opacity(0.5).frame(height: insets.bottom)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+}
+
+public extension EdgeInsets {
+    /// The device safe-area insets a modal cover must apply to its OWN content,
+    /// gated by OS: the real captured insets on iOS 26 — where `.fullScreenCover`
+    /// drops them (verified on a physical device: cover content sees
+    /// `safeArea.top == 0`) — and `.zero` on iOS 17/18, where the cover supplies
+    /// them itself (applying them again would double up). Apply with `.safeAreaInset`
+    /// so the inset is RESERVED (content/scroll can't overflow into it). Apple
+    /// renumbered 18 → 26 with nothing in between, so the boundary is exact.
+    var coverManual: EdgeInsets {
+        if #available(iOS 26, *) { return self }
+        return EdgeInsets()
     }
 }
 
 /// The device's real safe-area insets, read from the key window. Capture this in
 /// the normal hierarchy at a reliable time (e.g. RootView `onAppear` / scene
 /// activation) and stash on ``AppState`` for modal covers to read — see
-/// ``SwiftUICore/View/coverSafeAreaPadding(_:)``. Reading it at a cover's own body
+/// ``Swift/EdgeInsets/coverManual``. Reading it at a cover's own body
 /// time is unreliable (the window/scene may not be settled yet on device).
 public enum WindowSafeArea {
     @MainActor
     public static var insets: EdgeInsets {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        let windows = scenes.flatMap(\.windows)
-        let keyWindow = windows.first(where: \.isKeyWindow)
-        let inset = keyWindow?.safeAreaInsets ?? .zero
-        print("🔵SA WindowSafeArea.insets: scenes=\(scenes.count) windows=\(windows.count) keyWindow=\(keyWindow != nil) → top \(inset.top) / bottom \(inset.bottom)")
+        let inset = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .safeAreaInsets ?? .zero
         return EdgeInsets(top: inset.top, leading: inset.left,
                           bottom: inset.bottom, trailing: inset.right)
     }
