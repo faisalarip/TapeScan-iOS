@@ -213,18 +213,27 @@ public struct MeasureAView: View {
     private var bottomDeck: some View {
         VStack(spacing: 12) {
             ModeSwitch(accent: theme.accent, active: modeBinding)
-            HStack {
-                MeasureCircleBtn(icon: "undo") {
-                    service.undo()
-                    autosaveDraft()
+            // The shutter must sit at TRUE horizontal center. The side clusters
+            // are asymmetric — undo+redo (two) on the left, check (one) on the
+            // right — so an HStack with Spacers on both sides of the shutter
+            // would push it right of center by half a button. A ZStack pins the
+            // shutter to screen center while the clusters stay on the edges.
+            ZStack {
+                HStack {
+                    MeasureCircleBtn(icon: "undo") {
+                        service.undo()
+                        autosaveDraft()
+                    }
+                    .accessibilityLabel("Undo last point")
+                    MeasureCircleBtn(icon: "undo", flip: true, enabled: service.canRedo) {
+                        service.redo()
+                        autosaveDraft()
+                    }
+                    .accessibilityLabel("Redo last point")
+                    Spacer()
+                    MeasureCircleBtn(icon: "check") { finishTapped() }
+                        .accessibilityLabel("Finish measurement")
                 }
-                .accessibilityLabel("Undo last point")
-                MeasureCircleBtn(icon: "undo", flip: true, enabled: service.canRedo) {
-                    service.redo()
-                    autosaveDraft()
-                }
-                .accessibilityLabel("Redo last point")
-                Spacer()
                 Shutter(accent: theme.accent, icon: "plus") {
                     if service.placePoint() == nil {
                         appState.presentAlert(
@@ -234,9 +243,6 @@ public struct MeasureAView: View {
                     autosaveDraft()
                 }
                 .accessibilityLabel("Add measurement point")
-                Spacer()
-                MeasureCircleBtn(icon: "check") { finishTapped() }
-                    .accessibilityLabel("Finish measurement")
             }
         }
         .padding(.horizontal, 14)

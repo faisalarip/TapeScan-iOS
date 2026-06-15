@@ -28,16 +28,33 @@ public enum MeasureHUDStyle: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
+/// Single-owner box for the AR backend, held by ``MeasureView`` via
+/// `@StateObject` so `MeasureServiceFactory.make()` runs exactly once per view
+/// identity (see the `serviceHost` doc comment). It publishes nothing — the
+/// service itself is `@Observable` and observed directly at each use site.
+@MainActor
+final class MeasureServiceHost: ObservableObject {
+    let service: any ARMeasureService
+    init() { service = MeasureServiceFactory.make() }
+}
+
 public struct MeasureView: View {
     @Environment(\.theme) private var theme
 
     @State private var style: MeasureHUDStyle
+    /// Owns the AR backend so it is constructed EXACTLY ONCE per MeasureView
+    /// identity. `@State(initialValue: MeasureServiceFactory.make())` re-evaluates
+    /// `make()` on every view re-init — e.g. a live theme/settings change while the
+    /// Measure tab is on screen re-runs `MeasureView.init` — which would spin up,
+    /// then immediately discard, a throwaway ARView/ARSession (on device an
+    /// expensive RealityKit allocation). `@StateObject`'s autoclosure is evaluated
+    /// once per identity, so the live session is never needlessly rebuilt.
+    @StateObject private var serviceHost = MeasureServiceHost()
     /// Shared AR backend for whichever direction is active.
-    @State private var service: any ARMeasureService
+    private var service: any ARMeasureService { serviceHost.service }
 
     @MainActor
     public init() {
-        _service = State(initialValue: MeasureServiceFactory.make())
         var initial: MeasureHUDStyle = .precision
         #if DEBUG
         // DEBUG-only: `-uiMeasureDir precision|minimal|pro` sets the initial
@@ -100,26 +117,61 @@ public struct MeasureView: View {
         return false
     }
 
-    /// Cold-start loading overlay. The camera is black until ARKit's first tracked
-    /// frame (and first-launch Metal/shader warm-up), so show a spinner instead of
-    /// a frozen-looking black screen. No-op in the Simulator (simulated backend
-    /// reports `.normal`), so it never affects previews/screenshots.
+    /// Cold-start info overlay. On device the camera is black until ARKit's first
+    /// tracked frame, and first-launch RealityKit/Metal warm-up briefly ties up the
+    /// main thread — without context that reads as a *freeze*. This card explains
+    /// the wait and coaches the motion ARKit needs to converge, turning dead time
+    /// into guidance. It's a static card (not a lone spinner): if a momentary stall
+    /// freezes the animation, the message still reads correctly.
+    /// No-op in the Simulator (simulated backend reports `.normal`), so it never
+    /// affects normal previews/screenshots; `-uiTrackingState initializing` forces
+    /// it for verification.
     @ViewBuilder
     private var arLoadingOverlay: some View {
         if isInitializing {
             ZStack {
                 Theme.cameraBG.ignoresSafeArea()
-                VStack(spacing: 14) {
-                    ProgressView()
-                        .controlSize(.large)
-                        .tint(theme.accent)
-                    Text("Starting camera…")
-                        .font(Theme.sans(14, weight: .medium))
-                        .foregroundStyle(Theme.ink2)
+                VStack(spacing: 18) {
+                    ZStack {
+                        Circle()
+                            .stroke(theme.accent.withA(0.18), lineWidth: 2)
+                            .frame(width: 76, height: 76)
+                        Icon("lidar", size: 34, weight: 1.8, color: theme.accent)
+                        ProgressView()
+                            .controlSize(.regular)
+                            .tint(theme.accent)
+                            .offset(y: 50) // sits just under the glyph ring
+                    }
+                    .frame(height: 96)
+
+                    VStack(spacing: 7) {
+                        Text("Starting AR session")
+                            .font(Theme.sans(17, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                        Text("Move your device slowly so it can map the space. This takes a moment right after launch.")
+                            .font(Theme.sans(13))
+                            .foregroundStyle(Theme.ink2)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 26)
+                .frame(maxWidth: 300)
+                .background(
+                    RoundedRectangle(cornerRadius: theme.r(22), style: .continuous)
+                        .fill(Theme.glass)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: theme.r(22), style: .continuous)
+                        .strokeBorder(Theme.glassBorder, lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
             }
             .transition(.opacity)
             .allowsHitTesting(false)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Starting AR session. Move your device slowly so it can map the space.")
         }
     }
 

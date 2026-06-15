@@ -101,7 +101,7 @@ public final class ARKitMeasureService: ARMeasureService {
 
     @discardableResult
     public func placePoint() -> WorldPoint? {
-        guard let hit = raycastCenter() else { return nil }
+        guard let hit = raycastReticle() else { return nil }
         let column = hit.worldTransform.columns.3
         let hitPosition = SIMD3<Float>(column.x, column.y, column.z)
 
@@ -171,18 +171,25 @@ public final class ARKitMeasureService: ARMeasureService {
 
     // MARK: - Raycasting
 
-    /// Raycasts from the screen-center reticle: detected geometry first (plane
+    /// Raycasts from the on-screen reticle: detected geometry first (plane
     /// anchors; the LiDAR mesh also answers estimated-plane queries), then
     /// estimated planes as the fallback.
-    private func raycastCenter() -> ARRaycastResult? {
+    ///
+    /// Fires from where the reticle is actually DRAWN — horizontally centered,
+    /// `SceneMapping.reticleAnchorY` (0.47h) down — not the geometric center
+    /// (0.50h). The arView and the SwiftUI reticle overlay both ignore the safe
+    /// area, so this resolves to the same screen-Y as the crosshair; using midY
+    /// dropped placed points ~3% of the screen height *below* the crosshair.
+    private func raycastReticle() -> ARRaycastResult? {
         guard arView.bounds.width > 0, arView.bounds.height > 0 else { return nil }
-        let center = CGPoint(x: arView.bounds.midX, y: arView.bounds.midY)
-        if let hit = arView.raycast(from: center,
+        let target = CGPoint(x: arView.bounds.midX,
+                             y: arView.bounds.height * SceneMapping.reticleAnchorY)
+        if let hit = arView.raycast(from: target,
                                     allowing: .existingPlaneGeometry,
                                     alignment: .any).first {
             return hit
         }
-        return arView.raycast(from: center,
+        return arView.raycast(from: target,
                               allowing: .estimatedPlane,
                               alignment: .any).first
     }
@@ -229,7 +236,7 @@ public final class ARKitMeasureService: ARMeasureService {
         // telemetry readout does not need a raycast per frame.
         frameCounter += 1
         guard frameCounter % 6 == 0 else { return }
-        if case .normal = tracking, let hit = raycastCenter() {
+        if case .normal = tracking, let hit = raycastReticle() {
             let cam = frame.camera.transform.columns.3
             let hitColumn = hit.worldTransform.columns.3
             targetDepthMeters = Double(simd_distance(

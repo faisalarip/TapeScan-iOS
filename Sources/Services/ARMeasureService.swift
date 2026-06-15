@@ -79,11 +79,33 @@ public enum MeasureServiceFactory {
     @MainActor
     public static func make() -> any ARMeasureService {
         #if targetEnvironment(simulator)
+        #if DEBUG
+        // DEBUG-only: `-uiTrackingState initializing|limited|notAvailable` seeds
+        // the simulated backend's tracking state so the AR warm-up / coaching
+        // overlays can be screenshot-verified in the Simulator, which otherwise
+        // always reports `.normal`. No-op in release / without the arg.
+        if let seeded = debugSeededTracking() {
+            return SimulatedARMeasureService(tracking: seeded)
+        }
+        #endif
         return SimulatedARMeasureService()
         #else
         return ARKitMeasureService()
         #endif
     }
+
+    #if targetEnvironment(simulator) && DEBUG
+    private static func debugSeededTracking() -> TrackingQuality? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-uiTrackingState"), i + 1 < args.count else { return nil }
+        switch args[i + 1] {
+        case "initializing": return .initializing
+        case "limited":      return .limited(reason: "Move slower — limited tracking")
+        case "notAvailable": return .notAvailable
+        default:             return nil
+        }
+    }
+    #endif
 }
 
 /// Default no-hardware backend for the Simulator and previews.

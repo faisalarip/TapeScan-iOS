@@ -143,29 +143,32 @@ public struct MeasureBView: View {
             }
             .padding(.bottom, 18)
 
-            // controls
-            HStack {
-                MeasureCircleBtn(icon: "undo", size: 48, solid: true) {
-                    service.undo()
-                    MeasureSession.autosave(service)
+            // controls — shutter pinned to true horizontal center via ZStack;
+            // the side clusters are asymmetric (undo+redo left, check right) so
+            // Spacers alone would offset the + right of center (see MeasureAView).
+            ZStack {
+                HStack {
+                    MeasureCircleBtn(icon: "undo", size: 48, solid: true) {
+                        service.undo()
+                        MeasureSession.autosave(service)
+                    }
+                        .accessibilityLabel("Undo last point")
+                    MeasureCircleBtn(icon: "undo", size: 48, solid: true, flip: true,
+                                     enabled: service.canRedo) {
+                        service.redo()
+                        MeasureSession.autosave(service)
+                    }
+                        .accessibilityLabel("Redo last point")
+                    Spacer()
+                    MeasureCircleBtn(icon: "check", size: 48, solid: true) {
+                        MeasureSession.finish(service, context: modelContext, appState: appState)
+                    }
+                        .accessibilityLabel("Finish measurement")
                 }
-                    .accessibilityLabel("Undo last point")
-                MeasureCircleBtn(icon: "undo", size: 48, solid: true, flip: true,
-                                 enabled: service.canRedo) {
-                    service.redo()
-                    MeasureSession.autosave(service)
-                }
-                    .accessibilityLabel("Redo last point")
-                Spacer()
                 Shutter(accent: theme.accent, size: 76, icon: "plus") {
                     MeasureSession.place(service, appState: appState)
                 }
                     .accessibilityLabel("Add measurement point")
-                Spacer()
-                MeasureCircleBtn(icon: "check", size: 48, solid: true) {
-                    MeasureSession.finish(service, context: modelContext, appState: appState)
-                }
-                    .accessibilityLabel("Finish measurement")
             }
         }
         .padding(20)
