@@ -87,7 +87,7 @@ public struct ExportView: View {
     private var diagnosticLine: String {
         let manual: Bool
         if #available(iOS 26, *) { manual = true } else { manual = false }
-        return "⚑ trace-v2 · app \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom)) · manual \(manual ? 1 : 0)"
+        return "⚑ trace-v3 · app \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom)) · manual \(manual ? 1 : 0)"
     }
 
     public var body: some View {

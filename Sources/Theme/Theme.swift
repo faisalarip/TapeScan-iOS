@@ -189,12 +189,24 @@ public extension View {
         print("🔵SA coverSafeAreaPadding: insets top \(insets.top) / bottom \(insets.bottom) · needsManual=\(needsManualInset) · topSpacer=\(needsManualInset ? insets.top : 0)")
         return VStack(spacing: 0) {
             if needsManualInset {
-                Color.clear.frame(height: insets.top)
+                // TEMP DIAGNOSTIC: red band = the top spacer. If it's visible and
+                // ~62pt tall the spacer works; if absent it collapsed.
+                Color.red.opacity(0.5).frame(height: insets.top)
             }
             self
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .border(Color.green, width: 3) // TEMP DIAGNOSTIC: green box = content bounds
+                .overlay(alignment: .topLeading) {
+                    // TEMP DIAGNOSTIC: log the content's ACTUAL on-screen position +
+                    // the safe area the cover gives it ON DEVICE (not the simulator).
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            print("🔵SA content frame: global.minY=\(proxy.frame(in: .global).minY) · cover safeArea.top=\(proxy.safeAreaInsets.top)")
+                        }
+                    }
+                }
             if needsManualInset {
-                Color.clear.frame(height: insets.bottom)
+                Color.red.opacity(0.5).frame(height: insets.bottom)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

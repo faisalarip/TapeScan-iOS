@@ -40,7 +40,7 @@ public struct RootView: View {
         // is unreliable. Re-read on each activation so rotation / dynamic changes
         // stay correct.
         .onAppear {
-            print("🔵SA ▶︎ BUILD trace-v2 · RootView.onAppear — capturing window insets")
+            print("🔵SA ▶︎ BUILD trace-v3 · RootView.onAppear — capturing window insets")
             appState.safeAreaInsets = WindowSafeArea.insets
         }
         .onChange(of: scenePhase) { _, phase in
