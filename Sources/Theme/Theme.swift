@@ -158,4 +158,42 @@ public extension View {
     func installTheme(_ theme: Theme) -> some View {
         environment(\.theme, theme)
     }
+
+    /// Lays out modal-cover content inside the device safe area using `insets`,
+    /// then opts the content out of the cover's own safe area.
+    ///
+    /// Why this exists: on iOS 26 a `.fullScreenCover` does NOT propagate the
+    /// top/bottom safe-area insets to its SwiftUI content — the content lands at
+    /// y = 0 under the status bar / Dynamic Island even with no `.ignoresSafeArea()`,
+    /// and a `GeometryReader` *inside* the cover reports `inset.top == 0`, so the
+    /// cover can't measure them locally. Pass the REAL insets captured at the app
+    /// root (``AppState/safeAreaInsets``); the content opts out of the cover's safe
+    /// area and pads by them for one identical, correct result on iOS 17 through 26.
+    /// Pair with a full-bleed background sibling:
+    /// `ZStack { Theme.screenBG.ignoresSafeArea(); content.coverSafeAreaPadding(insets) }`.
+    func coverSafeAreaPadding(_ insets: EdgeInsets) -> some View {
+        self
+            .padding(.top, insets.top)
+            .padding(.bottom, insets.bottom)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .ignoresSafeArea()
+    }
+}
+
+/// The device's real safe-area insets, read from the key window. Capture this in
+/// the normal hierarchy at a reliable time (e.g. RootView `onAppear` / scene
+/// activation) and stash on ``AppState`` for modal covers to read — see
+/// ``SwiftUICore/View/coverSafeAreaPadding(_:)``. Reading it at a cover's own body
+/// time is unreliable (the window/scene may not be settled yet on device).
+public enum WindowSafeArea {
+    @MainActor
+    public static var insets: EdgeInsets {
+        let inset = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .safeAreaInsets ?? .zero
+        return EdgeInsets(top: inset.top, leading: inset.left,
+                          bottom: inset.bottom, trailing: inset.right)
+    }
 }

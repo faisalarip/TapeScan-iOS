@@ -12,6 +12,7 @@ import SwiftUI
 /// onboarding, and forever after from Settings ("Back up & sync").
 public struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.scenePhase) private var scenePhase
 
     /// One-time post-onboarding sign-in offer (never shown again after).
     @AppStorage("authOffered") private var authOffered = false
@@ -31,6 +32,16 @@ public struct RootView: View {
                 MainTabView()
                     .transition(.opacity)
             }
+        }
+        // Capture the device's REAL safe-area insets here in the normal hierarchy
+        // (where the key window reliably reports them) and stash them on AppState
+        // for modal covers to read — iOS 26 `.fullScreenCover` doesn't hand its
+        // content the device insets, and reading them at the cover's own body time
+        // is unreliable. Re-read on each activation so rotation / dynamic changes
+        // stay correct.
+        .onAppear { appState.safeAreaInsets = WindowSafeArea.insets }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { appState.safeAreaInsets = WindowSafeArea.insets }
         }
         .animation(.easeInOut(duration: 0.25), value: appState.phase)
         .onChange(of: appState.phase) { _, phase in

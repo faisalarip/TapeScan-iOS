@@ -83,28 +83,30 @@ public struct ExportView: View {
     private var enabledCount: Int { formats.filter(\.on).count }
 
     public var body: some View {
-        // Content respects the safe area (the header clears the status bar / Dynamic
-        // Island); only the background bleeds full-screen. A ZStack sibling color
-        // with .ignoresSafeArea() previously let the whole column render full-bleed
-        // under the status bar.
-        VStack(spacing: 0) {
-            header
-            quotaMeter
-                .padding(.horizontal, 18)
-                .padding(.bottom, 14)
-            preview
-                .padding(.horizontal, 18)
-            formatGrid
-                .padding(.horizontal, 18)
-                .padding(.top, 18)
-            includeToggles
-                .padding(.horizontal, 18)
-                .padding(.top, 16)
-            Spacer(minLength: 14)
-            ctaBar
+        // Background bleeds full-screen; content is laid out inside the device
+        // safe area via the key window's real insets. iOS 26 `.fullScreenCover`
+        // doesn't hand its content the device insets (see `coverSafeAreaPadding`).
+        ZStack(alignment: .top) {
+            Theme.screenBG.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                header
+                quotaMeter
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 14)
+                preview
+                    .padding(.horizontal, 18)
+                formatGrid
+                    .padding(.horizontal, 18)
+                    .padding(.top, 18)
+                includeToggles
+                    .padding(.horizontal, 18)
+                    .padding(.top, 16)
+                Spacer(minLength: 14)
+                ctaBar
+            }
+            .coverSafeAreaPadding(appState.safeAreaInsets)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Theme.screenBG.ignoresSafeArea())
         .fullScreenCover(isPresented: $showPaywall) {
             // Context-aware copy: at 0 free exports the canonical "used all 3"
             // headline is truthful; with quota remaining show the proactive line.
@@ -154,6 +156,10 @@ public struct ExportView: View {
                 Text(headerSubtitle)
                     .font(Theme.sans(13))
                     .foregroundStyle(Theme.ink3)
+                // TEMP DIAGNOSTIC — proves this build is running + shows captured insets.
+                Text("⚑ insets \(Int(appState.safeAreaInsets.top))/\(Int(appState.safeAreaInsets.bottom))")
+                    .font(Theme.mono(12, weight: .bold))
+                    .foregroundStyle(.red)
             }
             Spacer()
             Button(action: onClose) {
@@ -407,7 +413,7 @@ public struct ExportView: View {
         .opacity(!locked && enabledCount == 0 ? 0.5 : 1)
         .padding(.horizontal, 18)
         .padding(.top, 14)
-        .padding(.bottom, 40)
+        .padding(.bottom, 14) // home-indicator clearance now comes from the window bottom inset
         .accessibilityLabel(locked ? "Upgrade to export" : "Export \(enabledCount) files")
     }
 

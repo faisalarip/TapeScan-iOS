@@ -33,20 +33,24 @@ public struct FloorPlanEditorView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
-            toolbar
-            canvas
-                .padding(14)
-            if selectedWallID != nil {
-                wallPanel
-                    .padding(.horizontal, 14)
-                    .padding(.bottom, 20)
+        // Background bleeds full-screen; content is laid out inside the device
+        // safe area via the key window's real insets — iOS 26 `.fullScreenCover`
+        // doesn't hand its content the device insets (see `coverSafeAreaPadding`).
+        ZStack(alignment: .top) {
+            Theme.screenBG.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                toolbar
+                canvas
+                    .padding(14)
+                if selectedWallID != nil {
+                    wallPanel
+                        .padding(.horizontal, 14)
+                        .padding(.bottom, 20)
+                }
             }
+            .coverSafeAreaPadding(appState.safeAreaInsets)
         }
-        // Content respects the safe area (the toolbar clears the status bar); only
-        // the background bleeds full-screen. See ExportView for the same fix.
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Theme.screenBG.ignoresSafeArea())
         .confirmationDialog("Discard changes?",
                             isPresented: $showDiscardConfirm,
                             titleVisibility: .visible) {
