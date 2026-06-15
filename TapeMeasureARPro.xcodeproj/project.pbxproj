@@ -39,6 +39,7 @@
 		6F25473B28888ABF2C5E2A56 /* SupabaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4837D735802B48E682D61BD6 /* SupabaseAuthService.swift */; };
 		7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */; };
 		738639914BF08BAF443BF5B6 /* FloorPlanEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05159C3A0182D443042BD604 /* FloorPlanEditorModel.swift */; };
+		7A0359B60C3A99727F3F095B /* GoogleSignInCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BE71453DF5C6BCFC3389C32 /* GoogleSignInCoordinator.swift */; };
 		812B78BE07ED961F879EA2F0 /* MeasurementRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5300EF69F268E8FF0CC4356B /* MeasurementRecord.swift */; };
 		82F24DBEDFDC1779A5A2F72E /* GLTFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0C91E2B4EAB840F3B84106 /* GLTFExporter.swift */; };
 		83C58C90E161379EF1B6854A /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB05998E50247F50640FA7F /* CSVExporter.swift */; };
@@ -58,6 +59,7 @@
 		B0E5E6C09D5F31F138C15C9E /* TapeMeasureARProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */; };
 		B2B4B8BF8508D8065DA1F753 /* UnitFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46DA5FEF1B06BEC02241B5 /* UnitFormatters.swift */; };
 		B7213F3F88F763A2DCF90013 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB79D2D010BAACCC1BCB70B7 /* PaywallView.swift */; };
+		B92837337C9DA859F14E4A80 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 9A6EFC756E3FDD1D4B9F7BD8 /* GoogleSignIn */; };
 		BADB2A4EEA313FD46BD3A337 /* MeasureTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39AFF5B0EFE28D1A1C80587 /* MeasureTypes.swift */; };
 		BD00AF879413A129E4B29C34 /* MeasureMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D502AFD85C8D2EB895C1CDB /* MeasureMath.swift */; };
 		BEDFBEABD5D62BFCB1AD68D0 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CECA1B2B87BED40DFD6393 /* ExportService.swift */; };
@@ -125,6 +127,7 @@
 		13A1D8EAB15807296E75631F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		160A7169F98D50FB48079639 /* ARPlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlacementTests.swift; sourceTree = "<group>"; };
 		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
+		1BE71453DF5C6BCFC3389C32 /* GoogleSignInCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInCoordinator.swift; sourceTree = "<group>"; };
 		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanService.swift; sourceTree = "<group>"; };
 		265DB6E8BF6ACF543EF68B85 /* DXFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DXFExporter.swift; sourceTree = "<group>"; };
@@ -215,6 +218,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C30EE185143D9424E0EA8AD /* Supabase in Frameworks */,
+				B92837337C9DA859F14E4A80 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				0318FC93BBE8D51D9B3FA3C2 /* AppleSignInCoordinator.swift */,
+				1BE71453DF5C6BCFC3389C32 /* GoogleSignInCoordinator.swift */,
 				A3F1882FED0A1E47F2DE1891 /* SignInView.swift */,
 				3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */,
 			);
@@ -489,6 +494,7 @@
 			name = TapeScan;
 			packageProductDependencies = (
 				0DE5065621590E9735B598EF /* Supabase */,
+				9A6EFC756E3FDD1D4B9F7BD8 /* GoogleSignIn */,
 			);
 			productName = TapeScan;
 			productReference = 23BC2ACFCD872AC7C1E32651 /* TapeScan.app */;
@@ -564,6 +570,7 @@
 			mainGroup = FF220E14C4D2EA0634A15469;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				DE6DC5055A88C9070971D19D /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				84E244D5BDE7AB6C55C35EE6 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -618,6 +625,7 @@
 				1AC0DC3698F35E24319A7A37 /* FloorPlanModel.swift in Sources */,
 				82F24DBEDFDC1779A5A2F72E /* GLTFExporter.swift in Sources */,
 				CD13EBA4B022C01978CBF588 /* GlassCard.swift in Sources */,
+				7A0359B60C3A99727F3F095B /* GoogleSignInCoordinator.swift in Sources */,
 				53AD88BDE903AE1C1FC17263 /* GroupedList.swift in Sources */,
 				BF592A236331CCD85A175F8F /* HistoryView.swift in Sources */,
 				E4013C34C559814D9DB70BF9 /* IOSControls.swift in Sources */,
@@ -1012,6 +1020,15 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		DE6DC5055A88C9070971D19D /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 9.0.0;
+				minimumVersion = 7.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1019,6 +1036,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 84E244D5BDE7AB6C55C35EE6 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		9A6EFC756E3FDD1D4B9F7BD8 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE6DC5055A88C9070971D19D /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

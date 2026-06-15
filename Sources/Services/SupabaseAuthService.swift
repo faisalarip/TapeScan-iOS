@@ -1,8 +1,8 @@
 // SupabaseAuthService.swift — production auth via supabase-swift (M7).
 //
 // Apple: native ASAuthorization identity token + nonce → signInWithIdToken.
-// Google: Supabase OAuth through the system browser (redirects back via the
-// tapescan:// URL scheme). Email: passwordless one-time codes. Account
+// Google: native GoogleSignIn ID token → signInWithIdToken (provider .google).
+// Email: passwordless one-time codes. Account
 // deletion calls the SECURITY DEFINER delete_user() RPC (cascades wipe the
 // user's rows), satisfying Guideline 5.1.1(v).
 
@@ -51,12 +51,11 @@ public final class SupabaseAuthService: AuthService {
         }
     }
 
-    public func signInWithGoogle() async throws {
+    public func signInWithGoogle(idToken: String, accessToken: String) async throws {
         guard let client else { throw AuthError.notConfigured }
         do {
-            let session = try await client.auth.signInWithOAuth(
-                provider: .google,
-                redirectTo: URL(string: "tapescan://auth-callback"))
+            let session = try await client.auth.signInWithIdToken(
+                credentials: .init(provider: .google, idToken: idToken, accessToken: accessToken))
             apply(session.user)
         } catch {
             throw AuthError.failed(error.localizedDescription)

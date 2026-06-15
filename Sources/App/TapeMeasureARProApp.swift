@@ -3,6 +3,7 @@
 import SwiftUI
 import SwiftData
 import ARKit
+import GoogleSignIn
 
 @main
 struct TapeMeasureARProApp: App {
@@ -18,6 +19,8 @@ struct TapeMeasureARProApp: App {
                 .environment(appState)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(.dark)
+                // Route OAuth redirects (Google native sign-in) to the SDK.
+                .onOpenURL { GIDSignIn.sharedInstance.handle($0) }
                 .task {
                     // Detect real LiDAR capability at launch so the precision badge
                     // + Settings reflect THIS device before the Measure tab is ever

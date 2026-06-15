@@ -31,7 +31,8 @@ public protocol AuthService: AnyObject, Observable {
     func loadSession() async
 
     func signInWithApple(idToken: String, nonce: String) async throws
-    func signInWithGoogle() async throws
+    /// Native Google sign-in: exchanges the GoogleSignIn ID token for a session.
+    func signInWithGoogle(idToken: String, accessToken: String) async throws
     func sendEmailOTP(to email: String) async throws
     func verifyEmailOTP(email: String, code: String) async throws
     func signOut() async throws

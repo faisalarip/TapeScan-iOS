@@ -28,7 +28,17 @@
 				<string>tapescan</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.faisalnurarif.tapescan.google</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.894084130874-q5eshb69hamtfpf4opd81armgerbujan</string>
+			</array>
+		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>894084130874-q5eshb69hamtfpf4opd81armgerbujan.apps.googleusercontent.com</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

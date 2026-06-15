@@ -9,6 +9,10 @@ packages:
   Supabase:
     url: https://github.com/supabase/supabase-swift
     majorVersion: 2.0.0
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    minVersion: 7.0.0
+    maxVersion: 9.0.0
 
 settings:
   base:
@@ -30,6 +34,8 @@ targets:
     dependencies:
       - package: Supabase
         product: Supabase
+      - package: GoogleSignIn
+        product: GoogleSignIn
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.faisalnurarif.tapescan

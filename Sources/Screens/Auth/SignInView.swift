@@ -101,9 +101,12 @@ public struct SignInView: View {
         Task {
             defer { isWorking = false }
             do {
-                try await auth.signInWithGoogle()
+                let (idToken, accessToken) = try await GoogleSignInCoordinator.signIn()
+                try await auth.signInWithGoogle(idToken: idToken, accessToken: accessToken)
                 appState.completeAuth()
                 onSignedIn()
+            } catch is CancellationError {
+                // user dismissed the Google sheet — silent
             } catch {
                 appState.presentAlert(title: "Sign in didn't complete",
                                       message: error.localizedDescription)
