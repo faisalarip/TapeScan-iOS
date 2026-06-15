@@ -151,7 +151,12 @@ public final class RoomScanService {
                 self.coveragePercent = min(68, step * 4)
                 self.wallCount = min(3, step / 4)
                 self.estimatedAreaSqM = min(18.6, Double(step) * 1.2)
+                #if DEBUG
+                // `.sample` is a DEBUG-only fixture; the simulated scan only runs in
+                // the Simulator (see `start()`), so the device Release build that
+                // archives for the App Store must not reference it.
                 if step == 10 { self.livePlan = .sample }
+                #endif
             }
         }
     }
