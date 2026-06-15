@@ -84,14 +84,13 @@ public struct ExportView: View {
 
     public var body: some View {
         // The content can exceed the screen (especially with all 7 formats on a
-        // short device), so it SCROLLS — fitting every iPhone size. iOS 26
-        // `.fullScreenCover` drops the device safe area (cover content sees
-        // top=0), so status-bar / home-indicator clearance is applied manually via
-        // `.safeAreaInset` using the insets captured at the app root; `.coverManual`
-        // zeroes that on iOS 17/18 where the cover already supplies it. The CTA is
-        // pinned at the bottom so it's always reachable instead of scrolling away.
-        let m = appState.safeAreaInsets.coverManual
-        return ZStack {
+        // short device), so it SCROLLS — fitting every iPhone size. The ScrollView
+        // automatically insets its content for the device safe area (status bar /
+        // Dynamic Island), so NO manual top inset is needed — adding one double-pads
+        // the header. The CTA is pinned via `.safeAreaInset(edge: .bottom)`, which
+        // also respects the home indicator, so it stays reachable instead of
+        // scrolling away.
+        ZStack {
             Theme.screenBG.ignoresSafeArea()
 
             ScrollView {
@@ -111,13 +110,8 @@ public struct ExportView: View {
                 }
                 .padding(.bottom, 16)
             }
-            .safeAreaInset(edge: .top, spacing: 0) {
-                Color.clear.frame(height: m.top)
-            }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                ctaBar
-                    .padding(.bottom, m.bottom)
-                    .background(Theme.screenBG)
+                ctaBar.background(Theme.screenBG)
             }
         }
         .fullScreenCover(isPresented: $showPaywall) {
