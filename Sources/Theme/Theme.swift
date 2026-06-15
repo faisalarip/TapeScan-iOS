@@ -172,11 +172,20 @@ public extension View {
     /// Pair with a full-bleed background sibling:
     /// `ZStack { Theme.screenBG.ignoresSafeArea(); content.coverSafeAreaPadding(insets) }`.
     func coverSafeAreaPadding(_ insets: EdgeInsets) -> some View {
-        self
-            .padding(.top, insets.top)
-            .padding(.bottom, insets.bottom)
+        // iOS 17/18 `.fullScreenCover` applies the device safe area to its content,
+        // so no manual inset is needed there. iOS 26 (Apple's year-based renumber
+        // directly after 18 — there are NO versions in between, so this boundary is
+        // exact, not a guess) does NOT: its cover content lays out from y=0 under
+        // the status bar. So pad by the device's real insets (captured at the app
+        // root) only on 26+. Deliberately NO `.ignoresSafeArea()` in this content
+        // chain — it composed unreliably on device (worked in the simulator, silently
+        // ate the top pad on a physical device). Plain padding can't be absorbed.
+        let needsManualInset: Bool
+        if #available(iOS 26, *) { needsManualInset = true } else { needsManualInset = false }
+        return self
+            .padding(.top, needsManualInset ? insets.top : 0)
+            .padding(.bottom, needsManualInset ? insets.bottom : 0)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .ignoresSafeArea()
     }
 }
 
