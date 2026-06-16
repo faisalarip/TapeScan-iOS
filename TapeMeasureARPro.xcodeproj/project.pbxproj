@@ -742,7 +742,7 @@
 				PRODUCT_NAME = TapeScan;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = minimal;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -870,7 +870,7 @@
 				PRODUCT_NAME = TapeScan;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = minimal;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

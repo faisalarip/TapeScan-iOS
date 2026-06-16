@@ -138,7 +138,7 @@ public struct RoomsView: View {
                     Text("Room scan requires LiDAR")
                         .font(Theme.sans(14, weight: .semibold))
                         .foregroundStyle(Theme.ink)
-                    Text("Available on iPhone Pro models. Tape measuring works on this device — and synced rooms appear below.")
+                    Text("Available on iPhone Pro and iPad Pro models with LiDAR. Tape measuring works on this device — and synced rooms appear below.")
                         .font(Theme.sans(12))
                         .foregroundStyle(Theme.ink2)
                 }
