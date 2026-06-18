@@ -80,14 +80,11 @@ public struct SettingsView: View {
         } message: {
             Text("This permanently deletes your account and everything synced to it. Measurements and rooms on this device are kept.")
         }
-        .fullScreenCover(isPresented: $showPaywall) {
-            // The Settings card is always a proactive upsell, so the headline must
-            // not falsely claim the free quota is spent.
-            PaywallView(context: .proactive(freeExportsLeft: appState.freeExportsLeft)) {
-                showPaywall = false
-            }
-            .environment(appState)
-            .installTheme(Theme(appState))
+        // Tapping "Upgrade" signs the user in first (Pro is account-tied), then
+        // shows the paywall. The Settings card is always a proactive upsell, so
+        // the headline must not falsely claim the free quota is spent.
+        .upgradeFlow(isPresented: $showPaywall, appState: appState) {
+            .proactive(freeExportsLeft: appState.freeExportsLeft)
         }
     }
 

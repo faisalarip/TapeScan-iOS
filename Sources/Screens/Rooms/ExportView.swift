@@ -114,14 +114,12 @@ public struct ExportView: View {
                 ctaBar.background(Theme.screenBG)
             }
         }
-        .fullScreenCover(isPresented: $showPaywall) {
-            // Context-aware copy: at 0 free exports the canonical "used all 3"
-            // headline is truthful; with quota remaining show the proactive line.
-            PaywallView(context: left <= 0 ? .quotaExhausted : .proactive(freeExportsLeft: left)) {
-                showPaywall = false
-            }
-            .environment(appState)
-            .installTheme(Theme(appState))
+        // Tapping upgrade signs the user in first (Pro is account-tied), then
+        // shows the paywall. Context-aware copy: at 0 free exports the canonical
+        // "used all 3" headline is truthful; with quota remaining show the
+        // proactive line.
+        .upgradeFlow(isPresented: $showPaywall, appState: appState) {
+            left <= 0 ? .quotaExhausted : .proactive(freeExportsLeft: left)
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(items: shareURLs) { completed in

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A9B108D47176B9D158D529F /* RoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B369180E9061586B748293 /* RoomsView.swift */; };
+		101A61C9E04862F02FB9E7CB /* UpgradeFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9706822F943B7C2059A8ADBA /* UpgradeFlow.swift */; };
 		13D72BB82D2E28E0C5D9FC1F /* MeasureAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */; };
 		16F225DC0C15AAA28F8BC785 /* MeasureCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A506848E51054BBE6D3F89 /* MeasureCView.swift */; };
 		175B4C807A2DAE4CD363648C /* TapeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */; };
@@ -168,6 +169,7 @@
 		8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		946BF90A9ECD2EA492D74F8A /* SimulatedARMeasureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedARMeasureServiceTests.swift; sourceTree = "<group>"; };
+		9706822F943B7C2059A8ADBA /* UpgradeFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeFlow.swift; sourceTree = "<group>"; };
 		A0DF1DA862210F71D931D7B6 /* MeasureBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureBView.swift; sourceTree = "<group>"; };
 		A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturedRoomConverterTests.swift; sourceTree = "<group>"; };
 		A3F1882FED0A1E47F2DE1891 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				37B369180E9061586B748293 /* RoomsView.swift */,
 				B2522359FDE1BAD3E5D96DF4 /* RootView.swift */,
 				83A10A28D18885D2E97D4409 /* TapeMeasureARProApp.swift */,
+				9706822F943B7C2059A8ADBA /* UpgradeFlow.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -670,6 +673,7 @@
 				B0E5E6C09D5F31F138C15C9E /* TapeMeasureARProApp.swift in Sources */,
 				E15761CBCC13A49DF5564BC2 /* Theme.swift in Sources */,
 				B2B4B8BF8508D8065DA1F753 /* UnitFormatters.swift in Sources */,
+				101A61C9E04862F02FB9E7CB /* UpgradeFlow.swift in Sources */,
 				184B5D9EDE69FC26A85F7E85 /* ValuePill.swift in Sources */,
 				69D6689E4E6C89C9823ED6CA /* VerifyCodeView.swift in Sources */,
 			);
