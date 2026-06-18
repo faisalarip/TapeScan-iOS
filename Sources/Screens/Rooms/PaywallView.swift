@@ -95,14 +95,24 @@ public struct PaywallView: View {
             Theme.screenBG.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                hero
-                perksList
-                    .padding(.horizontal, 22)
-                    .padding(.top, 6)
-                plansArea
-                    .padding(.horizontal, 22)
-                    .padding(.top, 18)
-                Spacer(minLength: 14)
+                // Scrollable content so the paywall fits every device + Dynamic
+                // Type size (small iPhones can't show 5 perks + 3 plans at once;
+                // iPad has lots of room). The footer (CTA + required billing
+                // disclosure) stays pinned below, so the purchase button is always
+                // reachable without scrolling.
+                ScrollView {
+                    VStack(spacing: 0) {
+                        hero
+                        perksList
+                            .padding(.horizontal, 22)
+                            .padding(.top, 6)
+                        plansArea
+                            .padding(.horizontal, 22)
+                            .padding(.top, 18)
+                    }
+                    .padding(.bottom, 14)
+                    .frame(maxWidth: .infinity)
+                }
                 footer
             }
         }
