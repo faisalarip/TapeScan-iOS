@@ -1,8 +1,9 @@
 # App Store Connect — v1.0 Submission Package
 
-Paste-ready values for the first submission of **3D Lidar Scanner: Room Measure**
-(bundle `com.faisalnurarif.tapescan`, Team `5VHRN5SF2P`). Built Universal
-(iPhone + iPad) as of commit `0dc4c98`. Replace anything in **{braces}**.
+Paste-ready values for the first submission of **TapeScan** (App Store name
+`TapeScan: AR Measure & Scan`). Bundle `com.faisalnurarif.tapescan`, Team
+`5VHRN5SF2P`. Built Universal (iPhone + iPad) as of commit `0dc4c98`. Replace
+anything in **{braces}**.
 
 ---
 
@@ -10,8 +11,8 @@ Paste-ready values for the first submission of **3D Lidar Scanner: Room Measure*
 
 | Field | Value |
 |---|---|
-| **App Name** (≤30) | `3D Lidar Scanner: Room Measure` (exactly 30 chars) |
-| **Subtitle** (≤30) | `AR Tape Measure & Floor Plans` (29 chars) |
+| **App Name** (≤30) | `TapeScan: AR Measure & Scan` (27 chars) |
+| **Subtitle** (≤30) | `LiDAR floor plans & AR ruler` (28 chars) |
 | **Bundle ID** | `com.faisalnurarif.tapescan` |
 | **SKU** | `tapescan-ios-100` *(any unique string; not shown to users)* |
 | **Primary Language** | English (U.S.) |
@@ -20,8 +21,9 @@ Paste-ready values for the first submission of **3D Lidar Scanner: Room Measure*
 | **Content Rights** | Does **not** contain, show, or access third-party content |
 | **Age Rating** | 4+ (questionnaire: all categories "None" / "No") |
 
-Home-screen label is `TapeScan`; the App Store name differs (allowed). If you
-want them to match, that's the parked in-app rebrand — not required to submit.
+Home-screen label stays `TapeScan` — it now matches the App Store brand, so your
+existing screenshots (which show "TapeScan" in-app) remain valid. This name change
+is **App Store Connect only**: no code change, no rebuild, no re-screenshot.
 
 ---
 
@@ -42,7 +44,7 @@ Measure distance, area, volume & angles in AR, then scan rooms into floor plans 
 
 ### Description (≤4000)
 ```
-Turn your iPhone or iPad into a precise AR measuring tool and a LiDAR room scanner. 3D Lidar Scanner: Room Measure uses ARKit to measure the real world — distances, areas, angles, and volumes — and scans entire rooms into clean, shareable floor plans.
+Turn your iPhone or iPad into a precise AR measuring tool and a LiDAR room scanner. TapeScan uses ARKit to measure the real world — distances, areas, angles, and volumes — and scans entire rooms into clean, shareable floor plans.
 
 MEASURE ANYTHING
 • Tap to drop points and measure length, width, height, and diagonals
@@ -83,12 +85,12 @@ Questions or feedback? Visit our support page — we read everything.
 
 ### Keywords (≤100, comma-separated — name/subtitle words omitted on purpose)
 ```
-ruler,distance,area,volume,angle,laser,blueprint,square footage,estimate,contractor,survey,camera
+3d scanner,room,distance,area,volume,blueprint,square footage,laser,estimate,contractor,camera,wall
 ```
 
 ### What's New in This Version
 ```
-Welcome to 3D Lidar Scanner: Room Measure — our first release! Measure in AR, scan rooms into floor plans with LiDAR, and export to USDZ, glTF, PDF, SVG, DXF, or CSV. Sign in to sync across your devices, or use it fully as a guest. We'd love your feedback.
+Welcome to TapeScan — our first release! Measure in AR, scan rooms into floor plans with LiDAR, and export to USDZ, glTF, PDF, SVG, DXF, or CSV. Sign in to sync across your devices, or use it fully as a guest. We'd love your feedback.
 ```
 
 ### URLs
