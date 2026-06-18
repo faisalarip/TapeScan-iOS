@@ -139,8 +139,8 @@ Add a group localization (en-US) or ASC will block submission.
 | Duration | 1 Month |
 | Price | USD **4.99** |
 | Intro Offer | **Free**, 1 week, new subscribers |
-| Display Name | `Pro Monthly` |
-| Description | `Unlimited exports (USDZ, glTF, PDF, SVG, DXF, CSV) and cross-device cloud sync.` |
+| Display Name | `TapeScan Pro – Monthly` |
+| Description (≤45 chars) | `Unlimited exports and cloud sync, monthly.` |
 
 ### 5b. Auto-Renewable — Annual
 | Field | Value |
@@ -150,8 +150,8 @@ Add a group localization (en-US) or ASC will block submission.
 | Duration | 1 Year |
 | Price | USD **24.99** |
 | Intro Offer | **Free**, 1 week, new subscribers |
-| Display Name | `Pro Annual` |
-| Description | `Unlimited exports and cloud sync, billed yearly — best value.` |
+| Display Name | `TapeScan Pro – Annual` |
+| Description (≤45 chars) | `Unlimited exports and cloud sync, yearly.` |
 
 ### 5c. Non-Consumable — Lifetime
 | Field | Value |
@@ -159,8 +159,8 @@ Add a group localization (en-US) or ASC will block submission.
 | Reference Name | `Pro Lifetime` |
 | Product ID | `tapescan.pro.lifetime` |
 | Price | USD **59.99** |
-| Display Name | `Pro Lifetime` |
-| Description | `Every Pro feature, forever. One-time purchase.` |
+| Display Name | `TapeScan Pro – Lifetime` |
+| Description (≤45 chars) | `All Pro features forever. One-time purchase.` |
 
 **IAP review screenshot (required for each):** one screenshot of the in-app
 paywall (Rooms → any Pro-gated action). The same image works for all three.
@@ -169,25 +169,38 @@ paywall (Rooms → any Pro-gated action). The same image works for all three.
 
 ## 6. App Review Information
 
-| Field | Value |
+The app has **no password login** — sign-in is Apple, Google, or email one-time-passcode
+only, and the app is **fully usable as a guest**. So we do **not** provide a demo
+username/password; instead we tell App Review sign-in is optional.
+
+| Field | Action |
 |---|---|
-| Sign-in required to use app? | **No** — fully usable as a guest |
-| Demo account | Not required (see notes); optionally provide one |
+| **Sign-In required** checkbox | **Uncheck it** (App Review Information section). This removes the username/password requirement — leave both blank. |
+| Demo account | None needed (guest covers it). Reviewer can use their own Apple ID to exercise sign-in/IAP. |
 | Contact | {First} {Last} · {phone} · `faisal.arif@tuntun.co.id` |
+
+> Why no demo user: a username/password account would have no field to log into
+> (the app is passwordless). The reviewer reaches the full app as a guest; the
+> sign-in sheet shown once after onboarding has a "Continue without account" path.
+> (If you ever want a real password demo account, we'd first add email+password
+> sign-in to the app — not required to ship.)
 
 ### Review Notes (paste)
 ```
-3D Lidar Scanner: Room Measure is an ARKit measuring + LiDAR room-scanning tool.
+This app does NOT require an account. It opens straight into the tools after a short onboarding, and all core features work as a guest:
+• AR measuring (distance, area, volume, angle) on any ARKit device
+• LiDAR room scanning + floor plans (on iPhone Pro / iPad Pro; non-LiDAR devices see an explainer and tape-measuring still works)
+• Saving to the on-device library and exporting (within the free quota)
 
-• No account is required. All AR measuring works on any ARKit device as a guest. LiDAR room scanning requires a LiDAR device (iPhone Pro / iPad Pro); on non-LiDAR devices the app shows an explainer and tape-measuring still works.
+A sign-in sheet appears once after onboarding but can be dismissed with "Continue without account" — no account is needed to proceed.
 
-• Optional sign-in (Sign in with Apple, Google, or email) only adds cloud backup/sync of saved measurements and rooms. Email sign-in uses a one-time passcode — please use a real inbox to receive the code.
+Optional sign-in (Sign in with Apple, Google, or email) only enables cloud backup/sync across devices. Email uses a one-time passcode sent to the inbox, so please use a real address if you choose email.
 
-• The Pro purchase asks the user to sign in first because Pro includes cross-device cloud sync, which is tied to an account. All core measuring, scanning, and on-device saving work free without any account or purchase.
+To test the Pro purchase: the paywall asks the user to sign in first because Pro includes cross-device cloud sync tied to an account. Tap "Continue with Apple" and use your (sandbox) Apple ID to proceed to the StoreKit purchase. All non-Pro features remain free without any account.
 
-• Account deletion: Settings → Account → Delete Account removes the account and all cloud data immediately (Guideline 5.1.1(v)).
+Account deletion: Settings → Account → Delete Account removes the account and all cloud data immediately (Guideline 5.1.1(v)).
 
-• AR measurements are estimates; the app states this in-app.
+AR measurements are estimates; the app states this in-app.
 
 Thank you for reviewing!
 ```
