@@ -165,7 +165,33 @@ Add a group localization (en-US) or ASC will block submission.
 | Description (≤45 chars) | `All Pro features forever. One-time purchase.` |
 
 **IAP review screenshot (required for each):** one screenshot of the in-app
-paywall (Rooms → any Pro-gated action). The same image works for all three.
+paywall (Settings → "TapeScan Pro" → Upgrade, or Rooms → Export after the free
+quota is used). The same "Unlock the full toolkit" image works for all three.
+
+### 5d. Review Notes (optional, but speeds first-submission IAP review)
+
+**How a reviewer reaches the purchase (same for all three):** Settings tab → tap
+**Upgrade** on the "TapeScan Pro" card → on the paywall tap the CTA → sign in with
+Apple (Pro is account-tied for cloud sync) → pick the plan → complete the StoreKit
+purchase. (The paywall also appears in Rooms → Export once the 3 free exports are
+used.) Restore Purchases is on the paywall and in Settings.
+
+**Pro Monthly** — paste:
+```
+TapeScan Pro (Monthly) — $4.99/month auto-renewable subscription with a 7-day free trial. It unlocks TapeScan Pro: unlimited exports (the free tier includes 3), watermark-free floor plans, and the full export toolkit (USDZ, glTF, PDF, SVG, DXF, CSV). The subscription is account-tied because Pro includes cross-device cloud sync.
+
+How to reach and test this purchase:
+1. Launch the app and continue past the short onboarding (no account is required to use the app).
+2. Open the Settings tab and tap "Upgrade" on the "TapeScan Pro" card. (The paywall also appears in Rooms → Export once the 3 free exports are used.)
+3. On the paywall, tap the call-to-action. You'll be asked to sign in first (Pro is account-tied for cloud sync) — tap "Continue with Apple" and use your sandbox Apple ID.
+4. Select the "Monthly" plan and tap the button to start the free trial and complete the StoreKit purchase.
+
+Restore Purchases is available on the paywall and in Settings. The subscription can be managed or canceled in Apple Account settings. Thanks for reviewing!
+```
+
+**Pro Annual** — same as Monthly, except: "$24.99/year auto-renewable with a 7-day free trial", and step 4 selects the **Annual** plan.
+
+**Pro Lifetime** — same as Monthly, except: "$59.99 one-time purchase (non-consumable, no trial)", and step 4 selects the **Lifetime** plan and taps "Unlock Lifetime · $59.99".
 
 ---
 
