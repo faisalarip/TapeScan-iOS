@@ -1,4 +1,4 @@
-# App Store Connect — v1.0 Submission Package
+# App Store Connect — v1.3 Submission Package
 
 Paste-ready values for the first submission of **TapeScan** (App Store name
 `TapeScan: AR Measure & Scan`). Bundle `com.faisalnurarif.tapescan`, Team
@@ -35,7 +35,7 @@ is **App Store Connect only**: no code change, no rebuild, no re-screenshot.
 
 ---
 
-## 3. Version 1.0 — Store Listing
+## 3. Version 1.3 — Store Listing
 
 ### Promotional Text (≤170, editable anytime)
 ```
@@ -103,7 +103,7 @@ Welcome to TapeScan — our first release! Measure in AR, scan rooms into floor 
 ### Other
 | Field | Value |
 |---|---|
-| **Version** | `1.0` |
+| **Version** | `1.3` |
 | **Copyright** | `© 2026 Faisal Nur Arif` *(or your company name)* |
 | **Screenshots** | Already prepared (iPhone 6.9"/6.5" + iPad 13"/12.9") |
 | **App Preview** | Optional |
@@ -220,8 +220,8 @@ Thank you for reviewing!
 
 - [ ] Three legal pages are **live** (open each in a browser):
       `…/privacy.html`, `…/terms.html`, `…/support.html`. Terms must include the EULA.
-- [ ] In Xcode: Product → Archive from `main` (≥ `0dc4c98`), upload to ASC, and **attach** the build to v1.0.
-- [ ] All 3 IAPs are created, "Ready to Submit", and **added to the v1.0 version** (first submission reviews IAPs with the app).
+- [ ] In Xcode: Product → Archive from `main` (≥ `0dc4c98`), upload to ASC, and **attach** the build to v1.3.
+- [ ] All 3 IAPs are created, "Ready to Submit", and **added to the v1.3 version** (first submission reviews IAPs with the app).
 - [ ] Subscription group has an en-US localization (display name + optional promo image).
 - [ ] App Privacy answers entered (Section 4) and match the binary's privacy manifest.
 - [ ] Screenshots uploaded for iPhone + iPad (you have these).
