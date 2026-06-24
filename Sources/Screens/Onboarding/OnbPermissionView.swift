@@ -4,11 +4,13 @@
 //   • Centered 132×132 scanner glyph with a LiDAR success badge.
 //   • Title "Camera & AR access" + privacy-forward body copy.
 //   • "Frames never leave your device" reassurance pill (green check).
-//   • Footer: paging dots (active 1) + "Allow Camera Access" CTA + "Not now".
+//   • Footer: paging dots (active 1) + a "Continue" CTA that fires the system
+//     camera permission request. Denial shows a Settings recovery path.
 //
-// This is a permission *prime* (App Store best practice): both the CTA and the
-// "Not now" affordance advance the flow — the real `AVCaptureDevice` /
-// `ARSession` request is fired by the AR seam later, not here.
+// This is a permission *prime* (App Store Guideline 5.1.1(iv)): the message
+// shown before the system prompt has NO exit affordance and a neutral
+// "Continue" label — tapping it always proceeds to the real
+// `AVCaptureDevice.requestAccess` prompt.
 
 import SwiftUI
 import AVFoundation
@@ -128,7 +130,7 @@ struct OnbPermissionView: View {
             OnbDots(count: 3, active: 1)
 
             if permissionDenied {
-                Text("Camera access is off. TapeScan can't measure without it — you can enable it in Settings.")
+                Text("Camera access is off. \(appState.brand) can't measure without it — you can enable it in Settings.")
                     .font(Theme.sans(12.5))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Theme.amber)
@@ -141,23 +143,28 @@ struct OnbPermissionView: View {
                 }
                 .padding(.top, 2)
                 .accessibilityLabel("Open Settings")
+
+                // Shown ONLY after the system prompt has been answered, so a user
+                // who declines is never trapped in onboarding. This is not an exit
+                // affordance on the pre-request message, so it stays 5.1.1(iv)-clean.
+                Button(action: onContinue) {
+                    Text("Continue without camera")
+                        .font(Theme.sans(14, weight: .medium))
+                        .foregroundStyle(Theme.ink3)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)        // 44pt min tap target
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Continue without camera")
             } else {
-                PrimaryButton(title: "Allow Camera Access", icon: "scan") {
+                // Permission-prime CTA. Per Guideline 5.1.1(iv) this always proceeds
+                // to the system permission request — neutral label, no exit button.
+                PrimaryButton(title: "Continue") {
                     requestCameraAccess()
                 }
                 .padding(.top, 6)
-                .accessibilityLabel("Allow camera access")
+                .accessibilityLabel("Continue")
             }
-
-            Button(action: onContinue) {
-                Text("Not now")
-                    .font(Theme.sans(14, weight: .medium))
-                    .foregroundStyle(Theme.ink3)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)        // 44pt min tap target
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Not now")
         }
         .padding(.horizontal, 22)
         .padding(.bottom, 38)

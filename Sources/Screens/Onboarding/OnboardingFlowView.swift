@@ -4,10 +4,9 @@
 // and the verified HTML reference (nav: welcome → permission → calibrate → measure).
 //
 // Flow:
-//   • "Get Started"          (Welcome)    → advances to Permission
-//   • "Allow Camera Access"  (Permission) → advances to Calibrate
-//   • "Not now"              (Permission) → advances to Calibrate (camera optional in the prime)
-//   • "Start Measuring"      (Calibrate)  → `appState.completeOnboarding()` → Main / Measure
+//   • "Get Started"      (Welcome)    → advances to Permission
+//   • "Continue"         (Permission) → fires the system camera prompt, then advances to Calibrate
+//   • "Start Measuring"  (Calibrate)  → `appState.completeOnboarding()` → Main / Measure
 //
 // RootView should present `OnboardingFlowView()` for `AppPhase.onboarding`.
 // Each step reads live tokens via `@Environment(\.theme)` and drives the flow
