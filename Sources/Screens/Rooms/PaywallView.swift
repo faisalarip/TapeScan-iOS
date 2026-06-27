@@ -146,6 +146,11 @@ public struct PaywallView: View {
                 AnalyticsParam.firstValueFeature: .string(appState.attribution.firstValueFeature ?? "none"),
                 AnalyticsParam.lastValueFeature: .string(appState.attribution.lastValueFeature ?? "none"),
             ])
+            // GA4 reserved screen_view so the paywall appears in Firebase's screen
+            // reports alongside the custom paywall_view funnel event above.
+            appState.analytics.log(
+                AnalyticsEventName.screenView,
+                [AnalyticsParam.screenName: .string(ScreenName.paywall)])
         }
         // Surface purchase/restore failures even though this is presented as a cover.
         .appAlert(appState)

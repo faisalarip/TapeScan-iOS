@@ -344,6 +344,16 @@ public enum PaywallSource {
     public static let debug = "debug"
 }
 
+/// GA4 `screen_view` screen names for the non-tab full-screen / modal roots. Tab
+/// screens reuse `AppTab.rawValue`; these cover the conversion-path screens so
+/// Firebase's screen reports aren't missing Export / Paywall / Scan / Editor.
+public enum ScreenName {
+    public static let export = "export"
+    public static let paywall = "paywall"
+    public static let roomScan = "room_scan"
+    public static let floorPlanEditor = "floor_plan_editor"
+}
+
 /// Maps a StoreKit product id to a low-cardinality plan kind for GA4. Pure and
 /// Firebase-free (like `ProductMapping`) so it's trivially unit-testable and
 /// usable from both the live paywall and the source-less StoreKit listener.

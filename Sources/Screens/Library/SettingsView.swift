@@ -28,7 +28,10 @@ public struct SettingsView: View {
     @State private var isRestoring = false
     @State private var showAuthSheet = false
     @State private var showDeleteConfirm = false
+    @State private var showSignOutConfirm = false
     @State private var isDeletingAccount = false
+    /// Active entitlement (plan + renewal) for the Pro status card; nil when free.
+    @State private var proSummary: StoreKitPurchaseService.EntitlementSummary?
     @Environment(\.openURL) private var openURL
 
     public init() {}
@@ -46,7 +49,11 @@ public struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 18) {
-                        if !appState.isPro { proUpsell }
+                        if appState.isPro {
+                            proStatusCard
+                        } else {
+                            proUpsell
+                        }
                         measurementGroup(unit: $appState.unit,
                                          snap: $appState.snapEnabled)
                         arEngineGroup
@@ -79,11 +86,28 @@ public struct SettingsView: View {
         } message: {
             Text("This permanently deletes your account and everything synced to it. Measurements and rooms on this device are kept.")
         }
+        .confirmationDialog("Sign out?",
+                            isPresented: $showSignOutConfirm,
+                            titleVisibility: .visible) {
+            Button("Sign Out", role: .destructive) {
+                Task { await signOut() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You'll stop syncing on this device. Your measurements and rooms stay here, and Pro stays active — it's tied to your Apple ID.")
+        }
         // Tapping "Upgrade" signs the user in first (Pro is account-tied), then
         // shows the paywall. The Settings card is always a proactive upsell, so
         // the headline must not falsely claim the free quota is spent.
         .upgradeFlow(isPresented: $showPaywall, appState: appState) {
             .proactive(freeExportsLeft: appState.freeExportsLeft)
+        }
+        .task(id: appState.isPro) {
+            // Load the active plan + renewal for the Pro status card; cleared when
+            // not Pro so an expiry/downgrade drops the detail immediately.
+            proSummary = appState.isPro
+                ? await StoreKitPurchaseService.currentEntitlement()
+                : nil
         }
     }
 
@@ -147,6 +171,64 @@ public struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Upgrade to \(appState.brand) Pro")
+    }
+
+    // MARK: - Pro status (shown instead of the upsell when subscribed)
+
+    /// Replaces the upgrade card once the user is Pro: a clear "you're subscribed"
+    /// card showing the active plan + renewal date (from StoreKit entitlements).
+    private var proStatusCard: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: theme.r(12), style: .continuous)
+                    .fill(Color.white.opacity(0.2))
+                Icon("cube3d", size: 24, weight: 1.8, color: .white)
+            }
+            .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 7) {
+                    Text("\(appState.brand) Pro")
+                        .font(Theme.sans(16, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                    Text("ACTIVE")
+                        .font(Theme.mono(9.5, weight: .bold))
+                        .tracking(0.5)
+                        .foregroundStyle(Color(hex: "#111111"))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(Color.white))
+                }
+                Text(proStatusDetail)
+                    .font(Theme.sans(12.5))
+                    .foregroundStyle(Color.white.opacity(0.9))
+            }
+            Spacer(minLength: 8)
+            Icon("check", size: 20, weight: 2.6, color: .white)
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: theme.r(18), style: .continuous)
+                .fill(LinearGradient(
+                    colors: [theme.accent.withA(0.9), theme.accent.withA(0.55)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing))
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(appState.brand) Pro active. \(proStatusDetail)")
+    }
+
+    /// Plan + renewal line for the Pro status card. Falls back to a generic line
+    /// until the StoreKit entitlement summary loads (or if it's unavailable).
+    private var proStatusDetail: String {
+        guard let summary = proSummary else {
+            return "Unlimited exports & every Pro feature"
+        }
+        if summary.isLifetime { return "Lifetime · one-time purchase" }
+        let kind = PlanKind.from(productID: summary.productID).capitalized
+        if let expiry = summary.expirationDate {
+            return "\(kind) · renews \(expiry.formatted(date: .abbreviated, time: .omitted))"
+        }
+        return "\(kind) subscription"
     }
 
     // MARK: - Measurement
@@ -243,7 +325,7 @@ public struct SettingsView: View {
                 })
                 .accessibilityLabel("Signed in as \(email)")
                 DRow(icon: "undo", title: "Sign Out",
-                     action: { Task { await signOut() } }, accessory: {
+                     action: { showSignOutConfirm = true }, accessory: {
                     Chevron()
                 })
                 .accessibilityLabel("Sign out")

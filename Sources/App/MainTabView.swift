@@ -47,6 +47,15 @@ public struct MainTabView: View {
                 [AnalyticsParam.screenName: .string(newTab.rawValue)]
             )
         }
+        // `.onChange` skips the initial value, so log the FIRST tab (the
+        // cold-start landing screen) once here — together they emit a
+        // `screen_view` for every tab the user actually lands on.
+        .onAppear {
+            appState.analytics.log(
+                AnalyticsEventName.screenView,
+                [AnalyticsParam.screenName: .string(appState.selectedTab.rawValue)]
+            )
+        }
     }
 
     @ViewBuilder

@@ -119,6 +119,31 @@ public final class StoreKitPurchaseService: PurchaseService {
         return false
     }
 
+    /// Display snapshot of the user's current Pro entitlement (plan + renewal),
+    /// for the Settings status card. `nil` when there's no active entitlement.
+    /// Reads the same verified, unrevoked, Apple-ID-level source as
+    /// `currentEntitlementIsPro`.
+    public struct EntitlementSummary: Equatable, Sendable {
+        public let productID: String
+        public let isLifetime: Bool
+        /// Next renewal / expiry for subscriptions; `nil` for the lifetime unlock.
+        public let expirationDate: Date?
+    }
+
+    public static func currentEntitlement() async -> EntitlementSummary? {
+        for await entitlement in Transaction.currentEntitlements {
+            if case .verified(let transaction) = entitlement,
+               ProductMapping.allIDs.contains(transaction.productID),
+               transaction.revocationDate == nil {
+                return EntitlementSummary(
+                    productID: transaction.productID,
+                    isLifetime: transaction.productID == ProductMapping.lifetimeID,
+                    expirationDate: transaction.expirationDate)
+            }
+        }
+        return nil
+    }
+
     /// Long-running listener: finishes incoming verified transactions
     /// (renewals, Ask-to-Buy approvals, refunds) and reports the recomputed
     /// entitlement. Run from the app root's `.task`.

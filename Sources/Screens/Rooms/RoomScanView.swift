@@ -37,7 +37,12 @@ public struct RoomScanView: View {
             // The camera/capture backdrop bleeds full-screen; the status chips +
             // progress deck respect the safe area (same fix as ExportView).
             .background(backdrop)
-            .onAppear { service.start() }
+            .onAppear {
+                service.start()
+                appState.analytics.log(
+                    AnalyticsEventName.screenView,
+                    [AnalyticsParam.screenName: .string(ScreenName.roomScan)])
+            }
         // Surface "Scan failed" even though this screen is presented as a cover.
         .appAlert(appState)
         .onDisappear { if service.phase == .scanning { service.cancel() } }

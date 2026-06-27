@@ -65,6 +65,11 @@ public struct FloorPlanEditorView: View {
         }
         // Surface editor save failures even though this is presented as a cover.
         .appAlert(appState)
+        .onAppear {
+            appState.analytics.log(
+                AnalyticsEventName.screenView,
+                [AnalyticsParam.screenName: .string(ScreenName.floorPlanEditor)])
+        }
     }
 
     // MARK: - Toolbar

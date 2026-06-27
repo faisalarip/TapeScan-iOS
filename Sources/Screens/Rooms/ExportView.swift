@@ -104,6 +104,12 @@ public struct ExportView: View {
                         quotaMeter
                             .padding(.horizontal, 18)
                             .padding(.bottom, 14)
+                    } else {
+                        // Pro replaces the free-export meter with a positive
+                        // "you're unlimited" affordance (no upgrade prompt).
+                        proUnlimitedBadge
+                            .padding(.horizontal, 18)
+                            .padding(.bottom, 14)
                     }
                     preview
                         .padding(.horizontal, 18)
@@ -162,6 +168,9 @@ public struct ExportView: View {
             // (both paywall entry points live here). No PII — room names/paths
             // are never logged.
             appState.analytics.log(AnalyticsEventName.exportScreenOpened)
+            appState.analytics.log(
+                AnalyticsEventName.screenView,
+                [AnalyticsParam.screenName: .string(ScreenName.export)])
         }
         // Surface "Export failed" even though this screen is presented as a cover.
         .appAlert(appState)
@@ -238,6 +247,43 @@ public struct ExportView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(left) of \(Self.freeTotal) free exports left. Go Pro.")
+    }
+
+    // MARK: - Pro "unlimited exports" badge (shown instead of the quota meter)
+
+    /// Replaces the amber free-export meter once the user is Pro: a calm green
+    /// confirmation that exports are unlimited — no quota, no upgrade prompt.
+    private var proUnlimitedBadge: some View {
+        HStack(spacing: 11) {
+            Icon("download", size: 17, weight: 2, color: Theme.successGreen)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Unlimited exports")
+                    .font(Theme.sans(13, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                Text("Pro is active — export as many files as you like")
+                    .font(Theme.sans(11.5))
+                    .foregroundStyle(Theme.ink2)
+            }
+            Spacer(minLength: 8)
+            Text("PRO")
+                .font(Theme.mono(10, weight: .bold))
+                .tracking(0.5)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(Theme.successGreen))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .frame(minHeight: 44)
+        .background(
+            RoundedRectangle(cornerRadius: theme.r(13), style: .continuous)
+                .fill(Theme.successGreen.withA(0.12)))
+        .overlay(
+            RoundedRectangle(cornerRadius: theme.r(13), style: .continuous)
+                .strokeBorder(Theme.successGreen.withA(0.4), lineWidth: 1))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Unlimited exports. Pro is active.")
     }
 
     /// "Room 2 · Scanned Jun 12" — real record metadata, no fictional apartment.
