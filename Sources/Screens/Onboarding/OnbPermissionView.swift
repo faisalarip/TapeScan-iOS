@@ -45,6 +45,8 @@ struct OnbPermissionView: View {
             // instead of stranding the user on the "access is off" recovery screen.
             guard phase == .active, permissionDenied,
                   AVCaptureDevice.authorizationStatus(for: .video) == .authorized else { return }
+            // The permission step resolved successfully via a Settings round-trip.
+            logPermissionCompleted(granted: true)
             onContinue()
         }
     }
@@ -175,12 +177,15 @@ struct OnbPermissionView: View {
     private func requestCameraAccess() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
+            logPermissionCompleted(granted: true)
             onContinue()
         case .denied, .restricted:
+            logPermissionCompleted(granted: false)
             permissionDenied = true
         case .notDetermined:
             Task {
                 let granted = await AVCaptureDevice.requestAccess(for: .video)
+                logPermissionCompleted(granted: granted)
                 if granted {
                     onContinue()
                 } else {
@@ -188,8 +193,23 @@ struct OnbPermissionView: View {
                 }
             }
         @unknown default:
+            // Unknown future status — treat the prime as resolved without a grant
+            // signal we can trust; advance the flow but do not claim camera access.
+            logPermissionCompleted(granted: false)
             onContinue()
         }
+    }
+
+    /// Emits the `onboarding_permission_completed` analytics event once the
+    /// camera permission step has resolved. `granted` reflects whether the
+    /// camera is authorized. Carries NO PII — only the boolean outcome, routed
+    /// through the AnalyticsService seam (Firebase calls stay behind canImport
+    /// guards inside that seam).
+    private func logPermissionCompleted(granted: Bool) {
+        appState.analytics.log(
+            AnalyticsEventName.onboardingPermissionCompleted,
+            [AnalyticsParam.granted: .bool(granted)]
+        )
     }
 }
 

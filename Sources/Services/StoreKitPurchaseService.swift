@@ -40,6 +40,7 @@ public final class StoreKitPurchaseService: PurchaseService {
                 ProductInfo(id: product.id,
                             displayPrice: product.displayPrice,
                             price: product.price,
+                            currencyCode: product.priceFormatStyle.currencyCode,
                             period: Self.periodKind(of: product),
                             hasIntroOffer: product.subscription?.introductoryOffer != nil)
             }
@@ -72,8 +73,14 @@ public final class StoreKitPurchaseService: PurchaseService {
                 guard case .verified(let transaction) = verification else {
                     return .failed("The purchase could not be verified.")
                 }
+                // Capture the revenue facts BEFORE finishing so the paywall can
+                // log a GA4 `purchase` event with value + currency + transaction id.
+                let receipt = PurchaseReceipt(
+                    value: product.price,
+                    currency: product.priceFormatStyle.currencyCode,
+                    transactionID: String(transaction.id))
                 await transaction.finish()
-                return .success
+                return .success(receipt)
             case .userCancelled:
                 return .cancelled
             case .pending:
@@ -93,7 +100,7 @@ public final class StoreKitPurchaseService: PurchaseService {
             return .failed(error.localizedDescription)
         }
         return await Self.currentEntitlementIsPro()
-            ? .success
+            ? .success(nil)
             : .failed("No previous purchases were found for this Apple Account.")
     }
 
@@ -115,13 +122,28 @@ public final class StoreKitPurchaseService: PurchaseService {
     /// Long-running listener: finishes incoming verified transactions
     /// (renewals, Ask-to-Buy approvals, refunds) and reports the recomputed
     /// entitlement. Run from the app root's `.task`.
-    public static func listenForTransactionUpdates(onChange: @escaping @MainActor (Bool) -> Void) async {
+    ///
+    /// The callback is widened beyond the bare `isPro` flag so the analytics
+    /// seam can fire a `subscription_status_change` event for out-of-band
+    /// entitlement changes (renewals, refunds, Ask-to-Buy approvals) that
+    /// arrive without a live paywall source. `productID` lets the caller map
+    /// to a plan kind, and `isRefund` (derived from the verified transaction's
+    /// `revocationDate`) lets it distinguish a refund from a renewal/purchase.
+    /// For unverified updates there is no transaction to read, so the defaults
+    /// (`productID == ""`, `isRefund == false`) are passed — the caller must
+    /// NOT treat these as a new revenue conversion.
+    public static func listenForTransactionUpdates(onChange: @escaping @MainActor (_ isPro: Bool, _ productID: String, _ isRefund: Bool) -> Void) async {
         for await update in Transaction.updates {
+            // Capture attribution-relevant facts only from verified transactions.
+            var productID = ""
+            var isRefund = false
             if case .verified(let transaction) = update {
+                productID = transaction.productID
+                isRefund = transaction.revocationDate != nil
                 await transaction.finish()
             }
             let isPro = await currentEntitlementIsPro()
-            await MainActor.run { onChange(isPro) }
+            await MainActor.run { onChange(isPro, productID, isRefund) }
         }
     }
 }

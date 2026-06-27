@@ -37,6 +37,9 @@
 		68783F56FDF5A4E09D1E63BC /* RoomScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7952A6746C94C008AE553685 /* RoomScanView.swift */; };
 		69D6689E4E6C89C9823ED6CA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */; };
 		6EDB2FC337FF3F19A87F5103 /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69692D600A7D3BF194AD76C /* SupabaseConfig.swift */; };
+		BA9D64FBAE106C5D2EAD9911 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 749A89F3565DD1B52D82F9E7 /* AnalyticsService.swift */; };
+		625CBDA84DFF63D71DF0D878 /* AttributionTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9ADFA7C17E5A0AA4F689EA /* AttributionTracker.swift */; };
+		A55179D7C47F0B43FFF43060 /* AttributionTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5CFE2C839747669855D5D /* AttributionTrackerTests.swift */; };
 		6F25473B28888ABF2C5E2A56 /* SupabaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4837D735802B48E682D61BD6 /* SupabaseAuthService.swift */; };
 		7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */; };
 		738639914BF08BAF443BF5B6 /* FloorPlanEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05159C3A0182D443042BD604 /* FloorPlanEditorModel.swift */; };
@@ -129,7 +132,7 @@
 		160A7169F98D50FB48079639 /* ARPlacementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlacementTests.swift; sourceTree = "<group>"; };
 		17C1C8C652EFBF00272FCCB6 /* MeasureAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureAView.swift; sourceTree = "<group>"; };
 		1BE71453DF5C6BCFC3389C32 /* GoogleSignInCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInCoordinator.swift; sourceTree = "<group>"; };
-		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		23BC2ACFCD872AC7C1E32651 /* TapeScan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TapeScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScanService.swift; sourceTree = "<group>"; };
 		265DB6E8BF6ACF543EF68B85 /* DXFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DXFExporter.swift; sourceTree = "<group>"; };
 		3118D2DE645FBF43DC831E5A /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
@@ -166,7 +169,7 @@
 		8850CB15986A4D93B73F780D /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
 		8CCDC4A4DD7DA34F5349950A /* TrackingQualityMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingQualityMappingTests.swift; sourceTree = "<group>"; };
 		8ED38FEF71D0C5E27BE88E43 /* SessionDraftStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDraftStore.swift; sourceTree = "<group>"; };
-		8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		8F4415FC55B06D165637F018 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9383F93E0991D93B5872C43B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		946BF90A9ECD2EA492D74F8A /* SimulatedARMeasureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedARMeasureServiceTests.swift; sourceTree = "<group>"; };
 		9706822F943B7C2059A8ADBA /* UpgradeFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeFlow.swift; sourceTree = "<group>"; };
@@ -206,6 +209,9 @@
 		F534B6DECCED95D4F2624D05 /* TapeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapeScanTests.swift; sourceTree = "<group>"; };
 		F59B806941DC1F427E3ABFA8 /* SupabaseSyncRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseSyncRemote.swift; sourceTree = "<group>"; };
 		F69692D600A7D3BF194AD76C /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
+		749A89F3565DD1B52D82F9E7 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		CF9ADFA7C17E5A0AA4F689EA /* AttributionTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionTracker.swift; sourceTree = "<group>"; };
+		9FC5CFE2C839747669855D5D /* AttributionTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionTrackerTests.swift; sourceTree = "<group>"; };
 		F6F61C2EDCB344C97C164FD8 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		F8A44956BDB1D755CA082147 /* GroupedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedList.swift; sourceTree = "<group>"; };
 		FB4C6B6F6A4D0882DA4E4635 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
@@ -424,6 +430,7 @@
 				A5DF30DA91A8C0FA38C47FFD /* AppStateBrandTests.swift */,
 				CD68C91758AEAACFAC753A77 /* AppStateSettingsTests.swift */,
 				160A7169F98D50FB48079639 /* ARPlacementTests.swift */,
+				9FC5CFE2C839747669855D5D /* AttributionTrackerTests.swift */,
 				A361A4D8902413890C21444C /* CapturedRoomConverterTests.swift */,
 				B042E9C50871677AE2B1280D /* ExportersTests.swift */,
 				FF70419ED5F0DB9D3C17E834 /* FloorPlanEditorModelTests.swift */,
@@ -447,6 +454,8 @@
 				8119FF31F81C5BACBD109115 /* ARMeasureService.swift */,
 				4F8CB3AE74B68317B955F85A /* ARPlacement.swift */,
 				58509F8544E0CDE7D691B8F9 /* ARTrackingMapping.swift */,
+				749A89F3565DD1B52D82F9E7 /* AnalyticsService.swift */,
+				CF9ADFA7C17E5A0AA4F689EA /* AttributionTracker.swift */,
 				68134443D18E1CBD7201E70E /* AuthService.swift */,
 				C62B9BD32537555D9C604FCD /* PurchaseService.swift */,
 				249DFE4A3A0B69B30F50E8D1 /* RoomScanService.swift */,
@@ -612,6 +621,8 @@
 				95EE4E16BE1BEA13CB4CC66B /* AppState.swift in Sources */,
 				DCC4BA0D353B71359104D69E /* AppleSignInCoordinator.swift in Sources */,
 				EAA678EBB93AB96C28E1ACBF /* AuthFlowView.swift in Sources */,
+				BA9D64FBAE106C5D2EAD9911 /* AnalyticsService.swift in Sources */,
+				625CBDA84DFF63D71DF0D878 /* AttributionTracker.swift in Sources */,
 				D4493B2E44305E12F4EDD1FC /* AuthService.swift in Sources */,
 				83C58C90E161379EF1B6854A /* CSVExporter.swift in Sources */,
 				E0BC4C1DB5968F240F49CBCE /* CameraBackdrop.swift in Sources */,
@@ -684,6 +695,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B13706D8AC2FC630D84C5BA /* ARPlacementTests.swift in Sources */,
+				A55179D7C47F0B43FFF43060 /* AttributionTrackerTests.swift in Sources */,
 				7022DE10D9A33E3F1BA22011 /* AppStateBrandTests.swift in Sources */,
 				E8116CD6AE8B80ABF38ED4D6 /* AppStateSettingsTests.swift in Sources */,
 				F173DD288879A312B9A574EB /* CapturedRoomConverterTests.swift in Sources */,
@@ -741,7 +753,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.faisalnurarif.tapescan;
 				PRODUCT_NAME = TapeScan;
 				SDKROOT = iphoneos;
@@ -869,7 +881,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.faisalnurarif.tapescan;
 				PRODUCT_NAME = TapeScan;
 				SDKROOT = iphoneos;

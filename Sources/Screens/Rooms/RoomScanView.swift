@@ -223,6 +223,12 @@ public struct RoomScanView: View {
                 .frame(width: 90, height: 44)
         } else {
             Button {
+                // Value-moment: finishing a scan is a core feature win that seeds
+                // conversion, so stamp the attribution feature before logging.
+                appState.recordValueFeature("room_scan_finished")
+                appState.analytics.log(
+                    AnalyticsEventName.roomScanFinished,
+                    [AnalyticsParam.wallCount: .int(service.wallCount)])
                 service.finishScan()
             } label: {
                 HStack(spacing: 6) {

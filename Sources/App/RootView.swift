@@ -107,7 +107,11 @@ private struct DebugPaywallPresenter: ViewModifier {
                 set: { if !$0 { appState.debugPaywallContext = nil } })
         ) {
             PaywallView(context: appState.debugPaywallContext ?? .quotaExhausted) {
+                // Reset the live paywall source (pendingPaywallSource) for the debug
+                // entry point when the cover closes. lastSource is deliberately left
+                // intact so any out-of-band StoreKit attribution can still resolve.
                 appState.debugPaywallContext = nil
+                appState.endPaywall()
             }
             .environment(appState)
             .installTheme(Theme(appState))

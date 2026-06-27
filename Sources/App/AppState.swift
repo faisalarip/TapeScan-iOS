@@ -171,6 +171,59 @@ public final class AppState {
     /// StoreKit entitlement checks (launch + Transaction.updates listener, M3).
     public var isPro: Bool = false
 
+    // MARK: - Analytics
+    /// The analytics sink (Firebase GA4 in release, no-op/console in tests/debug).
+    /// `@ObservationIgnored` because it drives no view — it is a fire-and-forget
+    /// service handle, mirroring ``SupabaseAuthService``'s non-reactive client.
+    /// Default is the no-op impl so the app behaves identically before
+    /// ``bootstrapped()`` swaps in the real service (and with zero SDK linked).
+    @ObservationIgnored public var analytics: any AnalyticsService = NoopAnalyticsService()
+
+    /// User opt-OUT of anonymous analytics collection. Default `false` =
+    /// analytics ON (opt-out model; legitimate for first-party analytics with no
+    /// IDFA/ATT). Persisted; the Settings toggle flips it. The `didSet` mirrors
+    /// the flag into the live service and the matching user property so the
+    /// choice takes effect immediately without a relaunch.
+    public var analyticsOptOut: Bool = false {
+        didSet {
+            UserDefaults.standard.set(analyticsOptOut, forKey: "analyticsOptOut")
+            analytics.setCollectionEnabled(!analyticsOptOut)
+            analytics.setUserProperty(analyticsOptOut ? "true" : "false", for: .analyticsOptOut)
+        }
+    }
+
+    // MARK: - Attribution
+    /// The IAP entry-point attribution spine (pure value-type funnel memory).
+    /// Owned here so AppState stays the single source of truth; the durable
+    /// subset is JSON-persisted on every mutation via the `didSet`.
+    public var attribution = AttributionTracker() {
+        didSet { persistAttribution() }
+    }
+
+    /// JSON-encodes the durable subset of ``attribution`` to UserDefaults.
+    /// `AttributionTracker.CodingKeys` excludes the session-only fields, so only
+    /// the persistable state (lastSource / impressionsBySource / firstOpenAt /
+    /// sessionCount) is written.
+    private func persistAttribution() {
+        if let data = try? JSONEncoder().encode(attribution) {
+            UserDefaults.standard.set(data, forKey: "attribution")
+        }
+    }
+
+    /// Convenience pass-throughs so call sites never reach into the struct.
+    public var pendingPaywallSource: String? {
+        get { attribution.pendingSource }
+        set { attribution.pendingSource = newValue }
+    }
+    /// Sets both the live (pending) and persisted (last) paywall source — call
+    /// IMMEDIATELY before presenting the paywall at each trigger site.
+    public func beginPaywall(source: String) { attribution.beginPaywall(source: source) }
+    /// Clears the session-only pending source on dismiss; leaves lastSource so
+    /// out-of-band (Ask-to-Buy / renewal) approvals can still attribute.
+    public func endPaywall() { attribution.endPaywall() }
+    /// Stamps a core value-moment feature (first once per session, last each time).
+    public func recordValueFeature(_ feature: String) { attribution.recordValueFeature(feature) }
+
     // MARK: - Error surface
     /// The single global alert (attached in ``RootView``). Set via
     /// ``presentAlert(title:message:)`` from any failure path.
@@ -228,6 +281,11 @@ public final class AppState {
         if let raw = d.string(forKey: "density"), let v = Density(rawValue: raw) { density = v }
         if d.object(forKey: "snapEnabled") != nil { snapEnabled = d.bool(forKey: "snapEnabled") }
         if d.object(forKey: "freeExportsLeft") != nil { freeExportsLeft = d.integer(forKey: "freeExportsLeft") }
+        if d.object(forKey: "analyticsOptOut") != nil { analyticsOptOut = d.bool(forKey: "analyticsOptOut") }
+        if let data = d.data(forKey: "attribution"),
+           let t = try? JSONDecoder().decode(AttributionTracker.self, from: data) {
+            attribution = t
+        }
         hasOnboarded = d.bool(forKey: "hasOnboarded")
     }
 
@@ -239,11 +297,20 @@ public final class AppState {
     /// history|settings`, `-uiFreeExports <Int>`, `-uiPro 1`.
     public static func bootstrapped() -> AppState {
         let state = AppState()
+        // Wire the production analytics service. This only stores a handle —
+        // FirebaseAnalyticsService.init() touches NO Firebase API; collection is
+        // toggled later from the root .task and the `analyticsOptOut` didSet.
+        state.analytics = FirebaseAnalyticsService.shared
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         func value(_ flag: String) -> String? {
             guard let i = args.firstIndex(of: flag), i + 1 < args.count else { return nil }
             return args[i + 1]
+        }
+        // DEBUG-only: route analytics to a console-logging sink for verification,
+        // consistent with the other -ui* launch-argument plumbing.
+        if value("-uiAnalytics") == "console" {
+            state.analytics = DebugLoggingAnalyticsService()
         }
         switch value("-uiPhase") {
         case "onboarding": state.hasOnboarded = false
@@ -254,8 +321,12 @@ public final class AppState {
         if let n = value("-uiFreeExports").flatMap(Int.init) { state.freeExportsLeft = n }
         if value("-uiPro") == "1" { state.isPro = true }
         switch value("-uiPaywall") {
-        case "exhausted": state.debugPaywallContext = .quotaExhausted
-        case "proactive": state.debugPaywallContext = .proactive(freeExportsLeft: state.freeExportsLeft)
+        case "exhausted":
+            state.debugPaywallContext = .quotaExhausted
+            state.beginPaywall(source: PaywallSource.debug)
+        case "proactive":
+            state.debugPaywallContext = .proactive(freeExportsLeft: state.freeExportsLeft)
+            state.beginPaywall(source: PaywallSource.debug)
         default: break
         }
         #endif
@@ -273,3 +344,5 @@ public final class AppState {
         isAuthenticated = false
     }
 }
+
+

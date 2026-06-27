@@ -13,6 +13,10 @@ import SwiftUI
 /// Onboarding calibration step. `onFinish` completes onboarding (→ Measure).
 struct OnbCalibrateView: View {
     @Environment(\.theme) private var theme
+    // Analytics seam (no-op until the Firebase SDK is added by the owner). Used to
+    // fire `onboarding_completed` and stamp the matching user property when the
+    // user taps "Start Measuring". appState is injected here (and in #Preview).
+    @Environment(AppState.self) private var appState
 
     var onFinish: () -> Void = {}
 
@@ -102,8 +106,17 @@ struct OnbCalibrateView: View {
         VStack(spacing: 16) {
             trackingRow
             OnbDots(count: 3, active: 2)
-            PrimaryButton(title: "Start Measuring", icon: "ruler2") { onFinish() }
-                .accessibilityLabel("Start measuring")
+            PrimaryButton(title: "Start Measuring", icon: "ruler2") {
+                // Onboarding terminal step — the user is heading into Measure.
+                // Log the funnel completion and flip the durable user property so
+                // GA4 can segment by whether a user finished onboarding. Fired here
+                // (rather than where `appState.completeOnboarding()` lives in the
+                // parent) so the event is tied to the actual CTA tap.
+                appState.analytics.log(AnalyticsEventName.onboardingCompleted)
+                appState.analytics.setUserProperty("true", for: .onboardingCompleted)
+                onFinish()
+            }
+            .accessibilityLabel("Start measuring")
         }
     }
 

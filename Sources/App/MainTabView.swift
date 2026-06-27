@@ -36,6 +36,17 @@ public struct MainTabView: View {
             // Floating bottom tab bar.
             TabBar(selection: $appState.selectedTab)
         }
+        // Fire a GA4 `screen_view` whenever the user switches tabs. SwiftUI has no
+        // automatic screen_view, and AppState.selectedTab is the single source of
+        // truth for which of Measure/Rooms/History/Settings is on screen — so one
+        // observer here covers all four. The seam is a no-op when collection is
+        // disabled or the SDK is absent, so this is always safe to call.
+        .onChange(of: appState.selectedTab) { _, newTab in
+            appState.analytics.log(
+                AnalyticsEventName.screenView,
+                [AnalyticsParam.screenName: .string(newTab.rawValue)]
+            )
+        }
     }
 
     @ViewBuilder

@@ -149,7 +149,14 @@ struct OnbWelcomeView: View {
     private var footer: some View {
         VStack(spacing: 18) {
             OnbDots(count: 3, active: 0)
-            PrimaryButton(title: "Get Started") { onContinue() }
+            PrimaryButton(title: "Get Started") {
+                // Funnel: user cleared the welcome step. No params — this is a
+                // simple step-completion signal. Firebase is fully behind the
+                // canImport guard inside the analytics seam, so this no-ops
+                // when the SDK isn't linked.
+                appState.analytics.log(AnalyticsEventName.onboardingWelcomeCompleted)
+                onContinue()
+            }
                 .accessibilityLabel("Get started")
         }
         .padding(.horizontal, 22)

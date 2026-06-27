@@ -84,9 +84,32 @@ public struct SubscriptionPlan: Identifiable, Hashable, Sendable {
     }
 }
 
+/// The minimal, StoreKit-free receipt facts needed to log a GA4 `purchase`
+/// revenue event so entry points can be ranked by REVENUE, not just count.
+/// Optional everywhere: the preview backend and the restore path (not a new
+/// conversion) return `.success(nil)`.
+public struct PurchaseReceipt: Equatable, Sendable {
+    /// Amount charged, in `currency` units (e.g. `4.99`).
+    public let value: Decimal
+    /// ISO-4217 currency code (e.g. `"USD"`). GA4 silently DROPS `value` unless
+    /// it is sent together WITH a currency, so this gates the revenue fields.
+    public let currency: String?
+    /// StoreKit transaction id as a string (GA4 `transaction_id`).
+    public let transactionID: String?
+
+    public init(value: Decimal, currency: String?, transactionID: String?) {
+        self.value = value
+        self.currency = currency
+        self.transactionID = transactionID
+    }
+}
+
 /// Outcome of a purchase / restore attempt.
 public enum PurchaseResult: Sendable {
-    case success
+    /// A verified, finished transaction. Carries a `PurchaseReceipt` on the live
+    /// purchase path (so the paywall can log GA4 revenue); `nil` for the preview
+    /// backend and for restores (a restore is not a new conversion).
+    case success(PurchaseReceipt?)
     case cancelled
     case failed(String)
 }
@@ -106,22 +129,31 @@ public struct ProductInfo: Equatable, Sendable {
     public var id: String
     public var displayPrice: String
     public var price: Decimal
+    /// ISO-4217 currency code for `price` (e.g. `"USD"`); nil if unknown.
+    public var currencyCode: String?
     public var period: PeriodKind?
     public var hasIntroOffer: Bool
 
     public init(id: String, displayPrice: String, price: Decimal,
+                currencyCode: String? = nil,
                 period: PeriodKind?, hasIntroOffer: Bool) {
         self.id = id
         self.displayPrice = displayPrice
         self.price = price
+        self.currencyCode = currencyCode
         self.period = period
         self.hasIntroOffer = hasIntroOffer
     }
 }
 
 public enum ProductMapping {
-    public static let monthlyID = "tapescan.pro.monthly"
-    public static let annualID = "tapescan.pro.annual"
+    // These MUST exactly match the product IDs in App Store Connect. Monthly and
+    // Annual are AUTO-RENEWABLE SUBSCRIPTIONS (not consumables) in a single
+    // subscription group; Lifetime is a Non-Consumable. The `.v2` IDs were first
+    // created (in error) as Consumables — they must be recreated in App Store
+    // Connect as auto-renewable subscriptions at these same IDs.
+    public static let monthlyID = "tapescan.pro.monthly.v2"
+    public static let annualID = "tapescan.pro.annual.v2"
     public static let lifetimeID = "tapescan.pro.lifetime"
     public static let allIDs = [monthlyID, annualID, lifetimeID]
     /// The design pre-selects Annual.
@@ -218,6 +250,6 @@ public final class SimulatedPurchaseService: PurchaseService {
     }
 
     public func loadProducts() async {}
-    public func purchase(_ plan: SubscriptionPlan) async -> PurchaseResult { .success }
-    public func restore() async -> PurchaseResult { .success }
+    public func purchase(_ plan: SubscriptionPlan) async -> PurchaseResult { .success(nil) }
+    public func restore() async -> PurchaseResult { .success(nil) }
 }

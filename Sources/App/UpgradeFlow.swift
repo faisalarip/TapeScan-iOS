@@ -1,12 +1,12 @@
-// UpgradeFlow.swift — gates the paywall behind sign-in.
+// UpgradeFlow.swift — opens the paywall from any "Upgrade" trigger.
 //
-// Tapping "Upgrade" must show the login page FIRST, then the paywall: Pro is
-// account-tied (cloud sync of unlimited rooms & history), so a subscription
-// always belongs to an account. If the user is already signed in, the paywall
-// is presented directly. Skipping or cancelling sign-in cancels the upgrade —
-// no paywall is shown. The paywall is presented from the auth sheet's
-// `onDismiss` so the two modals never overlap (SwiftUI presents the cover only
-// after the sheet has fully dismissed).
+// Tapping "Upgrade" shows the paywall directly so the In-App Purchases are
+// always viewable — App Review must be able to locate the IAPs without first
+// clearing a sign-in wall (Guideline 2.1(b)). Sign-in is NOT required to see
+// the plans; PaywallView still asks the user to sign in at the moment of
+// purchase, because Pro is account-tied (cloud sync of unlimited rooms &
+// history). `context` is captured at trigger time so quota-dependent copy stays
+// truthful when the cover appears.
 
 import SwiftUI
 
@@ -28,7 +28,6 @@ private struct UpgradeFlowModifier: ViewModifier {
     let appState: AppState
     let context: () -> PaywallContext
 
-    @State private var presentAuth = false
     @State private var presentPaywall = false
     /// Context captured when the flow starts, replayed when the paywall opens.
     @State private var pending: PaywallContext?
@@ -36,31 +35,24 @@ private struct UpgradeFlowModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             // Edge-trigger: the control sets `trigger = true`; consume it and
-            // branch on auth. Already signed in → paywall; otherwise → login.
+            // open the paywall directly. The plans must be viewable without an
+            // account so App Review can locate the IAPs (Guideline 2.1(b));
+            // PaywallView still gates the actual purchase behind sign-in.
             .onChange(of: trigger) { _, started in
                 guard started else { return }
                 trigger = false
                 pending = context()
-                if appState.isAuthenticated {
-                    presentPaywall = true
-                } else {
-                    presentAuth = true
-                }
+                presentPaywall = true
             }
-            // Present the paywall only AFTER the login sheet is fully dismissed,
-            // and only if the user actually signed in (skip/cancel → no paywall).
-            .sheet(isPresented: $presentAuth, onDismiss: {
-                if appState.isAuthenticated, pending != nil {
-                    presentPaywall = true
-                } else {
-                    pending = nil
-                }
+            // On dismiss, clear the captured context AND reset the live paywall
+            // source (pendingSource) so a later, source-less event can't be
+            // mis-attributed to this entry point. We deliberately leave
+            // attribution.lastSource intact so the source-less StoreKit listener
+            // can still attribute a later Ask-to-Buy approval or renewal.
+            .fullScreenCover(isPresented: $presentPaywall, onDismiss: {
+                pending = nil
+                appState.endPaywall()
             }) {
-                AuthFlowView { presentAuth = false }
-                    .environment(appState)
-                    .installTheme(Theme(appState))
-            }
-            .fullScreenCover(isPresented: $presentPaywall, onDismiss: { pending = nil }) {
                 PaywallView(context: pending ?? .quotaExhausted) {
                     presentPaywall = false
                 }

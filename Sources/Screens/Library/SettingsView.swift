@@ -25,7 +25,6 @@ public struct SettingsView: View {
 
     // Local interactive state for controls that are not global tweaks.
     @State private var showPaywall = false
-    @State private var showManageSubscriptions = false
     @State private var isRestoring = false
     @State private var showAuthSheet = false
     @State private var showDeleteConfirm = false
@@ -56,6 +55,7 @@ public struct SettingsView: View {
                                    brand: $appState.brand)
                         accountGroup
                         purchasesGroup
+                        privacyGroup
                         aboutGroup
                     }
                     .padding(.horizontal, 18)
@@ -64,7 +64,6 @@ public struct SettingsView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
         }
-        .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
         .sheet(isPresented: $showAuthSheet) {
             AuthFlowView { showAuthSheet = false }
                 .environment(appState)
@@ -106,7 +105,13 @@ public struct SettingsView: View {
     // MARK: - Pro upsell
 
     private var proUpsell: some View {
-        Button(action: { showPaywall = true }) {
+        // Stamp the entry-point source onto the attribution spine BEFORE opening
+        // the paywall so the impression/purchase events are attributed to the
+        // Settings upsell (last-touch). UpgradeFlow.onDismiss clears pendingSource.
+        Button(action: {
+            appState.beginPaywall(source: PaywallSource.settingsUpsell)
+            showPaywall = true
+        }) {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: theme.r(12), style: .continuous)
@@ -306,12 +311,23 @@ public struct SettingsView: View {
             DRow(icon: "gear",
                  title: "Manage Subscription",
                  last: true,
-                 action: { showManageSubscriptions = true }, accessory: {
+                 action: { openURL(Self.manageSubscriptionsURL) }, accessory: {
                 Chevron()
             })
             .accessibilityLabel("Manage Subscription")
         }
     }
+
+    // Apple's account-level subscription management page. We deliberately open
+    // this URL instead of StoreKit's native `.manageSubscriptionsSheet` /
+    // `AppStore.showManageSubscriptions(in:)`: that in-app sheet talks to Apple's
+    // subscription service directly and renders its own "Cannot Connect / Retry"
+    // error state when the account has no active subscription or the sandbox
+    // can't reach the service — which is exactly what App Review hit on iPad
+    // (Guideline 2.1(b) rejection). The URL hands off to the App Store / Settings
+    // and always resolves, with no in-app connection to fail.
+    private static let manageSubscriptionsURL =
+        URL(string: "https://apps.apple.com/account/subscriptions")!
 
     private func restorePurchases() async {
         guard !isRestoring else { return }
@@ -321,12 +337,48 @@ public struct SettingsView: View {
         switch result {
         case .success:
             appState.isPro = true
+            // Funnel event: restore succeeded from the Settings origin. Also
+            // refresh the is_pro user property so segments stay accurate.
+            appState.analytics.log(AnalyticsEventName.paywallRestoreResult, [
+                AnalyticsParam.result: .string("success"),
+                AnalyticsParam.restoreOrigin: .string("settings"),
+            ])
+            appState.analytics.setUserProperty("true", for: .isPro)
             appState.presentAlert(title: "Purchases restored",
                                   message: "TapeScan Pro is active on this device.")
         case .cancelled:
-            break
+            appState.analytics.log(AnalyticsEventName.paywallRestoreResult, [
+                AnalyticsParam.result: .string("cancelled"),
+                AnalyticsParam.restoreOrigin: .string("settings"),
+            ])
         case .failed(let message):
+            appState.analytics.log(AnalyticsEventName.paywallRestoreResult, [
+                AnalyticsParam.result: .string("failed"),
+                AnalyticsParam.restoreOrigin: .string("settings"),
+            ])
             appState.presentAlert(title: "Restore didn't complete", message: message)
+        }
+    }
+
+    // MARK: - Privacy
+
+    /// First-party usage analytics opt-out. We persist `analyticsOptOut` (default
+    /// false = collection ON) on AppState, but present the control inverted for
+    /// honest labeling: the toggle reads "on = sharing enabled". Flipping it runs
+    /// AppState.analyticsOptOut's didSet, which toggles GA4 collection and mirrors
+    /// the flag into a user property. No IDFA, no ATT, no personal data.
+    private var privacyGroup: some View {
+        DListSection(header: "Privacy") {
+            DRow(icon: "share",
+                 title: "Share anonymous usage analytics",
+                 subtitle: "Helps us improve TapeScan. No personal data or ads.",
+                 last: true, accessory: {
+                IOSToggle(isOn: Binding(
+                    get: { !appState.analyticsOptOut },
+                    set: { appState.analyticsOptOut = !$0 }))
+                    .accessibilityLabel("Share anonymous usage analytics")
+                    .accessibilityValue(appState.analyticsOptOut ? "Off" : "On")
+            })
         }
     }
 

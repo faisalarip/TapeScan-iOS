@@ -54,7 +54,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "tapescan.pro.monthly",
+          "productID" : "tapescan.pro.monthly.v2",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Pro Monthly",
           "subscriptionGroupID" : "21000001",
@@ -83,7 +83,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "tapescan.pro.annual",
+          "productID" : "tapescan.pro.annual.v2",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Pro Annual",
           "subscriptionGroupID" : "21000001",

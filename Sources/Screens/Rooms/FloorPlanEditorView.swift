@@ -335,6 +335,13 @@ public struct FloorPlanEditorView: View {
         do {
             try room.updatePlan(editor.normalizedPlan())
             try modelContext.save()
+            // Value-moment: a successfully saved floor-plan edit is one of the
+            // core moments that can seed a later conversion, so stamp it on the
+            // attribution spine (first/last value-feature) and emit the funnel
+            // event before dismissing. The analytics seam is a no-op when the
+            // Firebase SDK is absent or the user has opted out.
+            appState.recordValueFeature("floor_plan_saved")
+            appState.analytics.log(AnalyticsEventName.floorPlanSaved)
             dismiss()
         } catch {
             appState.presentAlert(title: "Couldn't save plan",

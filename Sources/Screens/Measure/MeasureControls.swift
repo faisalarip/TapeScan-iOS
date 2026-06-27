@@ -34,6 +34,13 @@ enum MeasureSession {
                                                result: result)
             context.insert(record)
             try context.save()
+            // Value-moment: a measurement was finalized + persisted. Seed the
+            // attribution spine (first-/last-value-feature) so the paywall can
+            // later attribute conversions to this feature, then log the funnel
+            // event with the (low-cardinality) measure mode. No PII.
+            appState.recordValueFeature("measure_finished")
+            appState.analytics.log(AnalyticsEventName.measureFinished,
+                                   [AnalyticsParam.mode: .string(result.mode.rawValue)])
             // Confirm the save: a visible toast + a success haptic (the screen also
             // clears and a new History row appears) — finishing is never silent.
             appState.presentNotice("Measurement saved")
@@ -60,6 +67,11 @@ enum MeasureSession {
     @discardableResult
     static func place(_ service: any ARMeasureService, appState: AppState) -> Bool {
         let placed = service.placePoint() != nil
+        // Core engagement signal: log every point-placement attempt with whether a
+        // surface was actually hit (no PII; just a bool). Routed through the
+        // AnalyticsService seam, which no-ops when the SDK/collection is off.
+        appState.analytics.log(AnalyticsEventName.measurePointPlaced,
+                               [AnalyticsParam.hit: .bool(placed)])
         if placed {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         } else {

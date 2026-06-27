@@ -100,6 +100,8 @@ public struct RoomsView: View {
     private var scanEntry: some View {
         if RoomScanService.isSupported {
             Button {
+                // Funnel: user opened the room-scan flow (engagement signal).
+                appState.analytics.log(AnalyticsEventName.roomScanStarted)
                 showScan = true
             } label: {
                 HStack(spacing: 14) {
@@ -211,6 +213,11 @@ public struct RoomsView: View {
                                         usdzFilename: usdzFilename)
             modelContext.insert(record)
             try modelContext.save()
+            // Value-moment: a completed scan is now persisted as a RoomRecord.
+            // Stamp attribution (first/last value-feature) before logging so the
+            // paywall funnel can later credit this feature for the conversion.
+            appState.recordValueFeature("room_saved")
+            appState.analytics.log(AnalyticsEventName.roomSaved)
             exportRoom = record
         } catch {
             appState.presentAlert(title: "Couldn't save room",

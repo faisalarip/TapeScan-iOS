@@ -96,9 +96,15 @@ public struct ExportView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     header
-                    quotaMeter
-                        .padding(.horizontal, 18)
-                        .padding(.bottom, 14)
+                    // The free-export meter is a non-Pro affordance only. Pro
+                    // unlocks unlimited exports, so hide the "N of 3 free exports
+                    // left / Go Pro" banner entirely once `isPro` is true —
+                    // otherwise a paid subscriber keeps seeing an upgrade prompt.
+                    if !appState.isPro {
+                        quotaMeter
+                            .padding(.horizontal, 18)
+                            .padding(.bottom, 14)
+                    }
                     preview
                         .padding(.horizontal, 18)
                     formatGrid
@@ -129,6 +135,14 @@ public struct ExportView: View {
                 if completed, !appState.isPro {
                     appState.freeExportsLeft = max(0, appState.freeExportsLeft - 1)
                 }
+                // Funnel: a completed share is where a free export is actually
+                // spent. Log the remaining quota AFTER the decrement above so the
+                // value reflects what the user has left going into the paywall.
+                if completed {
+                    appState.analytics.log(
+                        AnalyticsEventName.exportShared,
+                        [AnalyticsParam.freeExportsLeft: .int(appState.freeExportsLeft)])
+                }
             }
         }
         .fullScreenCover(isPresented: $showPlanEditor) {
@@ -144,6 +158,10 @@ public struct ExportView: View {
             if room?.usdzFilename == nil {
                 formats.removeAll { $0.format == .usdz }
             }
+            // Funnel: the export screen is a key step on the conversion path
+            // (both paywall entry points live here). No PII — room names/paths
+            // are never logged.
+            appState.analytics.log(AnalyticsEventName.exportScreenOpened)
         }
         // Surface "Export failed" even though this screen is presented as a cover.
         .appAlert(appState)
@@ -181,6 +199,12 @@ public struct ExportView: View {
 
     private var quotaMeter: some View {
         Button {
+            // Attribution spine: stamp the source for THIS entry point before
+            // opening the paywall. The quota-meter and the locked CTA share one
+            // `showPaywall` binding, so each trigger site must set its own source
+            // — that's the whole point: it lets GA4 tell the two strongest export
+            // entry points apart. Reset happens on dismiss in UpgradeFlow.
+            appState.beginPaywall(source: PaywallSource.exportQuotaMeter)
             showPaywall = true
         } label: {
             HStack(spacing: 11) {
@@ -254,7 +278,10 @@ public struct ExportView: View {
                 quantityChip("VOL", UnitFormat.volume(quantities.volumeCubicMeters, theme.unit))
                 Spacer(minLength: 0)
                 if room != nil {
-                    Button { showPlanEditor = true } label: {
+                    Button {
+                        appState.analytics.log(AnalyticsEventName.floorPlanEditOpened)
+                        showPlanEditor = true
+                    } label: {
                         HStack(spacing: 5) {
                             Icon("ruler2", size: 12, weight: 2, color: theme.accent)
                             Text("Edit Plan")
@@ -425,6 +452,9 @@ public struct ExportView: View {
     private func exportTapped() {
         // Locked (no quota left, not Pro): straight to the paywall.
         guard !locked else {
+            // Distinct source from the quota meter so the funnel attributes the
+            // locked-CTA path separately (shares the same `showPaywall` binding).
+            appState.beginPaywall(source: PaywallSource.exportCtaLocked)
             showPaywall = true
             return
         }
@@ -459,6 +489,14 @@ public struct ExportView: View {
                 return
             }
             isExporting = false
+            // Value-moment: files generated successfully. Stamp the attribution
+            // feature (firstValueFeature once, lastValueFeature every time) so a
+            // later conversion can be credited to "export_generated", then log the
+            // engagement event with how many formats were produced.
+            appState.recordValueFeature("export_generated")
+            appState.analytics.log(
+                AnalyticsEventName.exportGenerated,
+                [AnalyticsParam.formatsCount: .int(selected.count)])
             shareURLs = urls
             showShareSheet = true
             // NOTE: the free-export quota is spent on share COMPLETION, not here —
