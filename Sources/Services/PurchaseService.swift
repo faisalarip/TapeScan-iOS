@@ -149,11 +149,11 @@ public struct ProductInfo: Equatable, Sendable {
 public enum ProductMapping {
     // These MUST exactly match the product IDs in App Store Connect. Monthly and
     // Annual are AUTO-RENEWABLE SUBSCRIPTIONS (not consumables) in a single
-    // subscription group; Lifetime is a Non-Consumable. The `.v2` IDs were first
-    // created (in error) as Consumables — they must be recreated in App Store
-    // Connect as auto-renewable subscriptions at these same IDs.
-    public static let monthlyID = "tapescan.pro.monthly.v2"
-    public static let annualID = "tapescan.pro.annual.v2"
+    // subscription group ("Pro Scanner"); Lifetime is a Non-Consumable. The
+    // `.sub` IDs are the auto-renewable subscriptions configured in App Store
+    // Connect (tapescan.pro.monthly.sub / tapescan.pro.annual.sub).
+    public static let monthlyID = "tapescan.pro.monthly.sub"
+    public static let annualID = "tapescan.pro.annual.sub"
     public static let lifetimeID = "tapescan.pro.lifetime"
     public static let allIDs = [monthlyID, annualID, lifetimeID]
     /// The design pre-selects Annual.
