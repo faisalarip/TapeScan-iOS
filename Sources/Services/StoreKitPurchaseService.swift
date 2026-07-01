@@ -144,8 +144,23 @@ public final class StoreKitPurchaseService: PurchaseService {
         return nil
     }
 
+    /// Pure decision: does a just-received transaction, on its own, prove a
+    /// CURRENT Pro entitlement? Kept free of StoreKit types (like ``ProductMapping``)
+    /// so the "a fresh grant can't be clobbered by a lagging snapshot" rule is
+    /// unit-tested. A transaction grants Pro now iff it's a Pro product, not
+    /// revoked/refunded, and not past its expiry (a nil `expirationDate` is the
+    /// lifetime non-consumable, which never expires).
+    nonisolated static func transactionGrantsProNow(productID: String,
+                                                     isRevoked: Bool,
+                                                     expirationDate: Date?,
+                                                     now: Date) -> Bool {
+        guard !isRevoked, ProductMapping.allIDs.contains(productID) else { return false }
+        if let expiry = expirationDate { return expiry > now }
+        return true
+    }
+
     /// Long-running listener: finishes incoming verified transactions
-    /// (renewals, Ask-to-Buy approvals, refunds) and reports the recomputed
+    /// (renewals, Ask-to-Buy approvals, refunds) and reports the resolved
     /// entitlement. Run from the app root's `.task`.
     ///
     /// The callback is widened beyond the bare `isPro` flag so the analytics
@@ -162,12 +177,29 @@ public final class StoreKitPurchaseService: PurchaseService {
             // Capture attribution-relevant facts only from verified transactions.
             var productID = ""
             var isRefund = false
+            // Does THIS update, by itself, prove a current Pro entitlement?
+            // `Transaction.currentEntitlements` lags briefly right after a
+            // purchase in the StoreKit-testing / Sandbox environments, so the
+            // recompute below can momentarily return `false` for an entitlement
+            // that was just granted. We OR this fresh-grant fact in so the
+            // listener can never downgrade a just-verified purchase back to
+            // `false` — the exact race that made the paywall/Pro card require a
+            // second subscribe to stick.
+            var grantsProNow = false
             if case .verified(let transaction) = update {
                 productID = transaction.productID
                 isRefund = transaction.revocationDate != nil
+                grantsProNow = transactionGrantsProNow(
+                    productID: transaction.productID,
+                    isRevoked: isRefund,
+                    expirationDate: transaction.expirationDate,
+                    now: Date())
                 await transaction.finish()
             }
-            let isPro = await currentEntitlementIsPro()
+            // Refunds/expirations still flip Pro off via the authoritative
+            // recompute (grantsProNow is false for those); only a valid, fresh
+            // grant forces `true` regardless of snapshot lag.
+            let isPro = await currentEntitlementIsPro() || grantsProNow
             await MainActor.run { onChange(isPro, productID, isRefund) }
         }
     }

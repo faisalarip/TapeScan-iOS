@@ -40,8 +40,16 @@ public struct PaywallView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.openURL) private var openURL
 
-    /// Injected purchasing seam (StoreKit 2 in production).
-    private let service: any PurchaseService
+    /// Injected purchasing seam (StoreKit 2 in production). Held in `@State` so the
+    /// SAME instance — and the plans it already loaded — survives SwiftUI
+    /// re-initializing this view. Returning from Safari after tapping Terms/Privacy
+    /// re-evaluates the presenting `fullScreenCover` content, which re-runs this
+    /// view's initializer; a plain stored property would be replaced with a fresh,
+    /// empty service stuck on its initial `.loading` state (the `.task` that loads
+    /// products only runs on first appear, not on that re-init), leaving the price
+    /// list spinning forever. `@State`'s initial value is captured once, so the
+    /// originally-loaded service is retained across every re-init.
+    @State private var service: any PurchaseService
     /// Why the sheet was opened — selects a non-false hero sub-headline.
     private let context: PaywallContext
     /// Dismiss handler (close button + successful purchase).
@@ -55,7 +63,7 @@ public struct PaywallView: View {
     public init(service: any PurchaseService,
                 context: PaywallContext = .quotaExhausted,
                 onClose: @escaping () -> Void = {}) {
-        self.service = service
+        _service = State(initialValue: service)
         self.context = context
         self.onClose = onClose
         _selectionID = State(initialValue: service.defaultSelectionID)
